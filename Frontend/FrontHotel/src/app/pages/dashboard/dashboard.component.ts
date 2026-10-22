@@ -1,4 +1,4 @@
-import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterOutlet, RouterLink, RouterLinkActive } from '@angular/router';
 import { AuthService } from '../../core/services/auth.service';
@@ -18,8 +18,7 @@ export class DashboardComponent implements OnInit {
 
   constructor(
     private router: Router,
-    private authService: AuthService,
-    private cdr: ChangeDetectorRef
+    private authService: AuthService
   ) {}
 
   ngOnInit(): void {
@@ -29,23 +28,19 @@ export class DashboardComponent implements OnInit {
         const payload = JSON.parse(atob(token.split('.')[1]));
         this.username = payload.sub || localStorage.getItem('username') || 'Usuario';
         
-        // Extraer roles del token
-        const roles = payload.role || payload.roles || payload.authorities || payload.roles || [];
-        let rawRole = '';
+        // Tu backend envía siempre 'roles' como un Array de Strings
+        const roles = payload.roles || [];
         if (Array.isArray(roles) && roles.length > 0) {
-          rawRole = typeof roles[0] === 'string' ? roles[0] : (roles[0].authority || roles[0].name || '');
-        } else if (typeof roles === 'string') {
-          rawRole = roles.split(',')[0].trim();
+          this.userRole = roles[0].replace(/^ROLE_/i, '').trim();
         }
-        this.userRole = rawRole.replace(/^ROLE_/i, '').trim().split(' ')[0];
 
-        // 1. Revisar si ya tenemos el ID en localStorage
+        // 1. Revisar si tenemos el ID en localStorage
         const storedId = localStorage.getItem('userId');
         if (storedId) {
           this.userId = Number(storedId);
           this.loadProfilePictureById(this.userId);
         } else if (this.username && this.username !== 'Usuario') {
-          // 2. Si no está en localStorage, lo consultamos con el endpoint público por username
+          // 2. Si no está en localStorage, lo consultamos
           this.authService.getUserIdByUsername(this.username).subscribe({
             next: (id) => {
               if (id) {
@@ -55,7 +50,7 @@ export class DashboardComponent implements OnInit {
               }
             },
             error: (err) => {
-              console.warn('No se pudo obtener el ID del usuario por username:', err);
+              console.warn('No se pudo obtener el ID del usuario:', err);
             }
           });
         }
@@ -67,8 +62,12 @@ export class DashboardComponent implements OnInit {
   }
 
   loadProfilePictureById(id: number): void {
-    this.avatarUrl = `http://localhost:8080/public/auth/${id}/profile-picture?t=${new Date().getTime()}`;//se ingresan la fecha actual por parametro para actualizar el cache y actuaiizar la url de la imagen
-    this.cdr.markForCheck();
+    this.avatarUrl = `http://localhost:8080/public/auth/${id}/profile-picture?t=${new Date().getTime()}`;
+  }
+
+  // Método seguro para manejar el error de la imagen sin bucles infinitos
+  onAvatarError(): void {
+    this.avatarUrl = null; // Cambia la variable de forma controlada
   }
 
   logout(): void {
