@@ -1,8 +1,10 @@
 <div class="dashboard-layout">
+  <!-- Barra Lateral (Sidebar) -->
   <aside class="sidebar">
     <div class="sidebar-header">
       <h2><i class="fa-solid fa-hotel"></i> Ultimate Hotel Software</h2>
     </div>
+    
     <nav class="sidebar-nav">
       <a routerLink="/dashboard" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">
         <i class="fa-solid fa-table-cells-large"></i> Inicio
@@ -10,7 +12,7 @@
       <a routerLink="/dashboard/bookings" routerLinkActive="active">
         <i class="fa-solid fa-calendar-days"></i> Reservas
       </a>
-      <a routerLink="/dashboard/check-ins" routerLinkActive="active" class="nav-link">
+      <a routerLink="/dashboard/check-ins" routerLinkActive="active">
         <i class="fa-solid fa-circle-check"></i> Estadías (Check-Ins)
       </a>
       <a routerLink="/dashboard/rooms" routerLinkActive="active">
@@ -38,8 +40,9 @@
         <i class="fa-solid fa-id-badge"></i> Empleados
       </a>
     </nav>
+
     <div class="sidebar-footer">
-      <button (click)="logout()" class="btn-logout">
+      <button (click)="logout()" class="btn-logout-custom">
         <i class="fa-solid fa-right-from-bracket"></i> Cerrar Sesión
       </button>
     </div>
@@ -49,41 +52,41 @@
   <main class="main-content">
     <header class="top-bar">
       <h3>Panel de Administración</h3>
+      
       <div class="top-bar-right">
         <div class="top-actions">
-          <button class="icon-btn" title="Notificaciones">
+          <button class="icon-btn-custom" title="Notificaciones">
             <i class="fa-regular fa-bell"></i>
           </button>
-          <button class="icon-btn" title="Configuración">
+          <button class="icon-btn-custom" title="Configuración">
             <i class="fa-solid fa-gear"></i>
           </button>
         </div>
-        <div class="divider"></div>
+        
+        <div class="divider-custom"></div>
         
         <!-- Perfil de usuario en la barra superior -->
         <div class="user-profile-container">
           <div class="user-avatar-wrapper">
             @if (avatarUrl) {
-                <img [src]="avatarUrl" 
-                    (error)="avatarUrl = null" 
-                    alt="Avatar" 
-                    class="top-user-avatar">
+              <img [src]="avatarUrl" 
+                   (error)="avatarUrl = null" 
+                   alt="Avatar" 
+                   class="top-user-avatar">
             } @else {
-                <i class="fa-solid fa-user"></i> 
-            }
-            
-            <ng-template #defaultIcon>
               <div class="top-user-default-icon">
                 <i class="fa-solid fa-user"></i>
               </div>
-            </ng-template>
+            }
           </div>
-          <span class="user-info">
+          
+          <span class="user-info-text">
             Bienvenido, <strong>{{ username }}</strong> 
-            <span class="text-muted" *ngIf="userRole">({{ userRole }})</span>
+            @if (userRole) {
+              <span class="text-muted">({{ userRole }})</span>
+            }
           </span>
         </div>
-
       </div>
     </header>
     

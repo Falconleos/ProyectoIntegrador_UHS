@@ -9,7 +9,13 @@ export const routes: Routes = [
     },
     {
         path:'dashboard',
-        component:DashboardComponent
+        component:DashboardComponent,
+        children:[
+            {
+                path:'usuarios',
+                loadComponent:()=>import('./components/user-list/user-list.component').then(m=>m.UserListComponent)
+            }
+        ]
     },
     {
         path:'**',

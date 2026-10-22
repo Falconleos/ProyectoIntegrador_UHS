@@ -17,6 +17,7 @@ export interface UserDtoResponse {
   credentialsNonExpired?: boolean;
   enabled?: boolean;
   profilePicture?: string;
+  role:RoleType
 }
 
 export interface UserDtoRequest {

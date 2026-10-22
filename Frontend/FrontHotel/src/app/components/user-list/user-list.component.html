@@ -1,0 +1,147 @@
+<div class="container mt-4">
+  <div class="d-flex justify-content-between align-items-center mb-4 header-section">
+    <h2><i class="fa-solid fa-users-gear me-2"></i> Gestión de Usuarios (Huéspedes)</h2>
+    <button 
+        class="btn-custom btn-primary-custom" 
+        (click)="goToNewUser()" 
+        [disabled]="!canModify">
+        <i class="fa-solid fa-user-plus me-2"></i> Nuevo Usuario
+    </button>
+  </div>
+  <hr class="mb-4">
+
+  <!-- Mensajes de carga o error -->
+  @if (loading) {
+    <div class="alert-custom alert-info-custom">
+      <i class="fa-solid fa-spinner fa-spin me-2"></i> Cargando registros...
+    </div>
+  }
+
+  @if (errorMessage) {
+    <div class="alert-custom alert-danger-custom">
+      <i class="fa-solid fa-triangle-exclamation me-2"></i> {{ errorMessage }}
+    </div>
+  }
+
+  <!-- Tabla de datos con miniaturas, clickeable -->
+  @if (!loading && !errorMessage && users.length > 0) {
+    <div class="table-responsive-custom">
+      <table class="table-custom">
+        <thead>
+          <tr>
+            <th style="width: 60px;">Avatar</th>
+            <th>Username</th>
+            <th>Nombre y Apellido</th>
+            <th>DNI</th>
+            <th>Teléfono</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (user of users; track user.id) {
+            <tr (click)="openUserDetail(user)" title="Haz clic para ver detalles" class="table-row-clickable">
+              <td>
+                <img [src]="getUserAvatarUrl(user)" 
+                     alt="Avatar" 
+                     class="rounded-circle-avatar-sm" 
+                     width="36" 
+                     height="36">
+              </td>
+              <td><strong>{{ user.username }}</strong></td>
+              <td>{{ user.name }} {{ user.surname }}</td>
+              <td>{{ user.dni }}</td>
+              <td>{{ user.phoneNumber || '-' }}</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+
+  <!-- Mensaje si la lista está vacía -->
+  @if (!loading && !errorMessage && users.length === 0) {
+    <div class="alert-warning-custom">
+      <i class="fa-solid fa-circle-info me-2"></i> No se encontraron usuarios con el rol GUEST registrados en el sistema.
+    </div>
+  }
+
+  <!-- MODAL FLOTANTE DE DETALLE (Ficha de Usuario) -->
+  @if (selectedUser) {
+    <div class="modal-backdrop-custom" (click)="closeUserDetail()">
+      <div class="modal-card-custom" (click)="$event.stopPropagation()">
+        
+        <!-- Botón cerrar -->
+        <button class="btn-close-modal" (click)="closeUserDetail()">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+
+        <!-- Ficha de Datos -->
+        <div class="text-center mb-4">
+          <img 
+            [src]="getUserAvatarUrl(selectedUser)"
+            alt="Avatar" 
+            class="rounded-circle-avatar mb-3" 
+            width="100" 
+            height="100">
+          <h3 class="user-modal-title">{{ selectedUser.name }} {{ selectedUser.surname }}</h3>
+          <p class="user-modal-subtitle">&#64;{{ selectedUser.username }}</p>
+        </div>
+
+        <div class="user-details-grid">
+          <div class="detail-item">
+            <span class="detail-label"><i class="fa-solid fa-id-card me-1"></i> DNI:</span>
+            <span class="detail-value">{{ selectedUser.dni }}</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label"><i class="fa-solid fa-envelope me-1"></i> Email:</span>
+            <span class="detail-value">{{ selectedUser.email }}</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label"><i class="fa-solid fa-phone me-1"></i> Teléfono:</span>
+            <span class="detail-value">{{ selectedUser.phoneNumber || 'No especificado' }}</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label"><i class="fa-solid fa-location-dot me-1"></i> Dirección:</span>
+            <span class="detail-value">{{ selectedUser.address || 'No especificada' }}</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label"><i class="fa-solid fa-venus-mars me-1"></i> Género:</span>
+            <span class="detail-value">{{ selectedUser.gender || 'No especificado' }}</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label"><i class="fa-solid fa-shield-halved me-1"></i> Roles:</span>
+            <span class="detail-value">
+              @for (role of selectedUser.role; track role; let last = $last) {
+                <span class="badge-custom badge-secondary-custom me-1">
+                  {{ role }}{{ !last ? ', ' : '' }}
+                </span>
+              }
+            </span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label"><i class="fa-solid fa-toggle-on me-1"></i> Estado:</span>
+            <span class="detail-value">
+              @if (selectedUser.enabled) {
+                <span class="badge-custom badge-success-custom">Activo</span>
+              } @else {
+                <span class="badge-custom badge-danger-custom">Inactivo</span>
+              }
+            </span>
+          </div>
+        </div>
+
+        <!-- Acciones dentro del modal -->
+        @if (canModify) {
+          <div class="mt-4 pt-3 border-top border-secondary d-flex justify-content-end gap-2">
+            <button class="btn-warning-custom" [routerLink]="['/dashboard/usuarios/editar', selectedUser.id]" (click)="closeUserDetail()">
+              <i class="fa-solid fa-pen-to-square me-1"></i> Editar
+            </button>
+            <button class="btn-danger-custom" (click)="deleteUserModal(selectedUser.id)">
+              <i class="fa-solid fa-trash-can me-1"></i> Eliminar
+            </button>
+          </div>
+        }
+
+      </div>
+    </div>
+  }
+</div>

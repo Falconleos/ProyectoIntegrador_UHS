@@ -1,5 +1,187 @@
-*{
-    box-sizing: border-box;
-    padding: 0;
-    margin: 0;
+/* ==========================================
+   ESTILOS GLOBALES - HOTEL APP
+   ========================================== */
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background-color: #0f172a;
+  color: #f8fafc;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+/* Alertas compartidas */
+.alert-custom {
+  border-radius: 10px;
+  font-size: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 1rem;
+  display: flex;
+  align-items: center;
+}
+.alert-danger-custom {
+  background: rgba(239, 68, 68, 0.15);
+  color: #fca5a5;
+  border-color: rgba(239, 68, 68, 0.3);
+}
+
+/* Botones compartidos */
+.btn-custom {
+  font-weight: 600;
+  font-size: 14px;
+  border-radius: 10px;
+  padding: 12px;
+  height: 46px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  cursor: pointer;
+  border: 1px solid transparent;
+}
+.btn-primary-custom {
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.4), rgba(79, 70, 229, 0.2));
+  border-color: rgba(129, 140, 248, 0.3);
+  color: #ffffff;
+}
+.btn-primary-custom:hover:not(:disabled) {
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.6), rgba(79, 70, 229, 0.4));
+}
+.btn-custom:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* Formularios compartidos */
+.form-label-custom {
+  color: #94a3b8;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 8px;
+  display: block;
+}
+.form-input-custom {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #f8fafc;
+  padding: 10px 16px;
+  height: 44px;
+  font-size: 14px;
+  width: 100%;
+}
+.form-input-custom:focus {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(129, 140, 248, 0.5);
+  outline: none;
+}
+
+/* Flexbox utilidades básicas */
+.d-flex { display: flex; }
+.flex-column { flex-direction: column; }
+.align-items-center { align-items: center; }
+.justify-content-between { justify-content: space-between; }
+.justify-content-center { justify-content: center; }
+.flex-1 { flex: 1; }
+
+/* Scrollbars personalizados unificados */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.25);
+}
+
+/* Divisor sutil unificado */
+.divider-custom {
+  width: 1px;
+  height: 24px;
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+/* Alertas de advertencia compartidas */
+.alert-warning-custom {
+  background: rgba(245, 158, 11, 0.15);
+  color: #fcd34d;
+  border: 1px solid rgba(245, 158, 11, 0.3);
+  border-radius: 10px;
+  padding: 1rem;
+  display: flex;
+  align-items: center;
+  backdrop-filter: blur(10px);
+}
+
+/* Botones de acción secundarios/peligro unificados */
+.btn-warning-custom {
+  background: rgba(245, 158, 11, 0.2);
+  border: 1px solid rgba(245, 158, 11, 0.3);
+  color: #fcd34d;
+  padding: 6px 10px;
+  border-radius: 6px;
+  font-weight: 600;
+  font-size: 12px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.2s ease;
+}
+.btn-warning-custom:hover {
+  background: rgba(245, 158, 11, 0.35);
+  color: #ffffff;
+}
+
+.btn-danger-custom {
+  background: rgba(239, 68, 68, 0.2);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  color: #fca5a5;
+  padding: 6px 10px;
+  border-radius: 6px;
+  font-weight: 600;
+  font-size: 12px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.2s ease;
+}
+.btn-danger-custom:hover {
+  background: rgba(239, 68, 68, 0.35);
+  color: #ffffff;
+}
+
+/* Badges unificados */
+.badge-custom {
+  font-weight: 600;
+  padding: 6px 10px;
+  font-size: 11px;
+  border-radius: 6px;
+  display: inline-flex;
+  align-items: center;
+}
+.badge-secondary-custom {
+  background: rgba(255, 255, 255, 0.08);
+  color: #cbd5e1;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+.badge-success-custom {
+  background: rgba(16, 185, 129, 0.2);
+  color: #34d399;
+  border: 1px solid rgba(16, 185, 129, 0.3);
+}
+.badge-danger-custom {
+  background: rgba(239, 68, 68, 0.2);
+  color: #fca5a5;
+  border: 1px solid rgba(239, 68, 68, 0.3);
 }

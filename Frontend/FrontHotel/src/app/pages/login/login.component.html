@@ -1,63 +1,63 @@
 <div class="login-container">
-    <div class="login-card">
+  <div class="login-card">
+    
+    <!-- Botón para volver a la landing -->
+    <a routerLink="/" class="btn-back">
+      <i class="fa-solid fa-arrow-left"></i> Volver
+    </a>
+
+    <h2><i class="fa-solid fa-hotel"></i> <span>Ultimate Hotel Software</span></h2>
+    <p class="subtitle">Inicia sesión para continuar</p>
+
+    <form [formGroup]="loginForm">
       
-      <!-- Botón para volver a la landing -->
-      <a routerLink="/" class="btn-back">
-        <i class="fa-solid fa-arrow-left"></i> Volver
-      </a>
-  
-      <h2><i class="fa-solid fa-hotel"></i> <span>Ultimate Hotel Software</span></h2>
-      <p class="subtitle">Inicia sesión para continuar</p>
-  
-      <form [formGroup]="loginForm">
-        
-        <!-- Campo Usuario -->
-        <div class="field-spacing">
-          <label for="username" class="form-label">Usuario</label>
-          <div class="input-group">
-            <span class="input-group-text"><i class="fa-solid fa-user"></i></span>
-            <input 
-              id="username" 
-              type="text" 
-              class="form-control"
-              formControlName="username" 
-              placeholder="Ingresa tu usuario"
-              required
-            />
-          </div>
+      <!-- Campo Usuario -->
+      <div class="field-spacing">
+        <label for="username" class="form-label-custom">Usuario</label>
+        <div class="input-group-custom">
+          <span class="input-group-icon"><i class="fa-solid fa-user"></i></span>
+          <input 
+            id="username" 
+            type="text" 
+            class="form-input-custom"
+            formControlName="username" 
+            placeholder="Ingresa tu usuario"
+            required
+          />
         </div>
-  
-        <!-- Campo Contraseña -->
-        <div class="field-spacing">
-          <label for="password" class="form-label">Contraseña</label>
-          <div class="input-group">
-            <span class="input-group-text"><i class="fa-solid fa-lock"></i></span>
-            <input 
-              id="password" 
-              type="password" 
-              class="form-control"
-              formControlName="password" 
-              placeholder="Ingresa tu contraseña"
-              required
-            />
-          </div>
+      </div>
+
+      <!-- Campo Contraseña -->
+      <div class="field-spacing">
+        <label for="password" class="form-label-custom">Contraseña</label>
+        <div class="input-group-custom">
+          <span class="input-group-icon"><i class="fa-solid fa-lock"></i></span>
+          <input 
+            id="password" 
+            type="password" 
+            class="form-input-custom"
+            formControlName="password" 
+            placeholder="Ingresa tu contraseña"
+            required
+          />
         </div>
-        
-        <!-- Alerta de Error-->
-        @if (errorMessage) {
-          <div class="alert alert-danger field-spacing">
-            <i class="fa-solid fa-triangle-exclamation">&nbsp;</i> {{ errorMessage }}
-          </div>
-        }
-  
-        <!-- Botón de Ingreso-->
-        <button (click)="onSubmit()" [disabled]="loginForm.invalid || loading" class="btn btn-primary btn-submit-spacing">
+      </div>
+      
+      <!-- Alerta de Error -->
+      @if (errorMessage) {
+        <div class="alert-custom alert-danger-custom field-spacing">
+          <i class="fa-solid fa-triangle-exclamation"></i>&nbsp; {{ errorMessage }}
+        </div>
+      }
+
+      <!-- Botón de Ingreso -->
+      <button type="button" (click)="onSubmit()" [disabled]="loginForm.invalid || loading" class="btn-custom btn-primary-custom btn-submit-spacing">
         @if (loading) {
           <i class="fa-solid fa-spinner fa-spin"></i>
         }
         {{ loading ? 'Ingresando...' : 'Entrar' }}
-        </button>
-  
-      </form>
-    </div>
+      </button>
+
+    </form>
   </div>
+</div>
