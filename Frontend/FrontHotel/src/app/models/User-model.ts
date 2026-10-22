@@ -48,3 +48,5 @@ export interface UserDtoRequestCreation {
   profilePictureFile?: File; 
   enabled?: boolean; 
 }
+
+export type UserDtoRequestModification = Omit<UserDtoRequestCreation,'password'|'role'|'enabled'>

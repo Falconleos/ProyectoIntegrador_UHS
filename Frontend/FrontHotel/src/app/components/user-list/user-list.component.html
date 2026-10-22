@@ -132,7 +132,7 @@
         <!-- Acciones del Modal -->
         @if (canModify) {
           <div class="modal-actions">
-            <button class="btn-warning" [routerLink]="['/dashboard/user-form', selectedUser.id]" (click)="closeUserDetail()">
+            <button class="btn-warning" [routerLink]="['/dashboard/user-edit', selectedUser.id]" (click)="closeUserDetail()">
               <i class="fa-solid fa-pen-to-square"></i> Editar
             </button>
             <button class="btn-danger" (click)="deleteUserModal(selectedUser.id)">
