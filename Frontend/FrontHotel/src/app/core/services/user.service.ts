@@ -91,4 +91,8 @@ private getHeaders(): HttpHeaders {
   return this.http.get<any>(`${this.apiUrl}/username/${username}`);
 }
 
+updateProfilePicture(id: number, formData: FormData): Observable<any> {
+    return this.http.post<any>(`${this.apiUrl}/${id}/profile-picture`, formData, { withCredentials: true });
+  }
+
 }

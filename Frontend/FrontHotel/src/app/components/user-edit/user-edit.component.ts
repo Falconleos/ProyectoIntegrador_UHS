@@ -89,10 +89,9 @@ export class UserEditComponent implements OnInit {
     this.errorMessage = '';
     this.loading = true;
 
-    // Incluimos la contraseña vacía o por defecto para satisfacer la validación del backend
-    const updatePayload: UserDtoRequest = {
+    // Usamos el DTO de modificación que no requiere password
+    const updatePayload = {
       username: this.formData.username,
-      password: '', // <--- Enviamos esto para que el backend no lance el error de que es necesaria
       name: this.formData.name,
       surname: this.formData.surname,
       dni: this.formData.dni,
@@ -103,13 +102,19 @@ export class UserEditComponent implements OnInit {
       birthDay: this.formData.birthDay ? this.formData.birthDay : ''
     };
 
+    // 1. Primero actualizamos los datos de texto
     this.userService.updateUser(this.userId, updatePayload).subscribe({
       next: () => {
-        this.loading = false;
-        alert('¡Usuario modificado con éxito!');
-        this.router.navigate(['/dashboard/usuarios']);
+        // 2. Si el usuario seleccionó una foto nueva, la subimos en paralelo/secuencia
+        if (this.formData.profilePictureFile && this.userId) {
+          this.onUploadPhoto(this.userId, this.formData.profilePictureFile);
+        } else {
+          this.loading = false;
+          alert('¡Usuario modificado con éxito!');
+          this.router.navigate(['/dashboard/usuarios']);
+        }
       },
-      error: (err) => {
+      error: (err: any) => {
         this.loading = false;
         this.errorMessage = err.error?.mensaje || err.error?.message || 'Error al actualizar el usuario.';
         this.cdr.markForCheck();
@@ -118,4 +123,25 @@ export class UserEditComponent implements OnInit {
       }
     });
   }
+
+  onUploadPhoto(userId: number, file: File): void {
+    const formData = new FormData();
+    formData.append('profilePicture', file);
+
+    this.userService.updateProfilePicture(userId, formData).subscribe({
+      next: (response: any) => {
+        this.loading = false;
+        console.log('Foto de perfil actualizada con éxito', response);
+        alert('¡Usuario y foto de perfil modificados con éxito!');
+        this.router.navigate(['/dashboard/usuarios']);
+      },
+      error: (err: any) => {
+        this.loading = false;
+        console.error('Error al actualizar la foto', err);
+        alert('Se guardaron los datos, pero hubo un error al actualizar la foto de perfil.');
+        this.router.navigate(['/dashboard/usuarios']);
+      }
+    });
+  }
+
 }
