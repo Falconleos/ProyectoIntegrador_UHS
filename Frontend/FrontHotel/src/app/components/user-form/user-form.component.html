@@ -1,0 +1,116 @@
+<div class="container">
+  <h2><i class="fa-solid fa-user-plus"></i> Crear Nuevo Usuario</h2>
+  <p class="subtitle">Agrega un nuevo perfil de huésped al sistema. Los campos marcados con un asterisco (*) son obligatorios.</p>
+  <hr class="divider">
+
+  @if (errorMessage) {
+    <div class="alert alert-danger">
+      <i class="fa-solid fa-triangle-exclamation"></i> {{ errorMessage }}
+    </div>
+  }
+
+  <form (ngSubmit)="onSubmit()" #userForm="ngForm" class="card-form">
+    
+    <!-- Sección de Datos de Cuenta -->
+    <h4 class="section-title">Datos de la Cuenta</h4>
+    <div class="form-grid">
+      <div class="field">
+        <label for="username" class="label">Usuario *</label>
+        <input type="text" id="username" class="input-field" name="username" [(ngModel)]="formData.username" required minlength="3" #username="ngModel" placeholder="ej. jperez">
+      </div>
+
+      <div class="field">
+        <label for="password" class="label">Contraseña *</label>
+        <input type="password" id="password" class="input-field" name="password" [(ngModel)]="formData.password" required minlength="6" #password="ngModel" placeholder="••••••••">
+      </div>
+    </div>
+
+    <hr class="section-divider">
+
+    <!-- Sección de Información Personal -->
+    <h4 class="section-title">Información Personal</h4>
+    <div class="form-grid">
+      <div class="field">
+        <label for="name" class="label">Nombre *</label>
+        <input type="text" id="name" class="input-field" name="name" [(ngModel)]="formData.name" required #name="ngModel" placeholder="Juan">
+      </div>
+
+      <div class="field">
+        <label for="surname" class="label">Apellido *</label>
+        <input type="text" id="surname" class="input-field" name="surname" [(ngModel)]="formData.surname" required #surname="ngModel" placeholder="Pérez">
+      </div>
+
+      <div class="field">
+        <label for="dni" class="label">DNI / Número de Identificación *</label>
+        <input type="text" id="dni" class="input-field" name="dni" [(ngModel)]="formData.dni" required #dni="ngModel" placeholder="12345678">
+      </div>
+
+      <div class="field">
+        <label for="gender" class="label">Género</label>
+        <select id="gender" class="input-field" name="gender" [(ngModel)]="formData.gender">
+          <option value="" disabled selected>Seleccione género</option>
+          <option value="Masculino">Masculino</option>
+          <option value="Femenino">Femenino</option>
+          <option value="Otro">Otro</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label for="birthDay" class="label">Fecha de Nacimiento</label>
+        <input type="date" id="birthDay" class="input-field" name="birthDay" [(ngModel)]="formData.birthDay">
+      </div>
+    </div>
+
+    <hr class="section-divider">
+
+    <!-- Sección de Datos de Contacto -->
+    <h4 class="section-title">Datos de Contacto</h4>
+    <div class="form-grid">
+      <div class="field">
+        <label for="email" class="label">Correo Electrónico *</label>
+        <input type="email" id="email" class="input-field" name="email" [(ngModel)]="formData.email" required email #email="ngModel" placeholder="juan@example.com">
+      </div>
+
+      <div class="field">
+        <label for="phoneNumber" class="label">Teléfono *</label>
+        <input type="text" id="phoneNumber" class="input-field" name="phoneNumber" [(ngModel)]="formData.phoneNumber" required #phone="ngModel" placeholder="+54 9 11...">
+      </div>
+
+      <div class="field">
+        <label for="address" class="label">Dirección</label>
+        <input type="text" id="address" class="input-field" name="address" [(ngModel)]="formData.address" placeholder="Calle Falsa 123">
+      </div>
+
+      <div class="field switch-field">
+        <div class="switch-wrapper">
+          <input class="switch-input" type="checkbox" id="enabled" name="enabled" [(ngModel)]="formData.enabled">
+          <label class="switch-label" for="enabled">Usuario activo</label>
+        </div>
+      </div>
+    </div>
+
+    <hr class="section-divider">
+
+    <!-- Sección de Foto de Perfil -->
+    <h4 class="section-title">Foto de Perfil (Opcional)</h4>
+    <div class="form-grid">
+      <div class="field full-width">
+        <label for="profilePicture" class="label">Subir Imagen (JPG, PNG - Máx. 2MB)</label>
+        <input type="file" id="profilePicture" class="input-field file-input" (change)="onFileSelected($event)" accept="image/png, image/jpeg, image/jpg">
+      </div>
+    </div>
+
+    <hr class="section-divider">
+
+    <!-- Acciones -->
+    <div class="form-actions">
+      <button type="button" class="btn-secondary" routerLink="/dashboard/usuarios">
+        Cancelar
+      </button>
+      <button type="submit" class="btn-primary" [disabled]="loading">
+        <i class="fa-solid" [ngClass]="loading ? 'fa-spinner fa-spin' : ''"></i> 
+        {{ loading ? 'Guardando...' : 'Crear Usuario' }}
+      </button>
+    </div>
+  </form>
+</div>

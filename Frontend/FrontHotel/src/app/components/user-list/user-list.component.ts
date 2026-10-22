@@ -108,7 +108,7 @@ export class UserListComponent implements OnInit {
 
   goToNewUser(): void {
     if (this.canModify) {
-      this.router.navigate(['/dashboard/usuarios/nuevo']);
+      this.router.navigate(['/dashboard/user-creation']);
     } else {
       alert('No tienes los permisos necesarios.');
     }

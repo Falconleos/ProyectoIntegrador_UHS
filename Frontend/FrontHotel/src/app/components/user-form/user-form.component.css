@@ -1,0 +1,206 @@
+/* --- Contenedor Principal --- */
+.container {
+  width: 100%;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 1.5rem;
+}
+
+/* --- Tipografía del Encabezado --- */
+h2 {
+  color: var(--color-text-main);
+  font-size: var(--font-size-lg);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 0.5rem;
+}
+
+h2 i {
+  color: var(--color-primary);
+}
+
+.subtitle {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
+  margin-bottom: 1.5rem;
+}
+
+.divider, .section-divider {
+  border: none;
+  border-top: var(--border-glass);
+  margin: 1.5rem 0;
+}
+
+/* --- Alerta de Error --- */
+.alert {
+  padding: 12px 16px;
+  border-radius: var(--radius-sm);
+  font-size: var(--font-size-xs);
+  margin-bottom: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.alert-danger {
+  background: rgba(239, 68, 68, 0.15);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  color: #fca5a5;
+}
+
+/* --- Tarjeta del Formulario (Glassmorphism) --- */
+.card-form {
+  background: var(--bg-secondary);
+  backdrop-filter: var(--backdrop-blur);
+  border-radius: var(--radius-lg);
+  border: var(--border-glass);
+  box-shadow: var(--shadow-main);
+  padding: 2rem;
+}
+
+/* --- Secciones del Formulario --- */
+.section-title {
+  color: var(--color-text-main);
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  margin-bottom: 1rem;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.field.full-width {
+  grid-column: span 2;
+}
+
+.label {
+  color: var(--color-text-main);
+  font-size: var(--font-size-xs);
+  font-weight: 500;
+}
+
+/* --- Inputs y Controles --- */
+.input-field {
+  width: 100%;
+  background: var(--bg-input-icon);
+  border: var(--border-input);
+  border-radius: var(--radius-md);
+  color: var(--color-text-main);
+  padding: 10px 14px;
+  font-size: var(--font-size-sm);
+  outline: none;
+  transition: border-color 0.2s ease;
+}
+
+.input-field::placeholder {
+  color: var(--color-text-muted);
+  opacity: 0.6;
+}
+
+.input-field:focus {
+  border-color: var(--color-primary);
+}
+
+select.input-field option {
+  background: #0f172a;
+  color: var(--color-text-main);
+}
+
+.file-input {
+  padding: 8px;
+  cursor: pointer;
+}
+
+/* --- Checkbox / Switch --- */
+.switch-field {
+  justify-content: flex-end;
+}
+
+.switch-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  height: 100%;
+}
+
+.switch-input {
+  width: 2.5rem;
+  height: 1.25rem;
+  cursor: pointer;
+}
+
+.switch-label {
+  color: var(--color-text-main);
+  font-size: var(--font-size-xs);
+  cursor: pointer;
+}
+
+/* --- Botones de Acción --- */
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  margin-top: 2rem;
+}
+
+.btn-secondary {
+  padding: 10px 16px;
+  background: var(--bg-btn-secondary);
+  border: var(--border-btn);
+  color: var(--color-text-muted);
+  border-radius: var(--radius-sm);
+  font-size: var(--font-size-xs);
+  text-decoration: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-secondary:hover {
+  color: var(--color-primary-hover);
+  background: var(--bg-btn-secondary-hover);
+}
+
+.btn-primary {
+  padding: 10px 20px;
+  background: var(--color-primary);
+  color: #ffffff;
+  border: none;
+  border-radius: var(--radius-sm);
+  font-size: var(--font-size-xs);
+  font-weight: 600;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  transition: opacity 0.2s ease;
+}
+
+.btn-primary:hover:not(:disabled) {
+  opacity: 0.9;
+}
+
+.btn-primary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* --- Responsividad --- */
+@media (max-width: 768px) {
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .field.full-width {
+    grid-column: span 1;
+  }
+}
