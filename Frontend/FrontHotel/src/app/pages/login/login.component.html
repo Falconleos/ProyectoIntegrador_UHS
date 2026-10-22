@@ -9,7 +9,7 @@
       <h2><i class="fa-solid fa-hotel"></i> <span>Ultimate Hotel Software</span></h2>
       <p class="subtitle">Inicia sesión para continuar</p>
   
-      <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+      <form [formGroup]="loginForm">
         
         <!-- Campo Usuario -->
         <div class="field-spacing">
@@ -42,16 +42,20 @@
             />
           </div>
         </div>
+        
+        <!-- Alerta de Error-->
+        @if (errorMessage) {
+          <div class="alert alert-danger field-spacing">
+            <i class="fa-solid fa-triangle-exclamation">&nbsp;</i> {{ errorMessage }}
+          </div>
+        }
   
-        <!-- Alerta de Error Glass -->
-        <div *ngIf="errorMessage" class="alert alert-danger field-spacing">
-          <i class="fa-solid fa-triangle-exclamation me-2"></i> {{ errorMessage }}
-        </div>
-  
-        <!-- Botón de Ingreso con separación superior extra -->
-        <button type="submit" [disabled]="loginForm.invalid || loading" class="btn btn-primary w-100 btn-submit-spacing">
-          <i class="fa-solid" [ngClass]="loading ? 'fa-spinner fa-spin' : 'fa-right-to-bracket'" *ngIf="loading"></i>
-          {{ loading ? 'Ingresando...' : 'Entrar' }}
+        <!-- Botón de Ingreso-->
+        <button (click)="onSubmit()" [disabled]="loginForm.invalid || loading" class="btn btn-primary btn-submit-spacing">
+        @if (loading) {
+          <i class="fa-solid fa-spinner fa-spin"></i>
+        }
+        {{ loading ? 'Ingresando...' : 'Entrar' }}
         </button>
   
       </form>
