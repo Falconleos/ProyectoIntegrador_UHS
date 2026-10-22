@@ -25,4 +25,7 @@ public interface UserService {
 
     List<UserDTOResponse> getUsersByRole(String roleName);
     byte[] getProfilePicture(Long id);
+
+    UserDTOResponse updateProfilePicture(Long id, org.springframework.web.multipart.MultipartFile file);
+
 }

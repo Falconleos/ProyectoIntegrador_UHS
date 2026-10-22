@@ -18,6 +18,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -142,6 +143,18 @@ public class UserController {
         return ResponseEntity.ok()
                 .contentType(MediaType.IMAGE_JPEG)
                 .body(imageBytes);
+    }
+
+    @PostMapping(value = "/{id}/profile-picture", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PreAuthorize("hasAnyRole('ADMIN', 'RECEPCIONIST') or (hasRole('GUEST') and #id == principal.id)")
+    @Operation(
+            summary = "Actualizar foto de perfil del usuario",
+            description = "Permite actualizar de forma independiente la imagen de perfil de un usuario."
+    )
+    public ResponseEntity<UserDTOResponse> updateProfilePicture(
+            @PathVariable Long id,
+            @RequestParam("profilePicture") MultipartFile file) {
+        return ResponseEntity.ok(userService.updateProfilePicture(id, file));
     }
 
 }

@@ -203,6 +203,19 @@ public class UserServiceImpl implements UserService {
         return userEntity.getProfilePicture();
     }
 
+    @Override
+    @Transactional
+    public UserDTOResponse updateProfilePicture(Long id, org.springframework.web.multipart.MultipartFile file) {
+        UserEntity userEntity = findEntityById(id);
 
+        try {
+            userEntity.setProfilePicture(file.getBytes());
+        } catch (java.io.IOException e) {
+            throw new RuntimeException("Error al procesar la imagen de perfil", e);
+        }
+
+        UserEntity updatedUser = userRepository.save(userEntity);
+        return userMapper.toUserDTOResponse(updatedUser);
+    }
 
 }
