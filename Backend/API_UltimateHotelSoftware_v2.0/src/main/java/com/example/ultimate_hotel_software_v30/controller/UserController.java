@@ -3,6 +3,7 @@ package com.example.ultimate_hotel_software_v30.controller;
 import com.example.ultimate_hotel_software_v30.dto.request.ChangePasswordDTORequest;
 import com.example.ultimate_hotel_software_v30.dto.request.UserDTORequest;
 import com.example.ultimate_hotel_software_v30.dto.request.UserDTORequestCreation;
+import com.example.ultimate_hotel_software_v30.dto.request.UserDtoRequestModification;
 import com.example.ultimate_hotel_software_v30.dto.response.UserDTOResponse;
 import com.example.ultimate_hotel_software_v30.service.UserService;
 import com.example.ultimate_hotel_software_v30.service.serviceImpl.AuthService;
@@ -104,8 +105,8 @@ public class UserController {
             summary = "Actualizar datos del usuario",
             description = "Permite modificar la información personal. Los huéspedes solo pueden modificar su propio perfil."
     )
-    public ResponseEntity<UserDTOResponse> updateUser(@PathVariable Long id, @Valid @RequestBody UserDTORequest userDtoRequest) {
-        return ResponseEntity.ok(userService.updateUser(id, userDtoRequest));
+    public ResponseEntity<UserDTOResponse> updateUser(@PathVariable Long id, @Valid @RequestBody UserDtoRequestModification userDtoRequestModification) {
+        return ResponseEntity.ok(userService.updateUser(id, userDtoRequestModification));
     }
 
     /*------administrador elimina---------------------------*/

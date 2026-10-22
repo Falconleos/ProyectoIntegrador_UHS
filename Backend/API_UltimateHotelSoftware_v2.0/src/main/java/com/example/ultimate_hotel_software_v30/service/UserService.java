@@ -2,6 +2,7 @@ package com.example.ultimate_hotel_software_v30.service;
 
 import com.example.ultimate_hotel_software_v30.dto.request.UserDTORequest;
 import com.example.ultimate_hotel_software_v30.dto.request.UserDTORequestCreation;
+import com.example.ultimate_hotel_software_v30.dto.request.UserDtoRequestModification;
 import com.example.ultimate_hotel_software_v30.dto.response.UserDTOResponse;
 import com.example.ultimate_hotel_software_v30.model.UserEntity;
 
@@ -14,7 +15,7 @@ public interface UserService {
     List<UserDTOResponse> getAll();
     UserDTOResponse createUserWithRole(UserDTORequestCreation request);
     void deleteUser (Long id);
-    UserDTOResponse updateUser(Long id, UserDTORequest userDtoRequest);
+    UserDTOResponse updateUser(Long id, UserDtoRequestModification request);
     UserDTOResponse userByDni(String dni);
     Optional<UserEntity> userEntityByDni(String dni);
     UserDTOResponse findByUsername(String username);

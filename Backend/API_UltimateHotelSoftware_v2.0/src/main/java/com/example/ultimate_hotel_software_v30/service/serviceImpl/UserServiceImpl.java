@@ -2,6 +2,7 @@ package com.example.ultimate_hotel_software_v30.service.serviceImpl;
 
 import com.example.ultimate_hotel_software_v30.dto.request.UserDTORequest;
 import com.example.ultimate_hotel_software_v30.dto.request.UserDTORequestCreation;
+import com.example.ultimate_hotel_software_v30.dto.request.UserDtoRequestModification;
 import com.example.ultimate_hotel_software_v30.dto.response.UserDTOResponse;
 import com.example.ultimate_hotel_software_v30.exceptions.DuplicatedDNIException;
 import com.example.ultimate_hotel_software_v30.exceptions.DuplicatedEmailException;
@@ -124,7 +125,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
-    public UserDTOResponse updateUser(Long id, UserDTORequest userDtoRequest) {
+    public UserDTOResponse updateUser(Long id, UserDtoRequestModification userDtoRequest) {
         UserEntity userEntity = findEntityById(id);
 
         // 2. Validar DNI: si el DNI ingresado es diferente al actual, verificar que no exista en otro usuario
@@ -139,9 +140,8 @@ public class UserServiceImpl implements UserService {
             throw new DuplicatedEmailException("Email already exists");
         }
 
-        // 4. Modificaciones completas según los campos de UserDTORequest
+        // 4. Modificaciones completas (Omitimos password para conservar la anterior intacta)
         userEntity.setUsername(userDtoRequest.getUsername());
-        userEntity.setPassword(passwordEncoder.encode(userDtoRequest.getPassword()));
         userEntity.setName(userDtoRequest.getName());
         userEntity.setSurname(userDtoRequest.getSurname());
         userEntity.setDni(userDtoRequest.getDni());
@@ -149,9 +149,15 @@ public class UserServiceImpl implements UserService {
         userEntity.setEmail(userDtoRequest.getEmail());
         userEntity.setPhoneNumber(userDtoRequest.getPhoneNumber());
         userEntity.setAddress(userDtoRequest.getAddress());
-        userEntity.setBirthDay(userDtoRequest.getBirthDay());
 
-        return userMapper.toUserDTOResponse(userEntity);
+        // Manejo de la fecha (si viene como String y tu entidad usa LocalDate, la parseamos)
+        if (userDtoRequest.getBirthDay() != null && !userDtoRequest.getBirthDay().isEmpty()) {
+            userEntity.setBirthDay(java.time.LocalDate.parse(userDtoRequest.getBirthDay()));
+        }
+
+        // Guardamos y retornamos
+        UserEntity updatedUser = userRepository.save(userEntity);
+        return userMapper.toUserDTOResponse(updatedUser);
     }
 
     @Override
@@ -196,4 +202,7 @@ public class UserServiceImpl implements UserService {
         }
         return userEntity.getProfilePicture();
     }
+
+
+
 }
