@@ -1,8 +1,8 @@
-<div class="dashboard-layout">
+<div class="dashboard">
   <!-- Barra Lateral (Sidebar) -->
   <aside class="sidebar">
     <div class="sidebar-header">
-      <h2><i class="fa-solid fa-hotel"></i> Ultimate Hotel Software</h2>
+      <h2><i class="fa-solid fa-hotel"></i> <span>Ultimate Hotel</span></h2>
     </div>
     
     <nav class="sidebar-nav">
@@ -13,7 +13,7 @@
         <i class="fa-solid fa-calendar-days"></i> Reservas
       </a>
       <a routerLink="/dashboard/check-ins" routerLinkActive="active">
-        <i class="fa-solid fa-circle-check"></i> Estadías (Check-Ins)
+        <i class="fa-solid fa-circle-check"></i> Estadías
       </a>
       <a routerLink="/dashboard/rooms" routerLinkActive="active">
         <i class="fa-solid fa-bed"></i> Habitaciones
@@ -42,7 +42,7 @@
     </nav>
 
     <div class="sidebar-footer">
-      <button (click)="logout()" class="btn-logout-custom">
+      <button (click)="logout()" class="logout-btn">
         <i class="fa-solid fa-right-from-bracket"></i> Cerrar Sesión
       </button>
     </div>
@@ -55,35 +55,35 @@
       
       <div class="top-bar-right">
         <div class="top-actions">
-          <button class="icon-btn-custom" title="Notificaciones">
+          <button class="icon-btn" title="Notificaciones">
             <i class="fa-regular fa-bell"></i>
           </button>
-          <button class="icon-btn-custom" title="Configuración">
+          <button class="icon-btn" title="Configuración">
             <i class="fa-solid fa-gear"></i>
           </button>
         </div>
         
-        <div class="divider-custom"></div>
+        <div class="divider"></div>
         
         <!-- Perfil de usuario en la barra superior -->
-        <div class="user-profile-container">
+        <div class="user-profile">
           <div class="user-avatar-wrapper">
             @if (avatarUrl) {
               <img [src]="avatarUrl" 
                    (error)="avatarUrl = null" 
                    alt="Avatar" 
-                   class="top-user-avatar">
+                   class="user-avatar">
             } @else {
-              <div class="top-user-default-icon">
+              <div class="user-default-icon">
                 <i class="fa-solid fa-user"></i>
               </div>
             }
           </div>
           
-          <span class="user-info-text">
+          <span class="user-info">
             Bienvenido, <strong>{{ username }}</strong> 
             @if (userRole) {
-              <span class="text-muted">({{ userRole }})</span>
+              <span class="muted">({{ userRole }})</span>
             }
           </span>
         </div>

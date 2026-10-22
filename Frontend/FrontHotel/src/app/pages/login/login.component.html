@@ -1,8 +1,8 @@
-<div class="login-container">
-  <div class="login-card">
+<div class="container">
+  <div class="card">
     
     <!-- Botón para volver a la landing -->
-    <a routerLink="/" class="btn-back">
+    <a routerLink="/" class="btn-secondary">
       <i class="fa-solid fa-arrow-left"></i> Volver
     </a>
 
@@ -12,14 +12,14 @@
     <form [formGroup]="loginForm">
       
       <!-- Campo Usuario -->
-      <div class="field-spacing">
-        <label for="username" class="form-label-custom">Usuario</label>
-        <div class="input-group-custom">
-          <span class="input-group-icon"><i class="fa-solid fa-user"></i></span>
+      <div class="field">
+        <label for="username" class="label">Usuario</label>
+        <div class="input-group">
+          <span class="input-icon"><i class="fa-solid fa-user"></i></span>
           <input 
             id="username" 
             type="text" 
-            class="form-input-custom"
+            class="input-field"
             formControlName="username" 
             placeholder="Ingresa tu usuario"
             required
@@ -28,14 +28,14 @@
       </div>
 
       <!-- Campo Contraseña -->
-      <div class="field-spacing">
-        <label for="password" class="form-label-custom">Contraseña</label>
-        <div class="input-group-custom">
-          <span class="input-group-icon"><i class="fa-solid fa-lock"></i></span>
+      <div class="field">
+        <label for="password" class="label">Contraseña</label>
+        <div class="input-group">
+          <span class="input-icon"><i class="fa-solid fa-lock"></i></span>
           <input 
             id="password" 
             type="password" 
-            class="form-input-custom"
+            class="input-field"
             formControlName="password" 
             placeholder="Ingresa tu contraseña"
             required
@@ -45,13 +45,17 @@
       
       <!-- Alerta de Error -->
       @if (errorMessage) {
-        <div class="alert-custom alert-danger-custom field-spacing">
+        <div class="alert alert-danger">
           <i class="fa-solid fa-triangle-exclamation"></i>&nbsp; {{ errorMessage }}
         </div>
       }
 
       <!-- Botón de Ingreso -->
-      <button type="button" (click)="onSubmit()" [disabled]="loginForm.invalid || loading" class="btn-custom btn-primary-custom btn-submit-spacing">
+      <button 
+        type="button" 
+        (click)="onSubmit()" 
+        [disabled]="loginForm.invalid || loading" 
+        class="btn-primary">
         @if (loading) {
           <i class="fa-solid fa-spinner fa-spin"></i>
         }
