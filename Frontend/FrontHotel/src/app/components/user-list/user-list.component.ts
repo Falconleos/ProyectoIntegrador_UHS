@@ -38,24 +38,21 @@ export class UserListComponent implements OnInit {
 
   checkUserRole(): void {
     const storedRoles = localStorage.getItem('role');
-    if (storedRoles) {
-      try {
-        const roles = JSON.parse(storedRoles);
-        if (Array.isArray(roles)) {
-          this.canModify = roles.some((r: any) => {
-            const val = typeof r === 'string' ? r : (r.authority || r.role || r.name || '');
-            const upperVal = val.toUpperCase();
-            return upperVal === 'ADMIN' || upperVal === 'ROLE_ADMIN' || upperVal === 'RECEPCIONIST' || upperVal === 'ROLE_RECEPCIONIST';
-          });
-        } else {
-          const val = typeof roles === 'string' ? roles : '';
-          const upperVal = val.toUpperCase();
-          this.canModify = upperVal === 'ADMIN' || upperVal === 'ROLE_ADMIN' || upperVal === 'RECEPCIONIST' || upperVal === 'ROLE_RECEPCIONIST';
-        }
-      } catch (e) {
-        this.canModify = storedRoles.includes('ADMIN') || storedRoles.includes('RECEPCIONIST');
-      }
-    } else {
+    if (!storedRoles) {
+      this.canModify = false;
+      return;
+    }
+
+    try {
+      const roles = JSON.parse(storedRoles);
+      const rolesArray = Array.isArray(roles) ? roles : [roles];
+
+      // Verificamos directamente contra el enum de Java (ADMIN, RECEPCIONIST)
+      this.canModify = rolesArray.some((r: any) => {
+        const roleName = typeof r === 'string' ? r : (r?.name || '');
+        return roleName === 'ADMIN' || roleName === 'RECEPCIONIST';
+      });
+    } catch (e) {
       this.canModify = false;
     }
   }
