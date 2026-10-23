@@ -1,5 +1,9 @@
 export type RoleType = 'ADMIN' | 'RECEPCIONIST' | 'HOUSEKEEPING' | 'MAINTENANCE' | 'RELIEF_STAFF' | 'GUEST';
-
+export interface RoleEntityDto {
+  id?: number;
+  name: RoleType;
+  description?: string;
+}
 export interface UserDtoResponse {
   id: number;
   username: string;
@@ -17,7 +21,7 @@ export interface UserDtoResponse {
   credentialsNonExpired?: boolean;
   enabled?: boolean;
   profilePicture?: string;
-  role:RoleType
+  roles:RoleEntityDto[];
 }
 
 export interface UserDtoRequest {

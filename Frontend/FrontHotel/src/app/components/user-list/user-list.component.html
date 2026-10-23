@@ -110,9 +110,9 @@
           <div class="detail-item">
             <span class="detail-label"><i class="fa-solid fa-shield-halved"></i> Roles:</span>
             <span class="detail-value">
-              @for (role of selectedUser.role; track role; let last = $last) {
+              @for (r of selectedUser.roles; track r.id; let last = $last) {
                 <span class="badge badge-secondary">
-                  {{ role }}{{ !last ? ', ' : '' }}
+                  {{ r.name }}{{ !last ? ', ' : '' }}
                 </span>
               }
             </span>
