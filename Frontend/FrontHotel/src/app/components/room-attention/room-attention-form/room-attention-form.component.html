@@ -1,0 +1,120 @@
+
+<section class="room-attention-form">
+
+  <h2>Registrar consumo o servicio</h2>
+
+  @if (bookingId() !== null) {
+    <p>Reserva N.º {{ bookingId() }}</p>
+  }
+
+  @if (errorMessage()) {
+    <div class="alert alert-danger">
+      {{ errorMessage() }}
+    </div>
+  }
+
+  @if (loadingItems()) {
+    <p>Cargando productos y servicios...</p>
+  } @else {
+
+    <form
+      [formGroup]="attentionForm"
+      (ngSubmit)="onSubmit()"
+    >
+
+      <div class="form-group">
+        <label for="itemId">
+          Producto o servicio
+        </label>
+
+        <select
+          id="itemId"
+          formControlName="itemId"
+        >
+          <option [ngValue]="0">
+            Seleccione un producto o servicio
+          </option>
+
+          @for (item of availableItems(); track item.id) {
+            <option [ngValue]="item.id">
+              {{ item.description }}
+              - ${{ item.unitPrice }}
+            </option>
+          }
+        </select>
+
+        @if (
+          attentionForm.controls.itemId.invalid &&
+          attentionForm.controls.itemId.touched
+        ) {
+          <small class="text-danger">
+            Debe seleccionar un producto o servicio.
+          </small>
+        }
+      </div>
+
+      <div class="form-group">
+        <label for="quantity">
+          Cantidad
+        </label>
+
+        <input
+          type="number"
+          id="quantity"
+          formControlName="quantity"
+          min="1"
+          step="1"
+        />
+
+        @if (
+          attentionForm.controls.quantity.invalid &&
+          attentionForm.controls.quantity.touched
+        ) {
+          <small class="text-danger">
+            La cantidad debe ser mayor o igual a 1.
+          </small>
+        }
+      </div>
+
+      @if (getSelectedItem(); as selectedItem) {
+        <div class="subtotal-info">
+          <p>
+            Producto o servicio:
+            {{ selectedItem.description }}
+          </p>
+
+          <p>
+            Precio unitario:
+            ${{ selectedItem.unitPrice.toFixed(2) }}
+          </p>
+
+          <p>
+            <strong>
+              Subtotal estimado:
+              ${{ calculateSubtotal().toFixed(2) }}
+            </strong>
+          </p>
+        </div>
+      }
+
+      <div class="form-actions">
+        <button
+          type="submit"
+          [disabled]="
+            attentionForm.invalid ||
+            saving() ||
+            bookingId() === null
+          "
+        >
+          @if (saving()) {
+            Guardando...
+          } @else {
+            Registrar consumo
+          }
+        </button>
+      </div>
+
+    </form>
+  }
+
+</section>

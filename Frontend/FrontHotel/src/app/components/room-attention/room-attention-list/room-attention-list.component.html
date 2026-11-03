@@ -1,0 +1,110 @@
+
+<section class="room-attention-list">
+  <h2>Consumos y servicios de la reserva</h2>
+
+  @if (bookingId() !== null) {
+    <p>Reserva N.º {{ bookingId() }}</p>
+  }
+  
+  @if (errorMessage()) {
+    <div class="alert alert-danger">
+      {{ errorMessage() }}
+    </div>
+  }
+
+  @if (loading()) {
+    <p>Cargando consumos...</p>
+  } @else {
+
+    @if (attentions().length === 0) {
+      <p>No hay consumos registrados para esta reserva.</p>
+    } @else {
+
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Producto / Servicio</th>
+            <th>Tipo</th>
+            <th>Cantidad</th>
+            <th>Precio unitario</th>
+            <th>Subtotal</th>
+            <th>Fecha</th>
+            <th>Empleado</th>
+            <th>Estado</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          @for (attention of attentions(); track attention.id) {
+            <tr>
+              <td>
+                {{ attention.itemDTOResponse.description }}
+              </td>
+
+              <td>
+                {{ attention.isService ? 'Servicio' : 'Producto' }}
+              </td>
+
+              <td>{{ attention.quantity }}</td>
+
+              <td>
+                {{ attention.unitPrice.toFixed(2) }}
+              </td>
+
+              <td>
+                {{ attention.subtotal.toFixed(2) }}
+              </td>
+
+              <td>
+                {{ attention.createdAt }}
+              </td>
+
+              <td>
+                {{ attention.employeeUsername }}
+              </td>
+
+              <td>
+                @if (attention.delivered) {
+                  <span>Entregado</span>
+                } @else {
+                  <span>Pendiente</span>
+                }
+              </td>
+
+              <td>
+                @if (!attention.delivered) {
+                  <button
+                    type="button"
+                    (click)="markAsDelivered(attention.id)"
+                    [disabled]="!canModify() || deliveringId() !== null || deletingId() !== null"
+                  >
+                    @if (deliveringId() === attention.id) {
+                      Entregando...
+                    } @else {
+                      Marcar entregado
+                    }
+                  </button>
+                }
+
+                <button
+                  type="button"
+                  (click)="deleteAttention(attention.id)"
+                  [disabled]="!canModify() || deletingId() !== null || deliveringId() !== null"
+                >
+                  @if (deletingId() === attention.id) {
+                    Eliminando...
+                  } @else {
+                    Eliminar
+                  }
+                </button>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+
+      <h3>Total: {{ total().toFixed(2) }}</h3>
+    }
+  }
+</section>
