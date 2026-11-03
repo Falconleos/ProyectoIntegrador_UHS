@@ -1,0 +1,281 @@
+
+<section class="room-list-container">
+
+  <header class="room-list-header">
+    <h1>Gestión de habitaciones</h1>
+
+    <a
+      routerLink="/dashboard/room-creation"
+      class="link-primary"
+    >
+      Nueva habitación
+    </a>
+  </header>
+
+  @if (actionError()) {
+    <p class="error-message" role="alert">
+      {{ actionError() }}
+    </p>
+  }
+
+  @if (loading()) {
+    <p>Cargando habitaciones...</p>
+  } @else if (errorMessage()) {
+    <div class="error-container">
+      <p class="error-message">{{ errorMessage() }}</p>
+
+      <button type="button" (click)="loadRooms()">
+        Reintentar
+      </button>
+    </div>
+  } @else if (rooms().length === 0) {
+    <p>No hay habitaciones registradas.</p>
+  } @else {
+
+    <div class="table-container">
+      <table class="room-table">
+
+        <thead>
+          <tr>
+            <th>Número</th>
+            <th>Tipo</th>
+            <th>Capacidad</th>
+            <th>Estado</th>
+            <th>Precio por noche</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          @for (room of rooms(); track room.id) {
+            <tr>
+
+              <td>{{ room.number }}</td>
+
+              <td>
+                {{ room.roomTypeDTOResponse?.name
+                   ?? room.roomTypeName
+                   ?? 'Sin tipo' }}
+              </td>
+
+              <td>
+                {{ room.roomTypeDTOResponse?.capacity
+                   ?? room.capacity
+                   ?? 'Sin datos' }}
+              </td>
+
+              <td>
+                <span
+                  class="room-status"
+                  [class.status-available]="room.state === 'AVAILABLE'"
+                  [class.status-occupied]="room.state === 'OCCUPIED'"
+                  [class.status-maintenance]="room.state === 'MAINTENANCE'"
+                  [class.status-cleaning]="room.state === 'CLEANING'"
+                >
+                  @switch (room.state) {
+                    @case ('AVAILABLE') {
+                      Disponible
+                    }
+                    @case ('OCCUPIED') {
+                      Ocupada
+                    }
+                    @case ('MAINTENANCE') {
+                      Mantenimiento
+                    }
+                    @case ('CLEANING') {
+                      Limpieza
+                    }
+                    @default {
+                      {{ room.state }}
+                    }
+                  }
+                </span>
+              </td>
+
+              <td>
+                {{ room.roomTypeDTOResponse?.pricePerNight
+                   ?? room.pricePerNight
+                   ?? 'Sin datos' }}
+              </td>
+
+              <td class="room-actions">
+
+                <button
+                  type="button"
+                  (click)="openRoomModal(room)"
+                >
+                  Ver detalle
+                </button>
+
+                <a
+                  [routerLink]="['/dashboard/room-edit', room.id]"
+                  class="link-edit"
+                >
+                  Editar
+                </a>
+
+                <button
+                  type="button"
+                  (click)="putInMaintenance(room.id)"
+                  [disabled]="room.state === 'MAINTENANCE'"
+                >
+                  Mantenimiento
+                </button>
+
+                <button
+                  type="button"
+                  class="btn-danger"
+                  (click)="deleteRoom(room.id)"
+                >
+                  Eliminar
+                </button>
+
+              </td>
+
+            </tr>
+          }
+        </tbody>
+
+      </table>
+    </div>
+  }
+
+</section>
+
+
+//MODAL DE DETALLE
+
+@if (selectedRoom(); as room) {
+
+  <div class="modal-overlay">
+
+    <div
+      class="modal-content"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="room-modal-title"
+    >
+
+      <header class="modal-header">
+
+        <h2 id="room-modal-title">
+          Habitación {{ room.number }}
+        </h2>
+
+        <button
+          type="button"
+          class="btn-close"
+          aria-label="Cerrar modal"
+          (click)="closeRoomModal()"
+        >
+          ×
+        </button>
+
+      </header>
+
+      <div class="modal-body">
+
+        <p>
+          <strong>Tipo:</strong>
+          {{ room.roomTypeDTOResponse?.name
+             ?? room.roomTypeName
+             ?? 'Sin tipo' }}
+        </p>
+
+        <p>
+          <strong>Estado:</strong>
+          {{ room.state }}
+        </p>
+
+        <p>
+          <strong>Capacidad:</strong>
+          {{ room.roomTypeDTOResponse?.capacity
+             ?? room.capacity
+             ?? 'Sin datos' }}
+        </p>
+
+        <p>
+          <strong>Precio por noche:</strong>
+          {{ room.roomTypeDTOResponse?.pricePerNight
+             ?? room.pricePerNight
+             ?? 'Sin datos' }}
+        </p>
+
+        <h3>Imágenes de la habitación</h3>
+
+        @if (loadingImages()) {
+
+          <p>Cargando imágenes...</p>
+
+        } @else if (imageError()) {
+
+          <p class="error-message">
+            {{ imageError() }}
+          </p>
+
+        } @else if (roomImages().length === 0) {
+
+          <p>Esta habitación no tiene imágenes.</p>
+
+        } @else {
+
+          <div class="image-gallery">
+
+            <img
+              [src]="roomImages()[currentImageIndex()]"
+              [alt]="'Imagen de la habitación ' + room.number"
+              class="room-image"
+            >
+
+            @if (roomImages().length > 1) {
+
+              <div class="gallery-controls">
+
+                <button
+                  type="button"
+                  (click)="previousImage()"
+                  aria-label="Imagen anterior"
+                >
+                  Anterior
+                </button>
+
+                <span>
+                  {{ currentImageIndex() + 1 }}
+                  de
+                  {{ roomImages().length }}
+                </span>
+
+                <button
+                  type="button"
+                  (click)="nextImage()"
+                  aria-label="Imagen siguiente"
+                >
+                  Siguiente
+                </button>
+
+              </div>
+
+            }
+
+          </div>
+
+        }
+
+      </div>
+
+      <footer class="modal-footer">
+
+        <button
+          type="button"
+          (click)="closeRoomModal()"
+        >
+          Cerrar
+        </button>
+
+      </footer>
+
+    </div>
+
+  </div>
+
+}
