@@ -23,4 +23,5 @@ export interface RoomAttentionDtoResponse {
   subtotal: number;
   createdAt: string;
   employeeUsername: string;
+  delivered: boolean;
 }
