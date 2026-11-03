@@ -1,7 +1,7 @@
 export interface RoomDtoResponse {
   id: number;
-  number: string;
-  state: 'AVAILABLE' | 'OCCUPIED' | 'MAINTENANCE';
+  number: number;
+  state: 'AVAILABLE' | 'OCCUPIED' | 'MAINTENANCE'|'CLEANING';
   roomTypeDTOResponse?: {
     id: number;
     name: string;
