@@ -22,3 +22,6 @@ export interface RoomDTORequest {
   images?: File[]; // Este campo permite enviar la lista de imágenes
 }
 
+export type RoomUpdateDTORequest =
+  Pick<RoomDTORequest, 'number' | 'roomTypeId'>;
+
