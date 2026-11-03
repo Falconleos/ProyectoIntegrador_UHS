@@ -1,0 +1,141 @@
+
+<section class="room-type-form-container">
+
+  <h1>
+    @if (isEditMode()) {
+      Editar tipo de habitación
+    } @else {
+      Crear tipo de habitación
+    }
+  </h1>
+
+  <!-- Mensajes de error -->
+  @if (errorMessage()) {
+    <p class="error-message" role="alert">
+      {{ errorMessage() }}
+    </p>
+  }
+
+  <!-- Carga de datos en modo edición -->
+  @if (loading()) {
+    <p>Cargando datos del tipo de habitación...</p>
+  } @else if (!loadError()) {
+
+    <form [formGroup]="roomTypeForm" (ngSubmit)="onSubmit()">
+      <!-- Nombre -->
+      <div class="form-group">
+        <label for="name">Nombre</label>
+        <input
+          id="name"
+          type="text"
+          formControlName="name"
+          maxlength="50"
+        >
+
+        @if (roomTypeForm.controls.name.touched &&
+             roomTypeForm.controls.name.hasError('required')) {
+          <p class="error-message">
+            El nombre es obligatorio.
+          </p>
+        }
+        @if (roomTypeForm.controls.name.touched &&
+             roomTypeForm.controls.name.hasError('maxlength')) {
+          <p class="error-message">
+            El nombre no puede superar los 50 caracteres.
+          </p>
+        }
+      </div>
+
+      <!-- Capacidad -->
+      <div class="form-group">
+        <label for="capacity">Capacidad de personas</label>
+        <input
+          id="capacity"
+          type="number"
+          formControlName="capacity"
+          min="1"
+        >
+        @if (roomTypeForm.controls.capacity.touched &&
+             roomTypeForm.controls.capacity.hasError('required')) {
+          <p class="error-message">
+            La capacidad es obligatoria.
+          </p>
+        }
+        @if (roomTypeForm.controls.capacity.touched &&
+             roomTypeForm.controls.capacity.hasError('min')) {
+          <p class="error-message">
+            La capacidad debe ser mayor a 0.
+          </p>
+        }
+      </div>
+
+      <!-- Descripción -->
+      <div class="form-group">
+        <label for="description">Descripción</label>
+        <textarea
+          id="description"
+          formControlName="description"
+          rows="4"
+          maxlength="250"
+        ></textarea>
+        @if (roomTypeForm.controls.description.touched &&
+            roomTypeForm.controls.description.hasError('required')) {
+            <p class="error-message">
+                La descripción es obligatoria.
+            </p>
+        }
+        @if (roomTypeForm.controls.description.touched &&
+             roomTypeForm.controls.description.hasError('maxlength')) {
+          <p class="error-message">
+            La descripción no puede superar los 250 caracteres.
+          </p>
+        }
+      </div>
+
+      <!-- Precio por noche -->
+      <div class="form-group">
+        <label for="pricePerNight">Precio por noche</label>
+        <input
+          id="pricePerNight"
+          type="number"
+          formControlName="pricePerNight"
+          min="0.01"
+          step="0.01"
+        >
+        @if (roomTypeForm.controls.pricePerNight.touched &&
+             roomTypeForm.controls.pricePerNight.hasError('required')) {
+          <p class="error-message">
+            El precio por noche es obligatorio.
+          </p>
+        }
+        @if (roomTypeForm.controls.pricePerNight.touched &&
+             roomTypeForm.controls.pricePerNight.hasError('min')) {
+          <p class="error-message">
+            El precio debe ser mayor a 0.
+          </p>
+        }
+      </div>
+
+      <!-- Acciones -->
+      <div class="form-actions">
+
+        <a routerLink="/dashboard/room-type-list">
+          Cancelar
+        </a>
+
+        <button
+          type="submit"
+          [disabled]="roomTypeForm.invalid || saving() || loading()"
+        >
+          @if (saving()) {
+            Guardando...
+          } @else if (isEditMode()) {
+            Guardar cambios
+          } @else {
+            Crear tipo de habitación
+          }
+        </button>
+      </div>
+    </form>
+  }
+</section>

@@ -1,0 +1,91 @@
+
+<section class="room-type-list-container">
+
+  <header class="room-type-list-header">
+    <h1>Gestión de tipos de habitación</h1>
+    <a
+      routerLink="/dashboard/room-type-creation"
+      class="link-primary"
+    >
+      Nuevo tipo de habitación
+    </a>
+  </header>
+
+  <!-- Error al realizar una acción -->
+  @if (actionError()) {
+    <p class="error-message" role="alert">
+      {{ actionError() }}
+    </p>
+  }
+
+  <!-- Cargando tipos de habitación -->
+  @if (loading()) {
+    <p>Cargando tipos de habitación...</p>
+  }
+
+  <!-- Error al cargar los tipos -->
+  @else if (errorMessage()) {
+    <div class="error-container">
+      <p class="error-message">
+        {{ errorMessage() }}
+      </p>
+      <button
+        type="button"
+        (click)="loadRoomTypes()"
+      >
+        Reintentar
+      </button>
+    </div>
+  }
+  <!-- No existen tipos de habitación -->
+  @else if (roomTypes().length === 0) {
+    <p>No hay tipos de habitación registrados.</p>
+  }
+
+  <!-- Listado de tipos de habitación -->
+  @else {
+    <div class="table-container">
+      <table class="room-type-table">
+        <thead>
+          <tr>
+            <th>Nombre</th>
+            <th>Capacidad</th>
+            <th>Descripción</th>
+            <th>Precio por noche</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+
+          @for (type of roomTypes(); track type.id) {
+            <tr>
+              <td>{{ type.name }}</td>
+              <td>{{ type.capacity }}</td>
+              <td>
+                {{ type.description || 'Sin descripción' }}
+              </td>
+              <td>
+                {{ type.pricePerNight }}
+              </td>
+              <td class="room-type-actions">
+                <a
+                  [routerLink]="['/dashboard/room-type-edit', type.id]"
+                  class="link-edit"
+                >
+                  Editar
+                </a>
+                <button
+                  type="button"
+                  class="btn-danger"
+                  (click)="deleteRoomType(type.id)"
+                >
+                  Eliminar
+                </button>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+</section>
