@@ -1,0 +1,153 @@
+<section class="room-form-container">
+
+  <h1>Crear nueva habitación</h1>
+
+  @if (errorMessage()) {
+    <p class="error-message" role="alert">
+      {{ errorMessage() }}
+    </p>
+  }
+
+  <form [formGroup]="roomForm" (ngSubmit)="createRoom()">
+
+    <!-- Número de habitación -->
+    <div class="form-group">
+
+      <label for="number">Número de habitación</label>
+
+      <input
+        id="number"
+        type="number"
+        formControlName="number"
+        min="1"
+      >
+
+      @if (roomForm.controls.number.touched &&
+           roomForm.controls.number.hasError('required')) {
+        <p class="error-message">
+          El número de habitación es obligatorio.
+        </p>
+      }
+
+      @if (roomForm.controls.number.touched &&
+           roomForm.controls.number.hasError('min')) {
+        <p class="error-message">
+          El número debe ser mayor a 0.
+        </p>
+      }
+
+    </div>
+
+    <!-- Tipo de habitación -->
+    <div class="form-group">
+
+      <label for="roomTypeId">Tipo de habitación</label>
+
+      @if (loadingTypes()) {
+        <p>Cargando tipos de habitación...</p>
+      } @else {
+
+        <select
+          id="roomTypeId"
+          formControlName="roomTypeId"
+        >
+
+          <option [ngValue]="0">
+            Seleccione un tipo de habitación
+          </option>
+
+          @for (type of roomTypes(); track type.id) {
+            <option [ngValue]="type.id">
+              {{ type.name }}
+            </option>
+          }
+
+        </select>
+
+      }
+
+      @if (roomForm.controls.roomTypeId.touched &&
+           roomForm.controls.roomTypeId.invalid) {
+        <p class="error-message">
+          Debe seleccionar un tipo de habitación.
+        </p>
+      }
+
+    </div>
+
+    <!-- Estado -->
+    <div class="form-group">
+
+      <label for="state">Estado inicial</label>
+
+      <select
+        id="state"
+        formControlName="state"
+      >
+        <option value="AVAILABLE">Disponible</option>
+        <option value="OCCUPIED">Ocupada</option>
+        <option value="MAINTENANCE">Mantenimiento</option>
+        <option value="CLEANING">Limpieza</option>
+      </select>
+
+      @if (roomForm.controls.state.touched &&
+           roomForm.controls.state.hasError('required')) {
+        <p class="error-message">
+          Debe seleccionar un estado.
+        </p>
+      }
+
+    </div>
+
+    <!-- Imágenes -->
+    <div class="form-group">
+
+      <label for="images">Imágenes de la habitación</label>
+
+      <input
+        id="images"
+        type="file"
+        accept="image/*"
+        multiple
+        (change)="onImagesSelected($event)"
+      >
+
+      @if (selectedImages().length > 0) {
+
+        <p>
+          Imágenes seleccionadas: {{ selectedImages().length }}
+        </p>
+
+        <ul>
+          @for (image of selectedImages(); track $index) {
+            <li>{{ image.name }}</li>
+          }
+        </ul>
+
+      }
+
+    </div>
+
+    <!-- Acciones -->
+    <div class="form-actions">
+
+      <a routerLink="/dashboard/room-list">
+        Cancelar
+      </a>
+
+      <button
+        type="submit"
+        [disabled]="roomForm.invalid || saving() || loadingTypes()"
+      >
+        @if (saving()) {
+          Guardando...
+        } @else {
+          Crear habitación
+        }
+      </button>
+
+    </div>
+
+  </form>
+
+</section>
