@@ -119,7 +119,7 @@ export class RoomTypeFormComponent implements OnInit {
       this.roomTypeService.createRoomType(request).subscribe({
         next: () => {
           this.saving.set(false);
-          this.router.navigate(['/dashboard/room-type-list']);
+          this.router.navigate(['/dashboard/room-list']);
         },
         error: () => {
           this.errorMessage.set('No se pudo crear el tipo de habitación. Verificá que el nombre no exista previamente.');

@@ -31,6 +31,10 @@ export const routes: Routes = [
                 path: 'room-edit/:id',
                 loadComponent: () => import('./components/room/room-edit/room-edit.component').then(m => m.RoomEditComponent)
             },
+            {
+                path: 'room-type',
+                loadComponent: () => import('./components/room/room-type-form/room-type-form.component').then(m=>m.RoomTypeFormComponent)
+            },
             
         ]
     },
