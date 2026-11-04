@@ -1,1 +1,178 @@
-<p>employee-edit works!</p>
+
+<h2>Editar empleado</h2>
+
+<p>
+  Modifique los datos laborales del empleado.
+  Los campos marcados con (*) son obligatorios.
+</p>
+
+<!-- Estado de carga -->
+@if (loading()) {
+  <p>Cargando datos del empleado...</p>
+}
+
+<!-- Mensaje de error -->
+@if (errorMessage()) {
+  <p role="alert">
+    {{ errorMessage() }}
+  </p>
+}
+
+<!-- Mensaje de éxito -->
+@if (successMessage()) {
+  <p role="status">
+    {{ successMessage() }}
+  </p>
+}
+
+<!-- Formulario de edición -->
+@if (!loading() && employee(); as currentEmployee) {
+
+  <h3>
+    {{ currentEmployee.name }}
+    {{ currentEmployee.surname }}
+  </h3>
+
+  <p>
+    Usuario: {{ currentEmployee.username }}
+  </p>
+
+  <p>
+    ID del empleado: {{ currentEmployee.id }}
+  </p>
+
+  <form
+    [formGroup]="employeeForm"
+    (ngSubmit)="onSubmit()">
+
+    <fieldset>
+      <legend>Datos laborales</legend>
+
+      <!-- Número de empleado -->
+      <div>
+        <label for="employeeNumber">
+          Número de empleado
+        </label>
+
+        <input
+          id="employeeNumber"
+          type="text"
+          formControlName="employeeNumber">
+      </div>
+
+      <!-- Fecha de contratación -->
+      <div>
+        <label for="hireDate">
+          Fecha de contratación *
+        </label>
+
+        <input
+          id="hireDate"
+          type="date"
+          formControlName="hireDate">
+
+        @if (
+          employeeForm.controls.hireDate.touched &&
+          employeeForm.controls.hireDate.hasError('required')
+        ) {
+          <small>
+            La fecha de contratación es obligatoria.
+          </small>
+        }
+      </div>
+
+      <!-- Turno -->
+      <div>
+        <label for="shift">
+          Turno *
+        </label>
+
+        <select
+          id="shift"
+          formControlName="shift">
+
+          @for (shift of availableShifts; track shift) {
+            <option [value]="shift">
+              {{ shift }}
+            </option>
+          }
+
+        </select>
+
+        @if (
+          employeeForm.controls.shift.touched &&
+          employeeForm.controls.shift.hasError('required')
+        ) {
+          <small>
+            Debe seleccionar un turno.
+          </small>
+        }
+      </div>
+
+      <!-- Salario -->
+      <div>
+        <label for="salary">
+          Salario *
+        </label>
+
+        <input
+          id="salary"
+          type="number"
+          step="0.01"
+          min="0.01"
+          formControlName="salary">
+
+        @if (
+          employeeForm.controls.salary.touched &&
+          employeeForm.controls.salary.invalid
+        ) {
+
+          @if (employeeForm.controls.salary.hasError('required')) {
+            <small>
+              El salario es obligatorio.
+            </small>
+          }
+
+          @if (employeeForm.controls.salary.hasError('min')) {
+            <small>
+              El salario debe ser mayor que cero.
+            </small>
+          }
+
+        }
+      </div>
+
+    </fieldset>
+
+    <!-- Acciones -->
+    <div>
+      <button
+        type="button"
+        routerLink="/dashboard/employees">
+        Cancelar
+      </button>
+
+      <button
+        type="submit"
+        [disabled]="saving() || employeeForm.invalid">
+
+        @if (saving()) {
+          Guardando cambios...
+        } @else {
+          Guardar cambios
+        }
+
+      </button>
+    </div>
+
+  </form>
+}
+
+<!-- Volver al listado cuando no se pudo cargar -->
+@if (!loading() && !employee()) {
+  <button
+    type="button"
+    routerLink="/dashboard/employees">
+    Volver al listado
+  </button>
+}
