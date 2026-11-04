@@ -1,5 +1,5 @@
 import { Component, inject, OnInit, OnDestroy, signal } from '@angular/core';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { forkJoin, Subscription } from 'rxjs';
 
 import { RoomService } from '../../../core/services/room.service';
@@ -18,6 +18,7 @@ export class RoomListComponent implements OnInit, OnDestroy {
 
   private roomService = inject(RoomService);
   private roomTypeService = inject(RoomTypeService);
+  private route = inject(Router);
 
   rooms = signal<RoomDtoResponse[]>([]);
   roomTypes = signal<RoomTypeDTOResponse[]>([]); // Señal para los tipos de habitación
@@ -186,4 +187,15 @@ export class RoomListComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     this.closeRoomModal();
   }
+
+  nuevaHabitacion(roomTypeId?: number): void {
+    if (roomTypeId) {
+      this.route.navigate(['/dashboard/room-form'], { 
+        queryParams: { roomTypeId } 
+      });
+    } else {
+      this.route.navigate(['/dashboard/room-form']);
+    }
+  }
+
 }

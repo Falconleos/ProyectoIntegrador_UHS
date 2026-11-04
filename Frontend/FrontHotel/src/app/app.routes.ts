@@ -35,6 +35,10 @@ export const routes: Routes = [
                 path: 'room-type',
                 loadComponent: () => import('./components/room/room-type-form/room-type-form.component').then(m=>m.RoomTypeFormComponent)
             },
+            {
+                path:'room-form',
+                loadComponent: ()=>import('./components/room/room-form/room-form.component').then(m=>m.RoomFormComponent)
+            }
             
         ]
     },

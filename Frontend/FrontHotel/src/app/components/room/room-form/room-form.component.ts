@@ -4,7 +4,7 @@ import {
   NonNullableFormBuilder,
   Validators
 } from '@angular/forms';
-import { Router, RouterLink } from '@angular/router';
+import { Router, RouterLink, ActivatedRoute } from '@angular/router'; // 1. Importar ActivatedRoute
 
 import { RoomService } from '../../../core/services/room.service';
 import { RoomTypeService } from '../../../core/services/room-type.service';
@@ -23,6 +23,7 @@ export class RoomFormComponent implements OnInit {
   private roomService = inject(RoomService);
   private roomTypeService = inject(RoomTypeService);
   private router = inject(Router);
+  private route = inject(ActivatedRoute); // 2. Inyectar ActivatedRoute
 
   roomTypes = signal<RoomTypeDTOResponse[]>([]);
   selectedImages = signal<File[]>([]);
@@ -49,6 +50,14 @@ export class RoomFormComponent implements OnInit {
       next: (data) => {
         this.roomTypes.set(data);
         this.loadingTypes.set(false);
+
+        // 3. Capturar el parámetro de la URL y asignarlo al formulario
+        const typeIdParam = this.route.snapshot.queryParamMap.get('roomTypeId');
+        if (typeIdParam) {
+          const parsedId = Number(typeIdParam);
+          // Opcional: Validar que el tipo exista en la lista cargada
+          this.roomForm.patchValue({ roomTypeId: parsedId });
+        }
       },
       error: () => {
         this.errorMessage.set('No se pudieron cargar los tipos de habitación.');
@@ -57,13 +66,10 @@ export class RoomFormComponent implements OnInit {
     });
   }
 
-  //Capura de imagenes para la habitacion
+  // Resto de tus métodos (onImagesSelected, createRoom, etc.) sin cambios...
   onImagesSelected(event: Event): void {
     const input = event.target as HTMLInputElement;
-
-    this.selectedImages.set(
-      Array.from(input.files ?? [])
-    );
+    this.selectedImages.set(Array.from(input.files ?? []));
   }
 
   createRoom(): void {
