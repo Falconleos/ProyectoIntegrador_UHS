@@ -26,7 +26,12 @@ export const routes: Routes = [
             {
                 path:'room-list',
                 loadComponent:()=>import('./components/room/room-list/room-list.component').then(m=>m.RoomListComponent)
-            }
+            },
+            {
+                path: 'room-edit/:id',
+                loadComponent: () => import('./components/room/room-edit/room-edit.component').then(m => m.RoomEditComponent)
+            },
+            
         ]
     },
     {
