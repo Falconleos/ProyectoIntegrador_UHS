@@ -38,7 +38,16 @@ export const routes: Routes = [
             {
                 path:'room-form',
                 loadComponent: ()=>import('./components/room/room-form/room-form.component').then(m=>m.RoomFormComponent)
-            }
+            },
+            {
+                path:'employee-list',
+                loadComponent: ()=>import('./components/employee/employee-list/employee-list.component').then(m=>m.EmployeeListComponent)
+            },
+            {
+                path:'employee-create',
+                loadComponent: ()=>import('./components/employee/employee-form/employee-form.component').then(m=>m.EmployeeFormComponent)
+            },
+
             
         ]
     },

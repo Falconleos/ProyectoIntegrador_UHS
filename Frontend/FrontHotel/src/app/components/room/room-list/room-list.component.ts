@@ -63,7 +63,7 @@ export class RoomListComponent implements OnInit, OnDestroy {
         this.roomTypes.set(Array.isArray(data) ? data : []);
       },
       error: () => {
-        // Manejo opcional de error para tipos de habitación si lo deseas
+        // Manejo opcional de error para tipos de habitación
         console.error('No se pudieron cargar los tipos de habitación.');
       }
     });
