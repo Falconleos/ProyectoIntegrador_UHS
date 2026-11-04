@@ -1,5 +1,5 @@
 export type RoleType = 'ADMIN' | 'RECEPCIONIST' | 'HOUSEKEEPING' | 'MAINTENANCE' | 'RELIEF_STAFF' | 'GUEST';
-export type ShiftType = 'MORNING' | 'AFTERNOON' | 'NIGHT' | string;
+export type ShiftType = 'MORNING' | 'AFTERNOON' | 'NIGHT';
 
 export interface EmployeeDtoResponse {
   id: number;
@@ -26,7 +26,7 @@ export interface EmployeeDtoRequest {
 export interface EmployeeCreateUnifiedDTO {
   // Datos del Usuario
   username: string;
-  password?: string;
+  password: string;
   name: string;
   surname: string;
   dni: string;
@@ -34,7 +34,7 @@ export interface EmployeeCreateUnifiedDTO {
   email: string;
   phoneNumber?: string;
   address?: string;
-  birthDay?: string; // Formato 'yyyy-MM-dd'
+  birthDay: string; // Formato 'yyyy-MM-dd'
   role: RoleType;
   profilePictureFile?: File;
   enabled?: boolean;
