@@ -1,0 +1,151 @@
+
+<div class="item-edit-container">
+
+  <h2>Editar producto o servicio</h2>
+
+  @if (errorMessage()) {
+    <p class="error-message">
+      {{ errorMessage() }}
+    </p>
+  }
+
+  @if (loading()) {
+    <p>Cargando datos del ítem...</p>
+  } @else if (itemLoaded())  {
+
+    <form [formGroup]="itemForm" (ngSubmit)="onSubmit()">
+
+      <!-- Descripción -->
+      <div class="form-field">
+        <label for="description">Descripción:</label>
+
+        <input
+          id="description"
+          type="text"
+          formControlName="description"
+        >
+
+        @if (itemForm.controls.description.touched &&
+             itemForm.controls.description.hasError('required')) {
+          <small class="error-message">
+            La descripción es obligatoria.
+          </small>
+        }
+      </div>
+
+      <!-- Cantidad -->
+      <div class="form-field">
+        <label for="quantity">Cantidad:</label>
+
+        <input
+          id="quantity"
+          type="number"
+          min="1"
+          step="1"
+          formControlName="quantity"
+        >
+
+        @if (itemForm.controls.quantity.touched) {
+
+          @if (itemForm.controls.quantity.hasError('required')) {
+            <small class="error-message">
+              La cantidad es obligatoria.
+            </small>
+          }
+
+          @if (itemForm.controls.quantity.hasError('min')) {
+            <small class="error-message">
+              La cantidad debe ser como mínimo 1.
+            </small>
+          }
+
+        }
+      </div>
+
+      <!-- Precio unitario -->
+      <div class="form-field">
+        <label for="unitPrice">Precio unitario:</label>
+
+        <input
+          id="unitPrice"
+          type="number"
+          min="0.01"
+          step="0.01"
+          formControlName="unitPrice"
+        >
+
+        @if (itemForm.controls.unitPrice.touched) {
+
+          @if (itemForm.controls.unitPrice.hasError('required')) {
+            <small class="error-message">
+              El precio unitario es obligatorio.
+            </small>
+          }
+
+          @if (itemForm.controls.unitPrice.hasError('min')) {
+            <small class="error-message">
+              El precio debe ser mayor que cero.
+            </small>
+          }
+
+        }
+      </div>
+
+      <!-- Tipo de ítem -->
+      <div class="form-field">
+        <label for="isService">
+          <input
+            id="isService"
+            type="checkbox"
+            formControlName="isService"
+          >
+          Es un servicio
+        </label>
+      </div>
+
+      <!-- Imagen opcional -->
+      <div class="form-field">
+        <label for="image">Nueva imagen (opcional):</label>
+
+        <input
+          id="image"
+          type="file"
+          accept="image/*"
+          (change)="onImageSelected($event)"
+        >
+
+        @if (selectedImage()) {
+          <p>
+            Nueva imagen seleccionada:
+            {{ selectedImage()?.name }}
+          </p>
+        }
+
+        <small>
+          Si no seleccionás una nueva imagen, no se enviará
+          ningún archivo.
+        </small>
+      </div>
+
+      <!-- Acciones -->
+      <div class="form-actions">
+
+        <button
+          type="submit"
+          [disabled]="saving() || loading()"
+        >
+          @if (saving()) {
+            Guardando cambios...
+          } @else {
+            Guardar cambios
+          }
+        </button>
+
+        <a routerLink="/items">
+          Cancelar
+        </a>
+
+      </div>
+    </form>
+  }
+</div>
