@@ -3,12 +3,63 @@
   <!-- Sección de Encabezado -->
   <div class="header-section">
     <h2><i class="fa-solid fa-door-closed"></i> Gestión de Habitaciones</h2>
-    <a routerLink="/dashboard/room-creation" class="btn-primary">
-      <i class="fa-solid fa-plus"></i> Nueva habitación
+    <a routerLink="/dashboard/room-type" class="btn-primary">
+      <i class="fa-solid fa-plus"></i> Crear Tipo de habitación
     </a>
   </div>
 
   <hr class="divider" />
+
+  <!-- Contenedor de Tarjetas de Tipos de Habitación -->
+  <div class="room-types-grid">
+    @for (type of roomTypes(); track type.id) {
+      <div class="room-type-card">
+        
+        <!-- Información del Tipo de Habitación -->
+        <div class="room-type-info">
+          <h3><i class="fa-solid fa-tag"></i> {{ type.name }}</h3>
+          <p class="room-type-desc">{{ type.description || 'Sin descripción disponible.' }}</p>
+          
+          <div class="room-type-details">
+            <span><i class="fa-solid fa-user-group"></i> Capacidad: <strong>{{ type.capacity }} pax</strong></span>
+            <span><i class="fa-solid fa-dollar-sign"></i> Precio: <strong>${{ type.pricePerNight }}</strong></span>
+          </div>
+        </div>
+
+        <!-- Botones de Acción (Crear, Editar, Eliminar) -->
+        <div class="room-type-actions">
+          <button 
+            type="button" 
+            class="btn-info-action" 
+            title="Crear tipo similar / Nuevo"
+            (click)="null">
+            <i class="fa-solid fa-plus"></i>
+          </button>
+
+          <button 
+            type="button" 
+            class="btn-warning" 
+            title="Editar tipo de habitación"
+            (click)="null">
+            <i class="fa-solid fa-pen-to-square"></i>
+          </button>
+
+          <button 
+            type="button" 
+            class="btn-danger" 
+            title="Eliminar tipo de habitación"
+            (click)="null">
+            <i class="fa-solid fa-trash-can"></i>
+          </button>
+        </div>
+
+      </div>
+    } @empty {
+      <div class="alert alert-warning" style="width: 100%;">
+        <i class="fa-solid fa-circle-info"></i> No hay tipos de habitación registrados.
+      </div>
+    }
+  </div>
 
   <!-- Mensajes de Error de Acción -->
   @if (actionError()) {
@@ -152,7 +203,7 @@
 </section>
 
 
-<!-- MODAL DE DETALLE (Fuera de la sección principal para evitar problemas de posicionamiento fixed/backdrop) -->
+<!-- MODAL DE DETALLE -->
 @if (selectedRoom(); as room) {
   <div class="modal-backdrop" (click)="closeRoomModal()">
     <div
@@ -267,4 +318,4 @@
 
     </div>
   </div>
-}
+}F
