@@ -1,40 +1,45 @@
-
 <section class="room-list-container">
 
-  <header class="room-list-header">
-    <h1>Gestión de habitaciones</h1>
-
-    <a
-      routerLink="/dashboard/room-creation"
-      class="link-primary"
-    >
-      Nueva habitación
+  <!-- Sección de Encabezado -->
+  <div class="header-section">
+    <h2><i class="fa-solid fa-door-closed"></i> Gestión de Habitaciones</h2>
+    <a routerLink="/dashboard/room-creation" class="btn-primary">
+      <i class="fa-solid fa-plus"></i> Nueva habitación
     </a>
-  </header>
+  </div>
 
+  <hr class="divider" />
+
+  <!-- Mensajes de Error de Acción -->
   @if (actionError()) {
-    <p class="error-message" role="alert">
-      {{ actionError() }}
-    </p>
+    <div class="alert alert-danger">
+      <i class="fa-solid fa-triangle-exclamation"></i> {{ actionError() }}
+    </div>
   }
 
+  <!-- Mensajes de Carga, Error general o Listado Vacío -->
   @if (loading()) {
-    <p>Cargando habitaciones...</p>
+    <div class="alert alert-info">
+      <i class="fa-solid fa-spinner fa-spin"></i> Cargando habitaciones...
+    </div>
   } @else if (errorMessage()) {
-    <div class="error-container">
-      <p class="error-message">{{ errorMessage() }}</p>
-
-      <button type="button" (click)="loadRooms()">
-        Reintentar
-      </button>
+    <div class="alert alert-danger">
+      <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+        <span><i class="fa-solid fa-triangle-exclamation"></i> {{ errorMessage() }}</span>
+        <button type="button" class="btn-warning" (click)="loadRooms()">
+          <i class="fa-solid fa-rotate-right"></i> Reintentar
+        </button>
+      </div>
     </div>
   } @else if (rooms().length === 0) {
-    <p>No hay habitaciones registradas.</p>
+    <div class="alert alert-warning">
+      <i class="fa-solid fa-circle-info"></i> No hay habitaciones registradas.
+    </div>
   } @else {
 
-    <div class="table-container">
-      <table class="room-table">
-
+    <!-- Tabla de Datos -->
+    <div class="table-wrapper">
+      <table class="table">
         <thead>
           <tr>
             <th>Número</th>
@@ -42,35 +47,34 @@
             <th>Capacidad</th>
             <th>Estado</th>
             <th>Precio por noche</th>
-            <th>Acciones</th>
+            <th style="text-align: right;">Acciones</th>
           </tr>
         </thead>
-
         <tbody>
           @for (room of rooms(); track room.id) {
             <tr>
-
-              <td>{{ room.number }}</td>
+              <td><strong>#{{ room.number }}</strong></td>
 
               <td>
                 {{ room.roomTypeDTOResponse?.name
-                   ?? room.roomTypeName
-                   ?? 'Sin tipo' }}
+                    ?? room.roomTypeName
+                    ?? 'Sin tipo' }}
               </td>
 
               <td>
+                <i class="fa-solid fa-user-group"></i> 
                 {{ room.roomTypeDTOResponse?.capacity
-                   ?? room.capacity
-                   ?? 'Sin datos' }}
+                    ?? room.capacity
+                    ?? 'Sin datos' }}
               </td>
 
               <td>
                 <span
-                  class="room-status"
-                  [class.status-available]="room.state === 'AVAILABLE'"
-                  [class.status-occupied]="room.state === 'OCCUPIED'"
-                  [class.status-maintenance]="room.state === 'MAINTENANCE'"
-                  [class.status-cleaning]="room.state === 'CLEANING'"
+                  class="badge"
+                  [class.badge-success]="room.state === 'AVAILABLE'"
+                  [class.badge-danger]="room.state === 'OCCUPIED'"
+                  [class.badge-warning]="room.state === 'MAINTENANCE'"
+                  [class.badge-secondary]="room.state === 'CLEANING'"
                 >
                   @switch (room.state) {
                     @case ('AVAILABLE') {
@@ -93,49 +97,54 @@
               </td>
 
               <td>
-                {{ room.roomTypeDTOResponse?.pricePerNight
-                   ?? room.pricePerNight
-                   ?? 'Sin datos' }}
+                <strong>${{ room.roomTypeDTOResponse?.pricePerNight
+                    ?? room.pricePerNight
+                    ?? 'Sin datos' }}</strong>
               </td>
 
-              <td class="room-actions">
+              <td>
+                <div class="table-actions">
+                  <button
+                    type="button"
+                    class="btn-info-action"
+                    (click)="openRoomModal(room)"
+                    title="Ver detalle"
+                  >
+                    <i class="fa-solid fa-eye"></i>
+                  </button>
 
-                <button
-                  type="button"
-                  (click)="openRoomModal(room)"
-                >
-                  Ver detalle
-                </button>
+                  <a
+                    [routerLink]="['/dashboard/room-edit', room.id]"
+                    class="btn-warning"
+                    title="Editar"
+                  >
+                    <i class="fa-solid fa-pen-to-square"></i>
+                  </a>
 
-                <a
-                  [routerLink]="['/dashboard/room-edit', room.id]"
-                  class="link-edit"
-                >
-                  Editar
-                </a>
+                  <button
+                    type="button"
+                    class="btn-secondary-action"
+                    (click)="putInMaintenance(room.id)"
+                    [disabled]="room.state === 'MAINTENANCE'"
+                    title="Poner en mantenimiento"
+                  >
+                    <i class="fa-solid fa-screwdriver-wrench"></i>
+                  </button>
 
-                <button
-                  type="button"
-                  (click)="putInMaintenance(room.id)"
-                  [disabled]="room.state === 'MAINTENANCE'"
-                >
-                  Mantenimiento
-                </button>
-
-                <button
-                  type="button"
-                  class="btn-danger"
-                  (click)="deleteRoom(room.id)"
-                >
-                  Eliminar
-                </button>
-
+                  <button
+                    type="button"
+                    class="btn-danger"
+                    (click)="deleteRoom(room.id)"
+                    title="Eliminar"
+                  >
+                    <i class="fa-solid fa-trash-can"></i>
+                  </button>
+                </div>
               </td>
 
             </tr>
           }
         </tbody>
-
       </table>
     </div>
   }
@@ -143,139 +152,119 @@
 </section>
 
 
-//MODAL DE DETALLE
-
+<!-- MODAL DE DETALLE (Fuera de la sección principal para evitar problemas de posicionamiento fixed/backdrop) -->
 @if (selectedRoom(); as room) {
-
-  <div class="modal-overlay">
-
+  <div class="modal-backdrop" (click)="closeRoomModal()">
     <div
-      class="modal-content"
+      class="modal-card"
       role="dialog"
       aria-modal="true"
       aria-labelledby="room-modal-title"
+      (click)="$event.stopPropagation()"
     >
 
-      <header class="modal-header">
+      <!-- Botón Cerrar -->
+      <button
+        type="button"
+        class="btn-close"
+        aria-label="Cerrar modal"
+        (click)="closeRoomModal()"
+      >
+        <i class="fa-solid fa-xmark"></i>
+      </button>
 
-        <h2 id="room-modal-title">
-          Habitación {{ room.number }}
-        </h2>
-
-        <button
-          type="button"
-          class="btn-close"
-          aria-label="Cerrar modal"
-          (click)="closeRoomModal()"
-        >
-          ×
-        </button>
-
-      </header>
-
-      <div class="modal-body">
-
-        <p>
-          <strong>Tipo:</strong>
-          {{ room.roomTypeDTOResponse?.name
-             ?? room.roomTypeName
-             ?? 'Sin tipo' }}
+      <!-- Encabezado del Modal -->
+      <div class="modal-header-profile">
+        <h3 id="room-modal-title">
+          Habitación #{{ room.number }}
+        </h3>
+        <p class="subtitle">
+          {{ room.roomTypeDTOResponse?.name ?? room.roomTypeName ?? 'Estándar' }}
         </p>
+      </div>
 
-        <p>
-          <strong>Estado:</strong>
-          {{ room.state }}
-        </p>
+      <!-- Cuadrícula de Detalles -->
+      <div class="detail-grid">
+        <div class="detail-item">
+          <span class="detail-label"><i class="fa-solid fa-circle-check"></i> Estado:</span>
+          <span class="detail-value">{{ room.state }}</span>
+        </div>
+        <div class="detail-item">
+          <span class="detail-label"><i class="fa-solid fa-user-group"></i> Capacidad:</span>
+          <span class="detail-value">
+            {{ room.roomTypeDTOResponse?.capacity ?? room.capacity ?? 'Sin datos' }} personas
+          </span>
+        </div>
+        <div class="detail-item" style="grid-column: span 2;">
+          <span class="detail-label"><i class="fa-solid fa-dollar-sign"></i> Precio por noche:</span>
+          <span class="detail-value">
+            ${{ room.roomTypeDTOResponse?.pricePerNight ?? room.pricePerNight ?? 'Sin datos' }}
+          </span>
+        </div>
+      </div>
 
-        <p>
-          <strong>Capacidad:</strong>
-          {{ room.roomTypeDTOResponse?.capacity
-             ?? room.capacity
-             ?? 'Sin datos' }}
-        </p>
-
-        <p>
-          <strong>Precio por noche:</strong>
-          {{ room.roomTypeDTOResponse?.pricePerNight
-             ?? room.pricePerNight
-             ?? 'Sin datos' }}
-        </p>
-
-        <h3>Imágenes de la habitación</h3>
+      <!-- Sección de Imágenes -->
+      <div class="modal-gallery-section">
+        <h3><i class="fa-solid fa-images"></i> Imágenes de la habitación</h3>
 
         @if (loadingImages()) {
-
-          <p>Cargando imágenes...</p>
-
+          <div class="alert alert-info" style="margin-top: 0.75rem;">
+            <i class="fa-solid fa-spinner fa-spin"></i> Cargando imágenes...
+          </div>
         } @else if (imageError()) {
-
-          <p class="error-message">
-            {{ imageError() }}
-          </p>
-
+          <div class="alert alert-danger" style="margin-top: 0.75rem;">
+            <i class="fa-solid fa-triangle-exclamation"></i> {{ imageError() }}
+          </div>
         } @else if (roomImages().length === 0) {
-
-          <p>Esta habitación no tiene imágenes.</p>
-
+          <p class="subtitle" style="margin-top: 0.5rem;">Esta habitación no tiene imágenes.</p>
         } @else {
-
           <div class="image-gallery">
-
             <img
               [src]="roomImages()[currentImageIndex()]"
               [alt]="'Imagen de la habitación ' + room.number"
-              class="room-image"
+              class="room-image-preview"
             >
 
             @if (roomImages().length > 1) {
-
               <div class="gallery-controls">
-
                 <button
                   type="button"
+                  class="btn-secondary-action"
                   (click)="previousImage()"
                   aria-label="Imagen anterior"
                 >
-                  Anterior
+                  <i class="fa-solid fa-chevron-left"></i> Anterior
                 </button>
 
                 <span>
-                  {{ currentImageIndex() + 1 }}
-                  de
-                  {{ roomImages().length }}
+                  {{ currentImageIndex() + 1 }} de {{ roomImages().length }}
                 </span>
 
                 <button
                   type="button"
+                  class="btn-secondary-action"
                   (click)="nextImage()"
                   aria-label="Imagen siguiente"
                 >
-                  Siguiente
+                  Siguiente <i class="fa-solid fa-chevron-right"></i>
                 </button>
-
               </div>
-
             }
-
           </div>
-
         }
-
       </div>
 
-      <footer class="modal-footer">
-
+      <!-- Acciones del Modal -->
+      <div class="modal-actions">
         <button
           type="button"
+          class="btn-primary"
           (click)="closeRoomModal()"
         >
           Cerrar
         </button>
-
-      </footer>
+      </div>
 
     </div>
-
   </div>
-
 }

@@ -22,6 +22,10 @@ export const routes: Routes = [
             {
                 path: 'user-edit/:id', 
                 loadComponent: () => import('./components/user-edit/user-edit.component').then(m => m.UserEditComponent)
+            },
+            {
+                path:'room-list',
+                loadComponent:()=>import('./components/room/room-list/room-list.component').then(m=>m.RoomListComponent)
             }
         ]
     },
