@@ -1,0 +1,79 @@
+
+<div class="item-container">
+
+  <div class="item-header">
+    <h2>Productos y servicios</h2>
+
+    <a routerLink="/items/new">
+      Agregar ítem
+    </a>
+  </div>
+
+  @if (errorMessage()) {
+    <p>{{ errorMessage() }}</p>
+  }
+
+  @if (loading()) {
+    <p>Cargando productos y servicios...</p>
+  } @else {
+
+    @if (items().length === 0) {
+      <p>No hay productos ni servicios registrados.</p>
+    } @else {
+
+      <div class="item-list">
+
+        @for (item of items(); track item.id) {
+
+          <div class="item-card">
+
+            @if (item.imageUrl) {
+              <img
+                [src]="item.imageUrl"
+                [alt]="item.description"
+              >
+            } @else {
+              <p>Sin imagen</p>
+            }
+
+            <h3>{{ item.description }}</h3>
+
+            <p>
+              <strong>Tipo:</strong>
+              {{ item.isService ? 'Servicio' : 'Producto' }}
+            </p>
+
+            <p>
+              <strong>Cantidad:</strong>
+              {{ item.quantity }}
+            </p>
+
+            <p>
+              <strong>Precio unitario:</strong>
+              {{ item.unitPrice | currency:'ARS':'symbol':'1.2-2' }}
+            </p>
+
+            <div class="item-actions">
+
+              <a [routerLink]="['/items/edit', item.id]">
+                Editar
+              </a>
+
+              <button
+                type="button"
+                [disabled]="deletingId() !== null"
+                (click)="deleteItem(item.id)"
+              >
+                @if (deletingId() === item.id) {
+                  Eliminando...
+                } @else {
+                  Eliminar
+                }
+              </button>
+            </div>
+          </div>
+        }
+      </div>
+    }
+  }
+</div>
