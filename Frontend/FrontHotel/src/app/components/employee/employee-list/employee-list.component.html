@@ -1,1 +1,303 @@
-<p>employee-list works!</p>
+
+<div class="employee-container">
+
+  <!-- Encabezado -->
+  <header class="employee-header">
+    <h2>Gestión de Empleados</h2>
+
+    @if (isAdmin()) {
+      <a
+        class="employee-create-link"
+        routerLink="/dashboard/employees/nuevo">
+        Nuevo Empleado
+      </a>
+    }
+  </header>
+
+  <!-- Estados -->
+  @if (loading()) {
+    <p class="loading-message">
+      Cargando empleados...
+    </p>
+  }
+
+  @if (errorMessage()) {
+    <p class="error-message">
+      {{ errorMessage() }}
+    </p>
+  }
+
+  <!-- Listado -->
+  @if (!loading() && employees().length > 0) {
+    <div class="employee-table-container">
+      <table class="employee-table">
+
+        <thead>
+          <tr>
+            <th>Fotografía</th>
+            <th>ID</th>
+            <th>Usuario</th>
+            <th>Nombre y apellido</th>
+            <th>Rol</th>
+            <th>Legajo</th>
+            <th>Tel. emergencia</th>
+            <th>Email</th>
+            <th>Contratación</th>
+            <th>Turno</th>
+            <th>Salario</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          @for (employee of employees(); track employee.id) {
+            <tr>
+
+              <td>
+                @if (getEmployeeAvatarUrl(employee.id) !== defaultAvatar) {
+                  <img
+                    class="employee-avatar"
+                    [src]="getEmployeeAvatarUrl(employee.id)"
+                    alt="Fotografía del empleado">
+                } @else {
+                  <span class="employee-avatar-placeholder">
+                    Sin foto
+                  </span>
+                }
+              </td>
+
+              <td>{{ employee.id }}</td>
+              <td>{{ employee.username }}</td>
+              <td>{{ employee.name }} {{ employee.surname }}</td>
+
+              <td>
+                {{ getEmployeeRole(employee.id) }}
+              </td>
+
+              <td>{{ employee.employeeNumber || '-' }}</td>
+
+              <td>
+                {{ employee.emergencyPhoneNumber || '-' }}
+              </td>
+
+              <td>{{ employee.email }}</td>
+              <td>{{ employee.hireDate || '-' }}</td>
+              <td>{{ employee.shift }}</td>
+
+              <td>
+                ${{ employee.salary | number:'1.2-2' }}
+              </td>
+
+              <td>
+                <div class="employee-actions">
+
+                  <button
+                    type="button"
+                    class="btn-detail"
+                    (click)="openEmployeeDetail(employee)">
+                    Ver detalles
+                  </button>
+
+                  @if (isAdmin()) {
+                    <button
+                      type="button"
+                      class="btn-delete"
+                      [disabled]="deletingId() !== null"
+                      (click)="deleteEmployee(employee.id)">
+
+                      @if (deletingId() === employee.id) {
+                        Eliminando...
+                      } @else {
+                        Eliminar
+                      }
+                    </button>
+                  }
+
+                </div>
+              </td>
+
+            </tr>
+          }
+        </tbody>
+
+      </table>
+    </div>
+  }
+
+  <!-- Listado vacío -->
+  @if (!loading() && !errorMessage() && employees().length === 0) {
+    <p class="empty-message">
+      No se encontraron empleados registrados.
+    </p>
+  }
+
+  <!-- Detalle del empleado -->
+  @if (selectedEmployee(); as employee) {
+
+    <div class="employee-modal-overlay">
+
+      <section
+        class="employee-modal"
+        role="dialog"
+        aria-modal="true"
+        aria-label="Detalle del empleado">
+
+        <div class="employee-modal-header">
+          <h3>Detalle del empleado</h3>
+
+          <button
+            type="button"
+            class="btn-close"
+            (click)="closeEmployeeDetail()">
+            Cerrar
+          </button>
+        </div>
+
+        <div class="employee-profile">
+
+          @if (getEmployeeAvatarUrl(employee.id) !== defaultAvatar) {
+            <img
+              class="employee-profile-avatar"
+              [src]="getEmployeeAvatarUrl(employee.id)"
+              alt="Fotografía del empleado">
+          } @else {
+            <div class="employee-profile-placeholder">
+              Sin fotografía
+            </div>
+          }
+
+          <h4>{{ employee.name }} {{ employee.surname }}</h4>
+          <p>{{ employee.username }}</p>
+        </div>
+
+        @if (detailLoading()) {
+          <p class="loading-message">
+            Cargando información del usuario...
+          </p>
+        }
+
+        @if (detailError()) {
+          <p class="error-message">
+            {{ detailError() }}
+          </p>
+        }
+
+        <!-- Datos laborales -->
+        <h4 class="employee-section-title">
+          Datos laborales
+        </h4>
+
+        <div class="employee-detail-grid">
+
+          <div>
+            <strong>Legajo:</strong>
+            <span>{{ employee.employeeNumber || 'No especificado' }}</span>
+          </div>
+
+          <div>
+            <strong>Teléfono de emergencia:</strong>
+            <span>{{ employee.emergencyPhoneNumber || 'No especificado' }}</span>
+          </div>
+
+          <div>
+            <strong>Fecha de contratación:</strong>
+            <span>{{ employee.hireDate || 'No especificada' }}</span>
+          </div>
+
+          <div>
+            <strong>Turno:</strong>
+            <span>{{ employee.shift }}</span>
+          </div>
+
+          <div>
+            <strong>Salario:</strong>
+            <span>${{ employee.salary | number:'1.2-2' }}</span>
+          </div>
+
+          <div>
+            <strong>Rol:</strong>
+            <span>{{ getEmployeeRole(employee.id) }}</span>
+          </div>
+
+        </div>
+
+        <!-- Datos del usuario -->
+        @if (selectedUser(); as user) {
+
+          <h4 class="employee-section-title">
+            Datos del usuario
+          </h4>
+
+          <div class="employee-detail-grid">
+
+            <div>
+              <strong>DNI:</strong>
+              <span>{{ user.dni }}</span>
+            </div>
+
+            <div>
+              <strong>Email:</strong>
+              <span>{{ user.email }}</span>
+            </div>
+
+            <div>
+              <strong>Teléfono:</strong>
+              <span>{{ user.phoneNumber || 'No especificado' }}</span>
+            </div>
+
+            <div>
+              <strong>Género:</strong>
+              <span>{{ user.gender || 'No especificado' }}</span>
+            </div>
+
+            <div>
+              <strong>Dirección:</strong>
+              <span>{{ user.address || 'No especificada' }}</span>
+            </div>
+
+            <div>
+              <strong>Fecha de nacimiento:</strong>
+              <span>{{ user.birthDay }}</span>
+            </div>
+
+            <div>
+              <strong>Estado:</strong>
+              <span>
+                {{ user.enabled ? 'Activo' : 'Inactivo' }}
+              </span>
+            </div>
+
+          </div>
+        }
+
+        <!-- Acciones del detalle -->
+        <div class="employee-modal-actions">
+
+          <button
+            type="button"
+            class="btn-cancel"
+            (click)="closeEmployeeDetail()">
+            Cerrar
+          </button>
+
+          @if (isAdmin()) {
+            <button
+              type="button"
+              class="btn-delete"
+              [disabled]="deletingId() !== null"
+              (click)="deleteEmployee(employee.id)">
+
+              @if (deletingId() === employee.id) {
+                Eliminando...
+              } @else {
+                Eliminar empleado
+              }
+            </button>
+          }
+
+        </div>
+
+      </section>
+    </div>
+  }
+</div>
