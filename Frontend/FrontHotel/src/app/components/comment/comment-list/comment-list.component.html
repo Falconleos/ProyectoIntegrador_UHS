@@ -1,77 +1,96 @@
+<div class="container">
+  <!-- Encabezado -->
+  <div class="header-section">
+    <h2>
+      <i class="bi bi-chat-square-text me-2"></i> Listado de Comentarios
+    </h2>
+    
+    @if (canCreate()) {
+      <a routerLink="/dashboard/comment-create" class="btn-primary-action">
+        <i class="bi bi-plus-lg me-1"></i> Nuevo comentario
+      </a>
+    }
+  </div>
 
-<h2>Listado de comentarios</h2>
+  <hr class="divider" />
 
-@if (canCreate()) {
-  <a routerLink="/comments/new">
-    Nuevo comentario
-  </a>
-}
-
-@if (errorMessage()) {
-  <p>{{ errorMessage() }}</p>
-}
-
-@if (loading()) {
-  <p>Cargando comentarios...</p>
-} @else {
-
-  @if (comments().length === 0) {
-    <p>No hay comentarios disponibles.</p>
-  } @else {
-
-    <table>
-      <thead>
-        <tr>
-          <th>ID</th>
-          <th>Usuario</th>
-          <th>Comentario</th>
-          <th>Valoración</th>
-          <th>Fecha</th>
-          <th>Acciones</th>
-        </tr>
-      </thead>
-
-      <tbody>
-        @for (comment of comments(); track comment.id) {
-          <tr>
-            <td>{{ comment.id }}</td>
-
-            <td>
-              {{ comment.name }} {{ comment.surname }}
-              ({{ comment.username }})
-            </td>
-
-            <td>{{ comment.content }}</td>
-
-            <td>{{ comment.rating }} / 5</td>
-
-            <td>{{ comment.createdAt }}</td>
-
-            <td>
-              @if (canEdit(comment)) {
-                <a [routerLink]="['/comments/edit', comment.id]">
-                  Editar
-                </a>
-              }
-
-              @if (canDelete()) {
-                <button
-                  type="button"
-                  [disabled]="deletingId() !== null"
-                  (click)="deleteComment(comment.id)">
-
-                  @if (deletingId() === comment.id) {
-                    Eliminando...
-                  } @else {
-                    Eliminar
-                  }
-
-                </button>
-              }
-            </td>
-          </tr>
-        }
-      </tbody>
-    </table>
+  <!-- Mensaje de Error -->
+  @if (errorMessage()) {
+    <div class="alert alert-danger">
+      <i class="bi bi-exclamation-triangle me-2"></i> {{ errorMessage() }}
+    </div>
   }
-}
+
+  <!-- Estado de Carga -->
+  @if (loading()) {
+    <div class="alert alert-info">
+      <i class="bi bi-arrow-repeat spin me-2"></i> Cargando comentarios...
+    </div>
+  } @else {
+    @if (comments().length === 0) {
+      <div class="alert alert-info">
+        <i class="bi bi-info-circle me-2"></i> No hay comentarios disponibles.
+      </div>
+    } @else {
+      <!-- Grilla de Tarjetas de Comentarios -->
+      <div class="comments-grid">
+        @for (comment of comments(); track comment.id) {
+          <div class="glass-card comment-card">
+            
+            <!-- Cabecera del Comentario (Autor y Avatar) -->
+            <div class="comment-header">
+              <div class="avatar-wrapper">
+                <div class="avatar-placeholder">
+                  <i class="bi bi-person-fill"></i>
+                </div>
+              </div>
+
+              <div class="user-meta">
+                <h4 class="user-fullname">{{ comment.name }} {{ comment.surname }}</h4>
+                <span class="user-handle">&#64;{{ comment.username }}</span>
+              </div>
+
+              <!-- Valoración con Estrellas -->
+              <div class="comment-rating" [title]="'Valoración: ' + comment.rating + ' de 5'">
+                @for (star of [1, 2, 3, 4, 5]; track star) {
+                  <i class="bi" [class.bi-star-fill]="star <= comment.rating" [class.bi-star]="star > comment.rating"></i>
+                }
+              </div>
+            </div>
+
+            <!-- Contenido del Comentario -->
+            <div class="comment-body">
+              <p class="comment-text">"{{ comment.content }}"</p>
+            </div>
+
+            <!-- Pie de tarjeta (Fecha y Acciones) -->
+            <div class="comment-footer">
+              <span class="comment-date">
+                <i class="bi bi-clock me-1"></i> {{ comment.createdAt }}
+              </span>
+
+              <div class="comment-actions">
+
+                @if (canDelete()) {
+                  <button
+                    type="button"
+                    class="btn-danger-action"
+                    [disabled]="deletingId() !== null"
+                    (click)="deleteComment(comment.id)"
+                  >
+                    @if (deletingId() === comment.id) {
+                      <i class="bi bi-arrow-repeat spin me-1"></i> Eliminando...
+                    } @else {
+                      <i class="bi bi-trash me-1"></i> Eliminar
+                    }
+                  </button>
+                }
+              </div>
+            </div>
+
+          </div>
+        }
+      </div>
+    }
+  }
+</div>

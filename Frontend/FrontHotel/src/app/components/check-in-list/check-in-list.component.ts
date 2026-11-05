@@ -334,6 +334,11 @@ export class CheckInListComponent implements OnInit {
   }
 
   servicesPlaceholder(id: number): void { 
-    this.router.navigate([`/dashboard/bookings/${id}/servicios`]);
+  console.log('ID de reserva recibido:', id);
+  if (!id) {
+    console.error('¡El ID es nulo o indefinido!');
+    return;
   }
+  this.router.navigate([`/dashboard/bookings/${id}/servicios`]);
+}
 }

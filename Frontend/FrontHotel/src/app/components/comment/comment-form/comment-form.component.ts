@@ -156,7 +156,7 @@ export class CommentFormComponent implements OnInit {
       this.commentService.create(payload).subscribe({
         next: () => {
           this.saving.set(false);
-          this.router.navigate(['/comments']);
+          this.router.navigate(['/comment-list']);
         },
         error: () => {
           this.errorMessage.set('No se pudo crear el comentario.');

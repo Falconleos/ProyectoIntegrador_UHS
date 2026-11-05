@@ -78,6 +78,30 @@ export const routes: Routes = [
             {
                 path: 'account-detail/:id',
                 loadComponent: () => import('./components/account-detail/account-detail.component').then(m => m.AccountDetailComponent)
+            },
+            {
+                path:'item-list',
+                loadComponent:()=>import('./components/item/item-list/item-list.component').then(m=>m.ItemListComponent)
+            },
+            {
+                path:'item-create',
+                loadComponent:()=>import('./components/item/item-form/item-form.component').then(m=>m.ItemFormComponent)
+            },
+            {
+                path:'item-edit/:id',
+                loadComponent:()=>import('./components/item/item-edit/item-edit.component').then(m=>m.ItemEditComponent)
+            },
+            {
+                path:'comment-list',
+                loadComponent:()=>import('./components/comment/comment-list/comment-list.component').then(m=>m.CommentListComponent)
+            },
+            {
+                path:'comment-create',
+                loadComponent:()=>import('./components/comment/comment-form/comment-form.component').then(m=>m.CommentFormComponent)
+            },
+            {
+                path: 'bookings/:id/servicios',
+                loadComponent: () => import('./components/room-attention/room-attention-list/room-attention-list.component').then(m => m.RoomAttentionListComponent)
             }
 
             
