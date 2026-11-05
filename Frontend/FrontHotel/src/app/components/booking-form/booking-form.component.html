@@ -1,0 +1,136 @@
+<div class="container">
+  <!-- Encabezado -->
+  <div class="header-section">
+    <h2><i class="bi bi-calendar-check me-2"></i> Completar datos de la reserva</h2>
+    <p class="subtitle">Ingresa la información del titular para registrar la nueva reserva en el sistema.</p>
+  </div>
+
+  <hr class="divider" />
+
+  <!-- Alerta de Error -->
+  @if (errorMessage()) {
+    <div class="alert alert-danger">
+      <i class="bi bi-exclamation-triangle-fill me-2"></i> {{ errorMessage() }}
+    </div>
+  }
+
+  <!-- Resumen de Selección Previa -->
+  @if (bookingData) {
+    <div class="summary-card">
+      <div class="summary-header">
+        <div class="summary-icon">
+          <i class="bi bi-door-open"></i>
+        </div>
+        <div>
+          <h5 class="summary-title">Habitación {{ bookingData.room.number }}</h5>
+          <span class="subtitle">{{ bookingData.room.roomTypeName || bookingData.room.roomTypeDTOResponse?.name }}</span>
+        </div>
+      </div>
+      
+      <div class="summary-details">
+        <div class="summary-item">
+          <i class="bi bi-calendar-days text-primary"></i>
+          <span><strong>Estadía:</strong> {{ bookingData.checkIn }} al {{ bookingData.checkOut }}</span>
+        </div>
+        <div class="summary-item">
+          <i class="bi bi-people text-primary"></i>
+          <span><strong>Huéspedes:</strong> {{ bookingData.guestCount }} persona(s)</span>
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- Formulario Principal -->
+  <form [formGroup]="bookingForm" (ngSubmit)="onSubmit()" class="form-container">
+    
+    <!-- Selector de Tipo de Cliente -->
+    <div class="switch-box">
+      <div class="form-check form-switch">
+        <input class="form-check-input" type="checkbox" role="switch" id="isRegisteredUser" formControlName="isRegisteredUser">
+        <label class="form-check-label" for="isRegisteredUser">
+          Asociar a un usuario ya registrado en el sistema
+        </label>
+      </div>
+      <small class="subtitle d-block mt-1">
+        Si se deja desmarcado, se creará una reserva rápida (telefónica) y el pasajero podrá registrarse o vincularse en el momento del Check-In.
+      </small>
+    </div>
+
+    <!-- OPCIÓN A: Selección de Usuario Registrado -->
+    @if (isRegisteredUser()) {
+      <div class="form-section">
+        <h4 class="section-title">Seleccionar Usuario del Sistema</h4>
+        <div class="form-group">
+          <label for="userId" class="form-label">Usuario Registrado *</label>
+          <div class="input-wrapper">
+            <span class="input-icon"><i class="bi bi-person-check"></i></span>
+            <select id="userId" class="form-control" formControlName="userId">
+              <option [ngValue]="null">-- Seleccione un usuario --</option>
+              @for (user of usersList(); track user.id) {
+                <option [value]="user.id">
+                  {{ user.name }} {{ user.surname }} (Username: {{ user.username }})
+                </option>
+              }
+            </select>
+          </div>
+        </div>
+      </div>
+    }
+
+    <!-- OPCIÓN B: Datos Manuales del Titular -->
+    @if (!isRegisteredUser()) {
+      <div class="form-section">
+        <h4 class="section-title">Información del Huésped Titular</h4>
+        <div class="grid-2">
+          
+          <div class="form-group">
+            <label for="guestFirstName" class="form-label">Nombre *</label>
+            <div class="input-wrapper">
+              <span class="input-icon"><i class="bi bi-person"></i></span>
+              <input type="text" id="guestFirstName" class="form-control" formControlName="guestFirstName" placeholder="Ej: Juan">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="guestLastName" class="form-label">Apellido *</label>
+            <div class="input-wrapper">
+              <span class="input-icon"><i class="bi bi-card-text"></i></span>
+              <input type="text" id="guestLastName" class="form-control" formControlName="guestLastName" placeholder="Ej: Pérez">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="guestPhone" class="form-label">Teléfono de Contacto *</label>
+            <div class="input-wrapper">
+              <span class="input-icon"><i class="bi bi-telephone"></i></span>
+              <input type="text" id="guestPhone" class="form-control" formControlName="guestPhone" placeholder="Ej: +54 9 223 1234567">
+            </div>
+          </div>
+
+        </div>
+      </div>
+    }
+
+    <hr class="divider" />
+
+    <h4 class="section-title">Adicionales</h4>
+    <div class="form-group">
+      <label for="observation" class="form-label">Observaciones (Opcional)</label>
+      <textarea id="observation" class="form-control textarea" formControlName="observation" rows="3" placeholder="Aclaraciones, horarios estimados de llegada o pedidos especiales..."></textarea>
+    </div>
+
+    <hr class="divider" />
+
+    <!-- Botones de Acción -->
+    <div class="actions-container">
+      <button type="button" class="btn-secondary-action" routerLink="/dashboard/bookings">
+        <i class="bi bi-arrow-left me-1"></i> Volver
+      </button>
+      <button type="submit" class="btn-primary" [disabled]="bookingForm.invalid || loading()">
+        <i class="bi" [ngClass]="loading() ? 'bi-arrow-repeat bi-spin' : 'bi-check-lg'"></i> 
+        {{ loading() ? 'Guardando reserva...' : 'Confirmar Creación de Reserva' }}
+      </button>
+    </div>
+
+  </form>
+</div>

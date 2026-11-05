@@ -120,7 +120,7 @@ export class AvailabilityComponent implements OnInit {
         nights: days,
         totalPrice: total
       });
-      this.router.navigate(['/dashboard/bookings/nuevo']);
+      this.router.navigate(['/dashboard/booking-create']);
     } else {
       console.log('Selección de habitación cancelada por el usuario.');
     }

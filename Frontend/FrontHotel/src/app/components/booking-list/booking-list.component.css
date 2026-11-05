@@ -1,4 +1,6 @@
 /* --- Corrección global de resaltado de texto para mantener estética oscura --- */
+@import "bootstrap-icons/font/bootstrap-icons.css";
+
 ::selection {
   background: var(--color-primary, #6366f1);
   color: #ffffff;

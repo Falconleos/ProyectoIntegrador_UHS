@@ -59,6 +59,10 @@ export const routes: Routes = [
                 path:'availability',
                 loadComponent:()=>import('./components/availability/availability.component').then(m=>m.AvailabilityComponent)
             },
+            {
+                path:'booking-create',
+                loadComponent:()=>import('./components/booking-form/booking-form.component').then(m=>m.BookingFormComponent)
+            },
             
 
             
