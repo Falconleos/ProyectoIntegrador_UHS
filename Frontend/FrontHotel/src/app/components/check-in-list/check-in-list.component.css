@@ -355,7 +355,8 @@ section {
   transition: opacity 0.2s;
   font-size: var(--font-size-sm);
   white-space: nowrap;
-  width: 100%;
+  width: 30%;
+  min-width: 100px;
 }
 
 .modal-card .btn-primary {

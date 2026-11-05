@@ -1,0 +1,94 @@
+<div class="container">
+  <!-- Encabezado -->
+  <div class="header-section">
+    <h2>
+      <i class="bi bi-file-earmark-text me-2"></i> Gestión de Cuentas y Pagos
+    </h2>
+    <p class="subtitle">Administre y consulte los saldos, pagos y estados de cuentas del hotel.</p>
+  </div>
+
+  <hr class="divider" />
+
+  <!-- Alertas de Carga / Error -->
+  @if (loading()) {
+    <div class="alert alert-info">
+      <i class="bi bi-arrow-repeat spin me-2"></i> Cargando registros de cuentas...
+    </div>
+  }
+
+  @if (errorMessage()) {
+    <div class="alert alert-danger">
+      <i class="bi bi-exclamation-triangle me-2"></i> {{ errorMessage() }}
+    </div>
+  }
+
+  <!-- Tabla de Cuentas con diseño Glass -->
+  @if (!loading() && !errorMessage() && accounts().length > 0) {
+    <div class="table-wrapper">
+      <table class="table">
+        <thead>
+          <tr>
+            <th class="ps-4">ID Cuenta</th>
+            <th>Huésped</th>
+            <th>DNI</th>
+            <th>Habitación</th>
+            <th>Período</th>
+            <th>Total</th>
+            <th>Pagado</th>
+            <th>Saldo</th>
+            <th>Estado</th>
+            <th style="text-align: right; padding-right: 1.5rem;">Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (account of accounts(); track account.id) {
+            <tr>
+              <td class="ps-4"><strong>#{{ account.id }}</strong></td>
+              <td class="text-nowrap">{{ account.user ? (account.user.name + ' ' + account.user.surname) : '-' }}</td>
+              <td>{{ account.user?.dni || '-' }}</td>
+              <td>
+                <span class="badge badge-secondary">
+                  <i class="bi bi-door-closed me-1"></i> Hab. {{ account.roomNumber || 'N/D' }}
+                </span>
+              </td>
+              <td class="subtitle text-nowrap">
+                <i class="bi bi-calendar-range me-1"></i> {{ account.checkInDate || 'N/D' }} al {{ account.checkOutDate || 'N/D' }}
+              </td>
+              <td class="fw-bold text-nowrap">${{ account.totalAmount | number:'1.2-2' }}</td>
+              <td class="fw-bold text-nowrap" style="color: #34d399;">${{ account.paidAmount | number:'1.2-2' }}</td>
+              <td class="fw-bold text-nowrap" style="color: #fca5a5;">${{ account.remainingBalance | number:'1.2-2' }}</td>
+              <td>
+                @if (account.isPaid) {
+                  <span class="badge" style="background: rgba(52, 211, 153, 0.15); color: #34d399; border: 1px solid rgba(52, 211, 153, 0.3);">
+                    <i class="bi bi-check-circle me-1"></i> Pagado
+                  </span>
+                } @else {
+                  <span class="badge" style="background: rgba(251, 191, 36, 0.15); color: #fbbf24; border: 1px solid rgba(251, 191, 36, 0.3);">
+                    <i class="bi bi-clock me-1"></i> Pendiente
+                  </span>
+                }
+              </td>
+              <td style="text-align: right; padding-right: 1.5rem;">
+                <div class="table-actions">
+                  <button 
+                    class="btn-secondary-action" 
+                    (click)="viewAccountDetail(account.id)"
+                    title="Ver detalle de cuenta">
+                    <i class="bi bi-eye"></i> Ver Detalle
+                  </button>
+                </div>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+
+  <!-- Mensaje si la lista está vacía -->
+  @if (!loading() && !errorMessage() && accounts().length === 0) {
+    <div class="alert alert-info">
+      <i class="bi bi-info-circle me-2"></i> No se encontraron cuentas registradas en el sistema.
+    </div>
+  }
+</div>

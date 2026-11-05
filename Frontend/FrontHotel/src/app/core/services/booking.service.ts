@@ -50,6 +50,8 @@ export class BookingService {
     return this.http.get<PaymentDTOResponse[]>(`http://localhost:8080/api/accounts/bookings/${bookingId}/payments`, { withCredentials: true });
   }
 
-
+  processNoShows(): Observable<void> {
+    return this.http.post<void>(`${this.apiUrl}/process-no-shows`, {}, { withCredentials: true });
+  }
 
 }

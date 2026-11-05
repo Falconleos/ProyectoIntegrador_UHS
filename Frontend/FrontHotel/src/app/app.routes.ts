@@ -71,6 +71,14 @@ export const routes: Routes = [
                 path:'check-in-list',
                 loadComponent:()=>import('./components/check-in-list/check-in-list.component').then(m=>m.CheckInListComponent)
             },
+            {
+                path:'account-list',
+                loadComponent:()=>import('./components/account-list/account-list.component').then(m=>m.AccountListComponent)
+            },
+            {
+                path: 'account-detail/:id',
+                loadComponent: () => import('./components/account-detail/account-detail.component').then(m => m.AccountDetailComponent)
+            }
 
             
         ]

@@ -75,13 +75,31 @@ export class BookingListComponent implements OnInit {
     this.loading.set(true);
     this.errorMessage.set('');
     
+    // 1. Primero procesamos los No-Shows en el backend para actualizar estados vencidos
+    this.bookingService.processNoShows().subscribe({
+      next: () => {
+        // 2. Una vez procesados, procedemos a listar las reservas con normalidad
+        this.fetchAndFilterBookings();
+      },
+      error: (err) => {
+        console.warn('No se pudo ejecutar el procesamiento automático de No-Shows, continuando carga...', err);
+        // Aun si falla el endpoint de process-no-shows, intentamos mostrar la lista
+        this.fetchAndFilterBookings();
+      }
+    });
+  }
+
+  // Extraemos la lógica original de carga a este método auxiliar
+  activeTab = signal<'PENDING' | 'NO_SHOW'>('PENDING');
+
+  private fetchAndFilterBookings(): void {
     this.bookingService.getAll().subscribe({
       next: (data) => {
         const allBookings = Array.isArray(data) ? [...data] : [];
         
-        // Filtramos para mostrar únicamente las activas o en estados válidos
+        // Incluimos PENDING, CONFIRMED y NO_SHOW para que no se pierdan
         const filtered: BookingWithAccount[] = allBookings.filter(
-          (b) => b.state === 'PENDING' || b.state === 'CONFIRMED'
+          (b) => b.state === 'PENDING' || b.state === 'CONFIRMED' || b.state === 'NO_SHOW'
         );
         
         this.bookings.set(filtered);
@@ -97,7 +115,6 @@ export class BookingListComponent implements OnInit {
               } else {
                 booking.hasAccount = false;
               }
-              // Forzamos el refresco de la vista con OnPush
               this.cdr.markForCheck();
             },
             error: () => {
