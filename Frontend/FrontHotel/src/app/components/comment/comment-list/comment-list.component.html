@@ -1,1 +1,77 @@
-<p>comment-list works!</p>
+
+<h2>Listado de comentarios</h2>
+
+@if (canCreate()) {
+  <a routerLink="/comments/new">
+    Nuevo comentario
+  </a>
+}
+
+@if (errorMessage()) {
+  <p>{{ errorMessage() }}</p>
+}
+
+@if (loading()) {
+  <p>Cargando comentarios...</p>
+} @else {
+
+  @if (comments().length === 0) {
+    <p>No hay comentarios disponibles.</p>
+  } @else {
+
+    <table>
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Usuario</th>
+          <th>Comentario</th>
+          <th>Valoración</th>
+          <th>Fecha</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        @for (comment of comments(); track comment.id) {
+          <tr>
+            <td>{{ comment.id }}</td>
+
+            <td>
+              {{ comment.name }} {{ comment.surname }}
+              ({{ comment.username }})
+            </td>
+
+            <td>{{ comment.content }}</td>
+
+            <td>{{ comment.rating }} / 5</td>
+
+            <td>{{ comment.createdAt }}</td>
+
+            <td>
+              @if (canEdit(comment)) {
+                <a [routerLink]="['/comments/edit', comment.id]">
+                  Editar
+                </a>
+              }
+
+              @if (canDelete()) {
+                <button
+                  type="button"
+                  [disabled]="deletingId() !== null"
+                  (click)="deleteComment(comment.id)">
+
+                  @if (deletingId() === comment.id) {
+                    Eliminando...
+                  } @else {
+                    Eliminar
+                  }
+
+                </button>
+              }
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  }
+}
