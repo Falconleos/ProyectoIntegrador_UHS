@@ -22,7 +22,33 @@ export const routes: Routes = [
             {
                 path: 'user-edit/:id', 
                 loadComponent: () => import('./components/user-edit/user-edit.component').then(m => m.UserEditComponent)
-            }
+            },
+            {
+                path:'room-list',
+                loadComponent:()=>import('./components/room/room-list/room-list.component').then(m=>m.RoomListComponent)
+            },
+            {
+                path: 'room-edit/:id',
+                loadComponent: () => import('./components/room/room-edit/room-edit.component').then(m => m.RoomEditComponent)
+            },
+            {
+                path: 'room-type',
+                loadComponent: () => import('./components/room/room-type-form/room-type-form.component').then(m=>m.RoomTypeFormComponent)
+            },
+            {
+                path:'room-form',
+                loadComponent: ()=>import('./components/room/room-form/room-form.component').then(m=>m.RoomFormComponent)
+            },
+            {
+                path:'employee-list',
+                loadComponent: ()=>import('./components/employee/employee-list/employee-list.component').then(m=>m.EmployeeListComponent)
+            },
+            {
+                path:'employee-create',
+                loadComponent: ()=>import('./components/employee/employee-form/employee-form.component').then(m=>m.EmployeeFormComponent)
+            },
+
+            
         ]
     },
     {

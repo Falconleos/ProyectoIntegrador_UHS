@@ -1,101 +1,107 @@
+<div class="container">
 
-<section class="room-edit-container">
+  <!-- Sección de Encabezado -->
+  <div class="header-section">
+    <h2><i class="fa-solid fa-pen-to-square"></i> Editar Habitación</h2>
+    <a routerLink="/dashboard/room-list" class="btn-secondary-action">
+      <i class="fa-solid fa-arrow-left"></i> Volver al listado
+    </a>
+  </div>
 
-  <h1>Editar habitación</h1>
+  <hr class="divider" />
 
   @if (loading()) {
-    <p>Cargando datos de la habitación...</p>
+    <div class="alert alert-info">
+      <i class="fa-solid fa-spinner fa-spin"></i> Cargando datos de la habitación...
+    </div>
   } @else {
 
     @if (errorMessage()) {
-      <p class="error-message" role="alert">
-        {{ errorMessage() }}
-      </p>
+      <div class="alert alert-danger">
+        <i class="fa-solid fa-triangle-exclamation"></i> {{ errorMessage() }}
+      </div>
     }
 
-    <form [formGroup]="roomForm" (ngSubmit)="updateRoom()">
+    <!-- Tarjeta contenedora del formulario (estilo glassmorphism unificado) -->
+    <div class="form-card-wrapper">
+      <form [formGroup]="roomForm" (ngSubmit)="updateRoom()" class="form-layout">
 
-      <!-- Número de habitación -->
-      <div class="form-group">
+        <!-- Número de habitación -->
+        <div class="form-group">
+          <label for="number" class="form-label">
+            <i class="fa-solid fa-hashtag"></i> Número de habitación
+          </label>
+          <input
+            id="number"
+            type="number"
+            formControlName="number"
+            min="1"
+            class="form-control"
+            placeholder="Ej. 101"
+          >
 
-        <label for="number">Número de habitación</label>
+          @if (roomForm.controls.number.touched && roomForm.controls.number.hasError('required')) {
+            <p class="error-text">
+              <i class="fa-solid fa-circle-exclamation"></i> El número de habitación es obligatorio.
+            </p>
+          }
+          @if (roomForm.controls.number.touched && roomForm.controls.number.hasError('min')) {
+            <p class="error-text">
+              <i class="fa-solid fa-circle-exclamation"></i> El número debe ser mayor a 0.
+            </p>
+          }
+        </div>
 
-        <input
-          id="number"
-          type="number"
-          formControlName="number"
-          min="1"
-        >
-
-        @if (roomForm.controls.number.touched &&
-             roomForm.controls.number.hasError('required')) {
-          <p class="error-message">
-            El número de habitación es obligatorio.
-          </p>
-        }
-
-        @if (roomForm.controls.number.touched &&
-             roomForm.controls.number.hasError('min')) {
-          <p class="error-message">
-            El número debe ser mayor a 0.
-          </p>
-        }
-
-      </div>
-
-      <!-- Tipo de habitación -->
-      <div class="form-group">
-
-        <label for="roomTypeId">Tipo de habitación</label>
-
-        <select
-          id="roomTypeId"
-          formControlName="roomTypeId"
-        >
-
-          <option [ngValue]="0">
-            Seleccione un tipo de habitación
-          </option>
-
-          @for (type of roomTypes(); track type.id) {
-            <option [ngValue]="type.id">
-              {{ type.name }}
+        <!-- Tipo de habitación -->
+        <div class="form-group">
+          <label for="roomTypeId" class="form-label">
+            <i class="fa-solid fa-layer-group"></i> Tipo de habitación
+          </label>
+          <select
+            id="roomTypeId"
+            formControlName="roomTypeId"
+            class="form-control"
+          >
+            <option [ngValue]="0" disabled>
+              Seleccione un tipo de habitación
             </option>
+
+            @for (type of roomTypes(); track type.id) {
+              <option [ngValue]="type.id">
+                {{ type.name }} (${{ type.pricePerNight }} - Cap. {{ type.capacity }})
+              </option>
+            }
+          </select>
+
+          @if (roomForm.controls.roomTypeId.touched && roomForm.controls.roomTypeId.invalid) {
+            <p class="error-text">
+              <i class="fa-solid fa-circle-exclamation"></i> Debe seleccionar un tipo de habitación.
+            </p>
           }
+        </div>
 
-        </select>
+        <!-- Acciones del Formulario -->
+        <div class="form-actions">
+          <a routerLink="/dashboard/room-list" class="btn-secondary-action">
+            Cancelar
+          </a>
 
-        @if (roomForm.controls.roomTypeId.touched &&
-             roomForm.controls.roomTypeId.invalid) {
-          <p class="error-message">
-            Debe seleccionar un tipo de habitación.
-          </p>
-        }
+          <button
+            type="submit"
+            class="btn-primary"
+            [disabled]="roomForm.invalid || saving() || loading()"
+          >
+            @if (saving()) {
+              <i class="fa-solid fa-spinner fa-spin"></i> Guardando cambios...
+            } @else {
+              <i class="fa-solid fa-floppy-disk"></i> Guardar cambios
+            }
+          </button>
+        </div>
 
-      </div>
-
-      <!-- Acciones -->
-      <div class="form-actions">
-
-        <a routerLink="/dashboard/room-list">
-          Cancelar
-        </a>
-
-        <button
-          type="submit"
-          [disabled]="roomForm.invalid || saving() || loading()"
-        >
-          @if (saving()) {
-            Guardando cambios...
-          } @else {
-            Guardar cambios
-          }
-        </button>
-
-      </div>
-
-    </form>
+      </form>
+    </div>
 
   }
 
-</section>
+</div>

@@ -1,0 +1,203 @@
+/* --- Contenedor Principal --- */
+.container {
+  width: 100%;
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 1.5rem;
+}
+
+/* --- Encabezado de Sección --- */
+.header-section {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-bottom: 1rem;
+}
+
+.header-section h2 {
+  color: var(--color-text-main);
+  font-size: var(--font-size-lg);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.header-section h2 i {
+  color: var(--color-primary);
+}
+
+.divider {
+  border: none;
+  border-top: var(--border-glass);
+  margin-bottom: 1.5rem;
+}
+
+/* --- Alertas --- */
+.alert {
+  padding: 12px 16px;
+  border-radius: var(--radius-sm);
+  font-size: var(--font-size-xs);
+  margin-bottom: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.alert-info {
+  background: rgba(129, 140, 248, 0.15);
+  border: 1px solid rgba(129, 140, 248, 0.3);
+  color: var(--color-primary);
+}
+
+.alert-danger {
+  background: rgba(239, 68, 68, 0.15);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  color: #fca5a5;
+}
+
+/* --- Tarjeta del Formulario --- */
+.form-card-wrapper {
+  background: var(--bg-secondary);
+  backdrop-filter: var(--backdrop-blur);
+  border-radius: var(--radius-lg);
+  border: var(--border-glass);
+  box-shadow: var(--shadow-main);
+  padding: 2rem;
+}
+
+.form-layout {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.form-label {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.form-label i {
+  color: var(--color-primary);
+}
+
+/* --- Inputs y Selects --- */
+.form-control {
+  width: 100%;
+  padding: 12px 16px;
+  background: rgba(15, 23, 42, 0.8);
+  border: var(--border-input);
+  border-radius: var(--radius-sm);
+  color: var(--color-text-main);
+  font-size: var(--font-size-xs);
+  outline: none;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.form-control:focus {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 2px rgba(129, 140, 248, 0.2);
+}
+
+/* Estilo para las opciones del selector en navegadores oscuros */
+.form-control option {
+  background: #0f172a;
+  color: var(--color-text-main);
+}
+
+/* --- Mensajes de Error en Validación --- */
+.error-text {
+  color: #fca5a5;
+  font-size: 0.75rem;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 2px;
+}
+
+/* --- Acciones del Formulario --- */
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 1rem;
+  padding-top: 1.25rem;
+  border-top: var(--border-glass);
+}
+
+/* --- Botones Compartidos --- */
+.btn-primary {
+  padding: 10px 18px;
+  background: var(--color-primary);
+  color: #ffffff;
+  border: none;
+  border-radius: var(--radius-sm);
+  font-size: var(--font-size-xs);
+  font-weight: 600;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  transition: opacity 0.2s ease;
+}
+
+.btn-primary:hover:not(:disabled) {
+  opacity: 0.9;
+}
+
+.btn-primary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btn-secondary-action {
+  padding: 10px 16px;
+  background: var(--bg-btn-secondary);
+  border: var(--border-btn);
+  color: var(--color-text-muted);
+  border-radius: var(--radius-sm);
+  font-size: var(--font-size-xs);
+  font-weight: 500;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  text-decoration: none;
+  transition: all 0.2s ease;
+}
+
+.btn-secondary-action:hover {
+  color: var(--color-text-main);
+  background: var(--bg-btn-secondary-hover);
+}
+
+/* --- Responsividad --- */
+@media (max-width: 640px) {
+  .header-section {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .form-actions {
+    flex-direction: column-reverse;
+    width: 100%;
+  }
+
+  .form-actions a,
+  .form-actions button {
+    width: 100%;
+    justify-content: center;
+  }
+}

@@ -1,0 +1,191 @@
+/* --- Contenedor Principal del Formulario --- */
+.employee-form-container,
+form {
+  width: 100%;
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 1.5rem;
+}
+
+/* --- Títulos y Párrafos Iniciales --- */
+h2 {
+  color: var(--color-text-main);
+  font-size: var(--font-size-lg);
+  margin-bottom: 0.5rem;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+p {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
+  margin-bottom: 1.5rem;
+}
+
+/* --- Fieldsets (Agrupación de Secciones) --- */
+fieldset {
+  background: var(--bg-secondary);
+  backdrop-filter: var(--backdrop-blur);
+  border-radius: var(--radius-lg);
+  border: var(--border-glass);
+  box-shadow: var(--shadow-main);
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+legend {
+  color: var(--color-primary);
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  padding: 0 10px;
+  background: rgba(15, 23, 42, 0.8);
+  border: var(--border-glass);
+  border-radius: var(--radius-sm);
+}
+
+/* --- Grupos de Campos (Inputs y Selects) --- */
+fieldset div {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 1.25rem;
+}
+
+fieldset div:last-child {
+  margin-bottom: 0;
+}
+
+label {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
+  font-weight: 500;
+}
+
+input[type="text"],
+input[type="password"],
+input[type="email"],
+input[type="tel"],
+input[type="date"],
+input[type="number"],
+select {
+  width: 100%;
+  padding: 12px 14px;
+  background: var(--bg-input-icon);
+  border: var(--border-input);
+  border-radius: var(--radius-sm);
+  color: var(--color-text-main);
+  font-size: var(--font-size-xs);
+  outline: none;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+input:focus,
+select:focus {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 2px rgba(129, 140, 248, 0.2);
+}
+
+/* --- Input de Archivos (Fotografía) --- */
+input[type="file"] {
+  width: 100%;
+  padding: 10px;
+  background: var(--bg-btn-secondary);
+  border: var(--border-input);
+  border-radius: var(--radius-sm);
+  color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
+  cursor: pointer;
+}
+
+input[type="file"]::file-selector-button {
+  padding: 8px 12px;
+  background: var(--bg-btn-secondary-hover);
+  border: var(--border-btn);
+  border-radius: var(--radius-sm);
+  color: var(--color-text-main);
+  font-size: var(--font-size-xs);
+  cursor: pointer;
+  margin-right: 12px;
+  transition: background 0.2s ease;
+}
+
+input[type="file"]::file-selector-button:hover {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+/* --- Mensajes de Validación y Alertas --- */
+small, 
+p[role="alert"] {
+  color: #fca5a5;
+  font-size: 0.75rem;
+  margin-top: 2px;
+  display: block;
+}
+
+p[role="alert"],
+.error-message {
+  padding: 12px 16px;
+  background: rgba(239, 68, 68, 0.15);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  border-radius: var(--radius-sm);
+  margin-bottom: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* --- Sección de Acciones (Botones al final) --- */
+form > div:last-of-type {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 2rem;
+  padding-top: 1.25rem;
+  border-top: var(--border-glass);
+}
+
+/* Botón Cancelar */
+form > div:last-of-type button[type="button"] {
+  padding: 10px 16px;
+  background: var(--bg-btn-secondary);
+  border: var(--border-btn);
+  color: var(--color-text-muted);
+  border-radius: var(--radius-sm);
+  font-size: var(--font-size-xs);
+  font-weight: 500;
+  cursor: pointer;
+  text-decoration: none;
+  transition: all 0.2s ease;
+}
+
+form > div:last-of-type button[type="button"]:hover {
+  color: var(--color-text-main);
+  background: var(--bg-btn-secondary-hover);
+}
+
+/* Botón Enviar / Registrar */
+form > div:last-of-type button[type="submit"] {
+  padding: 10px 20px;
+  background: var(--color-primary);
+  color: #ffffff;
+  border: none;
+  border-radius: var(--radius-sm);
+  font-size: var(--font-size-xs);
+  font-weight: 600;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  transition: opacity 0.2s ease;
+}
+
+form > div:last-of-type button[type="submit"]:hover:not(:disabled) {
+  opacity: 0.9;
+}
+
+form > div:last-of-type button[type="submit"]:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}

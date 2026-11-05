@@ -1,0 +1,165 @@
+/* --- Contenedor Principal del Formulario --- */
+.room-form-container {
+    width: 100%;
+    max-width: 650px;
+    margin: 2rem auto;
+    padding: 2rem;
+    background: var(--bg-secondary);
+    backdrop-filter: var(--backdrop-blur);
+    border-radius: var(--radius-lg);
+    border: var(--border-glass);
+    box-shadow: var(--shadow-main);
+  }
+  
+  /* --- Título Principal --- */
+  .room-form-container h1 {
+    color: var(--color-text-main);
+    font-size: var(--font-size-lg);
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  
+  /* --- Grupos de Formulario --- */
+  .form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 1.25rem;
+  }
+  
+  .form-group label {
+    color: var(--color-text-muted);
+    font-size: var(--font-size-xs);
+    font-weight: 500;
+  }
+  
+  /* --- Entradas (Inputs y Selects) --- */
+  .form-group input[type="number"],
+  .form-group select {
+    width: 100%;
+    padding: 12px 14px;
+    background: var(--bg-input-icon);
+    border: var(--border-input);
+    border-radius: var(--radius-sm);
+    color: var(--color-text-main);
+    font-size: var(--font-size-xs);
+    outline: none;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  }
+  
+  .form-group input[type="number"]:focus,
+  .form-group select:focus {
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 2px rgba(129, 140, 248, 0.2);
+  }
+  
+  /* --- Input de Archivos (Imágenes) --- */
+  .form-group input[type="file"] {
+    width: 100%;
+    padding: 10px;
+    background: var(--bg-btn-secondary);
+    border: var(--border-input);
+    border-radius: var(--radius-sm);
+    color: var(--color-text-muted);
+    font-size: var(--font-size-xs);
+    cursor: pointer;
+  }
+  
+  .form-group input[type="file"]::file-selector-button {
+    padding: 8px 12px;
+    background: var(--bg-btn-secondary-hover);
+    border: var(--border-btn);
+    border-radius: var(--radius-sm);
+    color: var(--color-text-main);
+    font-size: var(--font-size-xs);
+    cursor: pointer;
+    margin-right: 12px;
+    transition: background 0.2s ease;
+  }
+  
+  .form-group input[type="file"]::file-selector-button:hover {
+    background: rgba(255, 255, 255, 0.15);
+  }
+  
+  /* --- Listas de Archivos Seleccionados --- */
+  .form-group ul {
+    list-style: none;
+    padding: 0;
+    margin-top: 6px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  
+  .form-group li {
+    color: var(--color-text-muted);
+    font-size: 0.75rem;
+    background: rgba(255, 255, 255, 0.02);
+    padding: 6px 10px;
+    border-radius: var(--radius-sm);
+    border: var(--border-glass);
+  }
+  
+  /* --- Mensajes de Error (Validaciones) --- */
+  .error-message {
+    color: #fca5a5;
+    font-size: 0.75rem;
+    margin-top: 2px;
+  }
+  
+  /* --- Acciones del Formulario (Botones e Interfaz) --- */
+  .form-actions {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 1rem;
+    margin-top: 2rem;
+    padding-top: 1.25rem;
+    border-top: var(--border-glass);
+  }
+  
+  /* Botón Cancelar (Enlace secundario) */
+  .form-actions a {
+    padding: 10px 16px;
+    background: var(--bg-btn-secondary);
+    border: var(--border-btn);
+    color: var(--color-text-muted);
+    border-radius: var(--radius-sm);
+    font-size: var(--font-size-xs);
+    font-weight: 500;
+    text-decoration: none;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  
+  .form-actions a:hover {
+    color: var(--color-text-main);
+    background: var(--bg-btn-secondary-hover);
+  }
+  
+  /* Botón Guardar / Enviar */
+  .form-actions button[type="submit"] {
+    padding: 10px 20px;
+    background: var(--color-primary);
+    color: #ffffff;
+    border: none;
+    border-radius: var(--radius-sm);
+    font-size: var(--font-size-xs);
+    font-weight: 600;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: opacity 0.2s ease;
+  }
+  
+  .form-actions button[type="submit"]:hover:not(:disabled) {
+    opacity: 0.9;
+  }
+  
+  .form-actions button[type="submit"]:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }

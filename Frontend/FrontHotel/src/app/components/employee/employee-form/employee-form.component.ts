@@ -221,7 +221,7 @@ export class EmployeeFormComponent {
     this.employeeService.create(employee).subscribe({
       next: () => {
         this.saving.set(false);
-        this.router.navigate(['/dashboard/employees']);
+        this.router.navigate(['/dashboard/employee-list']);
       },
 
       error: () => {

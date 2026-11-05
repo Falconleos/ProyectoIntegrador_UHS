@@ -50,7 +50,7 @@ export class UserListComponent implements OnInit {
       // Verificamos directamente contra el enum de Java (ADMIN, RECEPCIONIST)
       this.canModify = rolesArray.some((r: any) => {
         const roleName = typeof r === 'string' ? r : (r?.name || '');
-        return roleName === 'ADMIN' || roleName === 'RECEPCIONIST';
+        return roleName === 'ROLE_ADMIN' || roleName === 'ROLE_RECEPCIONIST';
       });
     } catch (e) {
       this.canModify = false;
