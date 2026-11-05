@@ -1,110 +1,128 @@
+<div class="container">
+  <!-- Encabezado -->
+  <div class="header-section">
+    <h2>
+      <i class="bi bi-basket me-2"></i> Consumos y Servicios de la Reserva
+    </h2>
+    
+    @if (canModify()) {
+      <button 
+        type="button"
+        class="btn-primary-action" 
+        [routerLink]="['/dashboard/bookings', bookingId(), 'agregar-servicio']">
+        <i class="bi bi-plus-lg me-1"></i> Agregar Consumo
+      </button>
+    }
+  </div>
 
-<section class="room-attention-list">
-  <h2>Consumos y servicios de la reserva</h2>
+  <hr class="divider" />
 
-  @if (bookingId() !== null) {
-    <p>Reserva N.º {{ bookingId() }}</p>
-  }
-  
+  <!-- Mensaje de Error -->
   @if (errorMessage()) {
     <div class="alert alert-danger">
-      {{ errorMessage() }}
+      <i class="bi bi-exclamation-triangle me-2"></i> {{ errorMessage() }}
     </div>
   }
 
+  <!-- Estado de Carga -->
   @if (loading()) {
-    <p>Cargando consumos...</p>
+    <div class="alert alert-info">
+      <i class="bi bi-arrow-repeat spin me-2"></i> Cargando consumos...
+    </div>
   } @else {
-
     @if (attentions().length === 0) {
-      <p>No hay consumos registrados para esta reserva.</p>
+      <div class="alert alert-info">
+        <i class="bi bi-info-circle me-2"></i> No hay consumos ni servicios registrados para esta reserva.
+      </div>
     } @else {
-
-      <table class="table">
-        <thead>
-          <tr>
-            <th>Producto / Servicio</th>
-            <th>Tipo</th>
-            <th>Cantidad</th>
-            <th>Precio unitario</th>
-            <th>Subtotal</th>
-            <th>Fecha</th>
-            <th>Empleado</th>
-            <th>Estado</th>
-            <th>Acciones</th>
-          </tr>
-        </thead>
-
-        <tbody>
-          @for (attention of attentions(); track attention.id) {
-            <tr>
-              <td>
-                {{ attention.itemDTOResponse.description }}
-              </td>
-
-              <td>
-                {{ attention.isService ? 'Servicio' : 'Producto' }}
-              </td>
-
-              <td>{{ attention.quantity }}</td>
-
-              <td>
-                {{ attention.unitPrice.toFixed(2) }}
-              </td>
-
-              <td>
-                {{ attention.subtotal.toFixed(2) }}
-              </td>
-
-              <td>
-                {{ attention.createdAt }}
-              </td>
-
-              <td>
-                {{ attention.employeeUsername }}
-              </td>
-
-              <td>
-                @if (attention.delivered) {
-                  <span>Entregado</span>
-                } @else {
-                  <span>Pendiente</span>
+      <!-- Contenedor con Estilo Glass para la Tabla -->
+      <div class="glass-table-container">
+        <div class="table-responsive">
+          <table class="table-glass">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Descripción</th>
+                <th>Cantidad</th>
+                <th>Precio Unitario</th>
+                <th>Subtotal</th>
+                <th>Estado</th>
+                @if (canModify()) {
+                  <th class="text-end">Acciones</th>
                 }
-              </td>
-
-              <td>
-                @if (!attention.delivered) {
-                  <button
-                    type="button"
-                    (click)="markAsDelivered(attention.id)"
-                    [disabled]="!canModify() || deliveringId() !== null || deletingId() !== null"
-                  >
-                    @if (deliveringId() === attention.id) {
-                      Entregando...
+              </tr>
+            </thead>
+            <tbody>
+              @for (item of attentions(); track item.id) {
+                <tr>
+                  <td><strong class="text-subtitle">#{{ item.id }}</strong></td>
+                  <td>
+                    <div class="text-main fw-medium">
+                    {{ $any(item).description || $any(item).itemName || $any(item).name || $any(item).title || 'Consumo #' + item.id }}
+                    </div>
+                  </td>
+                  <td>
+                    <span class="text-main">{{ item.quantity }}</span>
+                  </td>
+                  <td>
+                    <span class="text-main">${{ item.unitPrice | number:'1.2-2' }}</span>
+                  </td>
+                  <td>
+                    <span class="text-main fw-bold text-success">${{ item.subtotal | number:'1.2-2' }}</span>
+                  </td>
+                  <td>
+                    @if (item.delivered) {
+                      <span class="badge badge-success-glass">
+                        <i class="bi bi-check-circle me-1"></i> Entregado
+                      </span>
                     } @else {
-                      Marcar entregado
+                      <span class="badge badge-warning-glass">
+                        <i class="bi bi-clock me-1"></i> Pendiente
+                      </span>
                     }
-                  </button>
-                }
-
-                <button
-                  type="button"
-                  (click)="deleteAttention(attention.id)"
-                  [disabled]="!canModify() || deletingId() !== null || deliveringId() !== null"
-                >
-                  @if (deletingId() === attention.id) {
-                    Eliminando...
-                  } @else {
-                    Eliminar
+                  </td>
+                  
+                  <!-- Acciones restringidas -->
+                  @if (canModify()) {
+                    <td class="text-end">
+                      <div class="d-flex justify-content-end gap-2">
+                        @if (!item.delivered) {
+                          <button 
+                            type="button"
+                            class="btn-secondary-action" 
+                            [disabled]="deliveringId() === item.id"
+                            (click)="markAsDelivered(item.id)">
+                            <i class="bi bi-check2-all me-1"></i> Entregar
+                          </button>
+                        }
+                        <button 
+                          type="button"
+                          class="btn-danger-action" 
+                          [disabled]="deletingId() === item.id"
+                          (click)="deleteAttention(item.id)">
+                          <i class="bi bi-trash me-1"></i> Eliminar
+                        </button>
+                      </div>
+                    </td>
                   }
-                </button>
-              </td>
-            </tr>
-          }
-        </tbody>
-      </table>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </div>
 
-      <h3>Total: {{ total().toFixed(2) }}</h3>
+      <!-- Resumen de Total -->
+      <div class="total-section">
+        <h3>Total consumos: <span class="text-success">${{ total() | number:'1.2-2' }}</span></h3>
+      </div>
     }
   }
-</section>
+
+  <!-- Botón Volver -->
+  <div class="mt-4">
+    <a routerLink="/dashboard/check-in-list" class="btn-secondary-action">
+      <i class="bi bi-arrow-left me-1"></i> Volver a Check-ins
+    </a>
+  </div>
+</div>

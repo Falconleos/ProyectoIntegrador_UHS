@@ -1,16 +1,14 @@
-
-import {Component, OnInit, computed, inject, signal} from '@angular/core';
-
+import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
+import { CommonModule } from '@angular/common';
 
 import { RoomAttentionService } from '../../../core/services/room-attention.service';
-
 import { RoomAttentionDtoResponse } from '../../../models/RoomAttention-model';
 
 @Component({
   selector: 'app-room-attention-list',
   standalone: true,
-  imports: [RouterLink],
+  imports: [RouterLink, CommonModule],
   templateUrl: './room-attention-list.component.html',
   styleUrl: './room-attention-list.component.css'
 })
@@ -20,27 +18,26 @@ export class RoomAttentionListComponent implements OnInit {
   private route = inject(ActivatedRoute);
 
   bookingId = signal<number | null>(null);
-
   attentions = signal<RoomAttentionDtoResponse[]>([]);
 
-  loading = signal(false);
+  loading = signal<boolean>(false);
   deletingId = signal<number | null>(null);
   deliveringId = signal<number | null>(null);
 
-  errorMessage = signal('');
-  canModify = signal(false); //Indica si la interfaz permite realizar modificaciones.
+  errorMessage = signal<string>('');
+  canModify = signal<boolean>(false);
 
   total = computed(() =>
     this.attentions().reduce(
-      (acc, attention) => acc + attention.subtotal,
+      (acc, attention) => acc + (attention.subtotal || 0),
       0
     )
   );
 
   ngOnInit(): void {
-    this.checkUserRole(); //Verifica si el usuario tiene permisos para realizar modifiaciones
+    this.checkUserRole();
 
-    const idParam = this.route.snapshot.paramMap.get('bookingId'); //Captura parametro de URL
+    const idParam = this.route.snapshot.paramMap.get('id');
     const id = Number(idParam);
 
     if (idParam && Number.isInteger(id) && id > 0) {
@@ -51,10 +48,10 @@ export class RoomAttentionListComponent implements OnInit {
     }
   }
 
-  checkUserRole(): void { //Determinar si el usuario puede modificar atenciones desde la interfaz
-    const storedRoles = localStorage.getItem('role'); //Obtiene roles del localStorage
+  checkUserRole(): void {
+    const storedRoles = localStorage.getItem('role');
 
-    if (!storedRoles) { //Si no encuentra roles setea señal
+    if (!storedRoles) {
       this.canModify.set(false);
       return;
     }
@@ -65,9 +62,9 @@ export class RoomAttentionListComponent implements OnInit {
       roles = JSON.parse(storedRoles);
     } catch {
       roles = storedRoles;
-    } //Interpreta contenido como json para admitir una cadena simple o un arreglo serializado
+    }
 
-    const roleList = Array.isArray(roles) ? roles : [roles]; //Garantiza que se trabaje con un arreglo
+    const roleList = Array.isArray(roles) ? roles : [roles];
 
     const allowed = roleList.some((role: unknown) => {
       let value = '';
@@ -75,7 +72,7 @@ export class RoomAttentionListComponent implements OnInit {
       if (typeof role === 'string') {
         value = role;
       } else if (role && typeof role === 'object' && 'authority' in role) {
-        value = String(role.authority);
+        value = String((role as any).authority);
       }
 
       return [
@@ -98,7 +95,7 @@ export class RoomAttentionListComponent implements OnInit {
     this.errorMessage.set('');
 
     this.roomAttentionService.getByBooking(id).subscribe({
-      next: (data) => {
+      next: (data: RoomAttentionDtoResponse[]) => {
         this.attentions.set(data);
         this.loading.set(false);
       },
@@ -147,4 +144,3 @@ export class RoomAttentionListComponent implements OnInit {
     });
   }
 }
-
