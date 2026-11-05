@@ -1,0 +1,217 @@
+@import "bootstrap-icons/font/bootstrap-icons.css";
+
+.container {
+  max-width: 800px;
+  margin: 2.5rem auto;
+  padding: 2.5rem;
+  background: var(--bg-secondary);
+  backdrop-filter: var(--backdrop-blur);
+  border: var(--border-glass);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-main);
+  color: var(--color-text-main);
+}
+
+.header-section {
+  margin-bottom: 1.5rem;
+}
+
+.header-section h2 {
+  font-size: var(--font-size-lg);
+  font-weight: 700;
+  color: var(--color-text-main);
+  display: flex;
+  align-items: center;
+  margin-bottom: 0;
+}
+
+.subtitle {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+}
+
+.divider {
+  border: 0;
+  height: 1px;
+  background: rgba(255, 255, 255, 0.08);
+  margin: 2rem 0;
+}
+
+/* Estructura del formulario */
+.form-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.row-grid-inputs {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.5rem;
+}
+
+@media (min-width: 768px) {
+  .row-grid-inputs {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.form-label {
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  color: var(--color-text-main);
+}
+
+/* Inputs y Contenedores con Iconos */
+.input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.input-icon-prefix {
+  position: absolute;
+  left: 14px;
+  color: var(--color-text-muted);
+  z-index: 2;
+  pointer-events: none;
+}
+
+.form-control {
+  width: 100%;
+  padding: 12px 14px 12px 38px;
+  background: var(--bg-secondary);
+  border: var(--border-input);
+  border-radius: var(--radius-sm);
+  color: var(--color-text-main);
+  font-size: var(--font-size-sm);
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.form-control:focus {
+  border-color: var(--color-primary);
+}
+
+/* Input tipo archivo personalizado */
+.form-control-file {
+  width: 100%;
+  padding: 10px;
+  background: var(--bg-secondary);
+  border: var(--border-input);
+  border-radius: var(--radius-sm);
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+  cursor: pointer;
+}
+
+/* Checkbox personalizado */
+.checkbox-group {
+  margin-top: 0.5rem;
+}
+
+.checkbox-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  cursor: pointer;
+  font-size: var(--font-size-sm);
+  color: var(--color-text-main);
+  user-select: none;
+}
+
+.checkbox-label input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--color-primary);
+  cursor: pointer;
+}
+
+/* Textos de Error */
+.error-text {
+  font-size: var(--font-size-xs);
+  color: #fca5a5;
+  margin-top: 0.25rem;
+  display: flex;
+  align-items: center;
+}
+
+/* Botones de Acción */
+.form-actions {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+.btn-primary-action {
+  background: var(--color-primary);
+  color: #000;
+  border: none;
+  padding: 12px 20px;
+  border-radius: var(--radius-sm);
+  font-weight: 600;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  font-size: var(--font-size-sm);
+  transition: opacity 0.2s;
+  flex: 2;
+}
+
+.btn-primary-action:hover:not(:disabled) {
+  opacity: 0.9;
+}
+
+.btn-primary-action:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btn-secondary-action {
+  background: var(--bg-btn-secondary);
+  color: var(--color-text-main);
+  border: var(--border-btn);
+  padding: 12px 20px;
+  border-radius: var(--radius-sm);
+  font-weight: 500;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--font-size-sm);
+  flex: 1;
+  transition: background 0.2s;
+}
+
+.btn-secondary-action:hover {
+  background: var(--bg-btn-secondary-hover);
+}
+
+/* Alertas */
+.alert {
+  padding: 0.85rem 1.15rem;
+  border-radius: var(--radius-sm);
+  font-size: var(--font-size-sm);
+  margin-bottom: 1.25rem;
+}
+
+.alert-danger {
+  background: rgba(239, 68, 68, 0.15);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  color: #fca5a5;
+}
+
+.alert-info {
+  background: rgba(129, 140, 248, 0.15);
+  border: 1px solid rgba(129, 140, 248, 0.3);
+  color: var(--color-primary);
+}

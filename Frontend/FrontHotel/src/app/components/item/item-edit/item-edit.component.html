@@ -1,150 +1,152 @@
+<div class="container">
+  <!-- Encabezado -->
+  <div class="header-section">
+    <h2>
+      <i class="bi bi-pencil-square me-2"></i> Editar Producto o Servicio
+    </h2>
+  </div>
 
-<div class="item-edit-container">
+  <hr class="divider" />
 
-  <h2>Editar producto o servicio</h2>
-
+  <!-- Mensaje de Error General -->
   @if (errorMessage()) {
-    <p class="error-message">
-      {{ errorMessage() }}
-    </p>
+    <div class="alert alert-danger">
+      <i class="bi bi-exclamation-triangle me-2"></i> {{ errorMessage() }}
+    </div>
   }
 
+  <!-- Estado de Carga -->
   @if (loading()) {
-    <p>Cargando datos del ítem...</p>
-  } @else if (itemLoaded())  {
-
-    <form [formGroup]="itemForm" (ngSubmit)="onSubmit()">
+    <div class="alert alert-info">
+      <i class="bi bi-arrow-repeat spin me-2"></i> Cargando datos del ítem...
+    </div>
+  } @else if (itemLoaded()) {
+    <form [formGroup]="itemForm" (ngSubmit)="onSubmit()" class="form-grid">
 
       <!-- Descripción -->
-      <div class="form-field">
-        <label for="description">Descripción:</label>
-
-        <input
-          id="description"
-          type="text"
-          formControlName="description"
-        >
-
-        @if (itemForm.controls.description.touched &&
-             itemForm.controls.description.hasError('required')) {
-          <small class="error-message">
-            La descripción es obligatoria.
+      <div class="form-group">
+        <label class="form-label" for="description">Descripción *</label>
+        <div class="input-wrapper">
+          <span class="input-icon-prefix"><i class="bi bi-card-text"></i></span>
+          <input
+            id="description"
+            type="text"
+            class="form-control"
+            formControlName="description"
+            placeholder="Ej: Desayuno continental..."
+          >
+        </div>
+        @if (itemForm.controls.description.touched && itemForm.controls.description.hasError('required')) {
+          <small class="error-text">
+            <i class="bi bi-info-circle me-1"></i> La descripción es obligatoria.
           </small>
         }
       </div>
 
-      <!-- Cantidad -->
-      <div class="form-field">
-        <label for="quantity">Cantidad:</label>
-
-        <input
-          id="quantity"
-          type="number"
-          min="1"
-          step="1"
-          formControlName="quantity"
-        >
-
-        @if (itemForm.controls.quantity.touched) {
-
-          @if (itemForm.controls.quantity.hasError('required')) {
-            <small class="error-message">
-              La cantidad es obligatoria.
-            </small>
+      <!-- Cantidad y Precio Unitario (En dos columnas) -->
+      <div class="row-grid-inputs">
+        <!-- Cantidad -->
+        <div class="form-group">
+          <label class="form-label" for="quantity">Cantidad *</label>
+          <div class="input-wrapper">
+            <span class="input-icon-prefix"><i class="bi bi-123"></i></span>
+            <input
+              id="quantity"
+              type="number"
+              min="1"
+              step="1"
+              class="form-control"
+              formControlName="quantity"
+            >
+          </div>
+          @if (itemForm.controls.quantity.touched) {
+            @if (itemForm.controls.quantity.hasError('required')) {
+              <small class="error-text">La cantidad es obligatoria.</small>
+            }
+            @if (itemForm.controls.quantity.hasError('min')) {
+              <small class="error-text">Mínimo 1.</small>
+            }
           }
+        </div>
 
-          @if (itemForm.controls.quantity.hasError('min')) {
-            <small class="error-message">
-              La cantidad debe ser como mínimo 1.
-            </small>
+        <!-- Precio unitario -->
+        <div class="form-group">
+          <label class="form-label" for="unitPrice">Precio unitario ($) *</label>
+          <div class="input-wrapper">
+            <span class="input-icon-prefix"><i class="bi bi-currency-dollar"></i></span>
+            <input
+              id="unitPrice"
+              type="number"
+              min="0.01"
+              step="0.01"
+              class="form-control"
+              formControlName="unitPrice"
+              placeholder="0.00"
+            >
+          </div>
+          @if (itemForm.controls.unitPrice.touched) {
+            @if (itemForm.controls.unitPrice.hasError('required')) {
+              <small class="error-text">El precio es obligatorio.</small>
+            }
+            @if (itemForm.controls.unitPrice.hasError('min')) {
+              <small class="error-text">Debe ser mayor a cero.</small>
+            }
           }
-
-        }
+        </div>
       </div>
 
-      <!-- Precio unitario -->
-      <div class="form-field">
-        <label for="unitPrice">Precio unitario:</label>
-
-        <input
-          id="unitPrice"
-          type="number"
-          min="0.01"
-          step="0.01"
-          formControlName="unitPrice"
-        >
-
-        @if (itemForm.controls.unitPrice.touched) {
-
-          @if (itemForm.controls.unitPrice.hasError('required')) {
-            <small class="error-message">
-              El precio unitario es obligatorio.
-            </small>
-          }
-
-          @if (itemForm.controls.unitPrice.hasError('min')) {
-            <small class="error-message">
-              El precio debe ser mayor que cero.
-            </small>
-          }
-
-        }
-      </div>
-
-      <!-- Tipo de ítem -->
-      <div class="form-field">
-        <label for="isService">
+      <!-- Tipo de ítem (Checkbox estilizado) -->
+      <div class="form-group checkbox-group">
+        <label class="checkbox-label" for="isService">
           <input
             id="isService"
             type="checkbox"
             formControlName="isService"
           >
-          Es un servicio
+          <span class="checkbox-custom"></span>
+          <span>Este ítem corresponde a un servicio</span>
         </label>
       </div>
 
       <!-- Imagen opcional -->
-      <div class="form-field">
-        <label for="image">Nueva imagen (opcional):</label>
-
-        <input
-          id="image"
-          type="file"
-          accept="image/*"
-          (change)="onImageSelected($event)"
-        >
-
+      <div class="form-group">
+        <label class="form-label" for="image">Nueva imagen (opcional)</label>
+        <div class="input-wrapper file-input-wrapper">
+          <input
+            id="image"
+            type="file"
+            accept="image/*"
+            class="form-control-file"
+            (change)="onImageSelected($event)"
+          >
+        </div>
         @if (selectedImage()) {
-          <p>
-            Nueva imagen seleccionada:
-            {{ selectedImage()?.name }}
-          </p>
+          <small class="subtitle mt-1 d-block text-success">
+            <i class="bi bi-file-earmark-image me-1"></i> Nueva imagen seleccionada: <strong>{{ selectedImage()?.name }}</strong>
+          </small>
         }
-
-        <small>
-          Si no seleccionás una nueva imagen, no se enviará
-          ningún archivo.
+        <small class="subtitle mt-1 d-block text-muted">
+          <i class="bi bi-info-circle me-1"></i> Si no seleccionás una nueva imagen, se mantendrá la actual.
         </small>
       </div>
 
       <!-- Acciones -->
       <div class="form-actions">
-
         <button
           type="submit"
+          class="btn-primary-action"
           [disabled]="saving() || loading()"
         >
           @if (saving()) {
-            Guardando cambios...
+            <i class="bi bi-arrow-repeat spin me-2"></i> Guardando cambios...
           } @else {
-            Guardar cambios
+            <i class="bi bi-check-lg me-2"></i> Guardar cambios
           }
         </button>
 
-        <a routerLink="/items">
+        <a routerLink="/dashboard/item-list" class="btn-secondary-action">
           Cancelar
         </a>
-
       </div>
     </form>
   }

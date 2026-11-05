@@ -67,7 +67,7 @@ export class ItemFormComponent {
     this.itemService.createItem(request, image).subscribe({
       next: () => {
         this.saving.set(false);
-        this.router.navigate(['/items']);
+        this.router.navigate(['/item-list']);
       },
       error: () => {
         this.errorMessage.set('No se pudo crear el ítem.');
