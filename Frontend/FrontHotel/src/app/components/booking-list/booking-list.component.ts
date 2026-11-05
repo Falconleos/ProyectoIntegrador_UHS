@@ -1,4 +1,4 @@
-import { Component, OnInit, ChangeDetectionStrategy, signal } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy, signal, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
@@ -7,6 +7,11 @@ import { BookingDtoResponse } from '../../models/Booking-model';
 import { PaymentDTOResponse } from '../../models/Payment-model'; 
 import { AuthService } from '../../core/services/auth.service';
 import { AccountService } from '../../core/services/account.service';
+
+export interface BookingWithAccount extends BookingDtoResponse {
+  hasAccount?: boolean;
+  accountId?: number;
+}
 
 @Component({
   selector: 'app-booking-list',
@@ -18,7 +23,7 @@ import { AccountService } from '../../core/services/account.service';
 })
 export class BookingListComponent implements OnInit {
   // --- Estados con Signals ---
-  bookings = signal<BookingDtoResponse[]>([]);
+  bookings = signal<BookingWithAccount[]>([]);
   loading = signal<boolean>(true);
   errorMessage = signal<string>('');
   canModify = signal<boolean>(false);
@@ -34,7 +39,8 @@ export class BookingListComponent implements OnInit {
   constructor(
     private bookingService: BookingService,
     private authService: AuthService,
-    private accountService: AccountService
+    private accountService: AccountService,
+    private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
@@ -73,13 +79,33 @@ export class BookingListComponent implements OnInit {
       next: (data) => {
         const allBookings = Array.isArray(data) ? [...data] : [];
         
-        // Filtramos para mostrar únicamente las que están activas o en estados válidos de gestión
-        const filtered = allBookings.filter(
+        // Filtramos para mostrar únicamente las activas o en estados válidos
+        const filtered: BookingWithAccount[] = allBookings.filter(
           (b) => b.state === 'PENDING' || b.state === 'CONFIRMED'
         );
         
         this.bookings.set(filtered);
         this.loading.set(false);
+
+        // Iteramos cada reserva para consultar su cuenta con el AccountService
+        filtered.forEach((booking) => {
+          this.accountService.getAccountByBookingId(booking.id).subscribe({
+            next: (account: any) => {
+              if (account && account.id) {
+                booking.hasAccount = true;
+                booking.accountId = account.id;
+              } else {
+                booking.hasAccount = false;
+              }
+              // Forzamos el refresco de la vista con OnPush
+              this.cdr.markForCheck();
+            },
+            error: () => {
+              booking.hasAccount = false;
+              this.cdr.markForCheck();
+            }
+          });
+        });
       },
       error: (err) => {
         this.errorMessage.set('No se pudieron cargar las reservas o no cuentas con los permisos necesarios.');
@@ -97,16 +123,14 @@ export class BookingListComponent implements OnInit {
 
     const reason = prompt('Por favor, ingrese el motivo de la cancelación:');
     if (reason === null) {
-      return; // El usuario canceló la acción
+      return;
     }
 
-    // 1. Primero consultamos la cuenta de la reserva para ver si tiene pagos
     this.accountService.getAccountByBookingId(id).subscribe({
       next: (account: any) => {
         const hasPayments = account && account.paidAmount > 0;
         let issueCreditNote = false;
 
-        // 2. Solo si tiene pagos, le preguntamos al usuario si desea emitir la nota de crédito
         if (hasPayments) {
           issueCreditNote = confirm('Esta reserva cuenta con pagos registrados. ¿Desea emitir una nota de crédito/reintegro?');
         }
@@ -121,7 +145,6 @@ export class BookingListComponent implements OnInit {
           issueCreditNote: issueCreditNote
         };
 
-        // 3. Ejecutamos la cancelación enviando el request
         this.bookingService.cancelBooking(request).subscribe({
           next: () => {
             alert(`Reserva ID ${id} cancelada exitosamente.`);
@@ -178,7 +201,7 @@ export class BookingListComponent implements OnInit {
     });
   }
 
-  openPaymentModal(booking: BookingDtoResponse): void {
+  openPaymentModal(booking: BookingWithAccount): void {
     this.selectedBookingForPayment.set(booking);
     this.loadBookingPayments(booking.id);
   }
@@ -207,7 +230,7 @@ export class BookingListComponent implements OnInit {
   }
 
   submitBookingPayment(): void {
-    const booking = this.selectedBookingForPayment();
+    const booking = this.selectedBookingForPayment() as BookingWithAccount;
     const amount = this.newPaymentAmount();
 
     if (!booking || !amount || amount <= 0) {
@@ -216,31 +239,29 @@ export class BookingListComponent implements OnInit {
     }
 
     const bookingId = booking.id;
+    const accountId = booking.accountId;
 
-    this.accountService.getAccountByBookingId(bookingId).subscribe({
-      next: (account: any) => {
-        const request = {
-          accountId: account.id,
-          amount: amount,
-          paymentMethod: this.newPaymentMethod(),
-          transactionReference: this.newPaymentReference().trim()
-        };
+    if (!accountId) {
+      alert('No se encontró una cuenta asociada a esta reserva.');
+      return;
+    }
 
-        this.accountService.addPayment(request).subscribe({
-          next: () => {
-            alert('Seña registrada exitosamente.');
-            this.loadBookingPayments(bookingId);
-            this.newPaymentAmount.set(null);
-            this.newPaymentReference.set('');
-          },
-          error: (err: any) => {
-            alert('Error al registrar la seña.');
-            console.error(err);
-          }
-        });
+    const request = {
+      accountId: accountId,
+      amount: amount,
+      paymentMethod: this.newPaymentMethod(),
+      transactionReference: this.newPaymentReference().trim()
+    };
+
+    this.accountService.addPayment(request).subscribe({
+      next: () => {
+        alert('Seña registrada exitosamente.');
+        this.loadBookingPayments(bookingId);
+        this.newPaymentAmount.set(null);
+        this.newPaymentReference.set('');
       },
       error: (err: any) => {
-        alert('No se pudo encontrar la cuenta asociada a esta reserva.');
+        alert('Error al registrar la seña.');
         console.error(err);
       }
     });

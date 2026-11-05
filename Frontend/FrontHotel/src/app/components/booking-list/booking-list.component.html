@@ -99,8 +99,8 @@
                     type="button"
                     class="btn-info-action"
                     (click)="openPaymentModal(booking)"
-                    [disabled]="!canModify()"
-                    title="Señas"
+                    [disabled]="!canModify() || !booking.hasAccount"
+                    [title]="booking.hasAccount ? 'Señas' : 'La reserva no cuenta con una cuenta asociada'"
                   >
                     <i class="bi bi-cash-coin"></i>
                   </button>

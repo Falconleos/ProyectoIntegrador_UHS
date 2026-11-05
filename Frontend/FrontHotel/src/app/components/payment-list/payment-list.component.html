@@ -1,0 +1,98 @@
+<div class="container">
+  <!-- Encabezado -->
+  <div class="header-section">
+    <h2>
+      <i class="bi bi-file-earmark-text me-2"></i> Gestión de Pagos Registrados
+    </h2>
+    <p class="subtitle">Historial completo de señas y pagos registrados en el sistema.</p>
+  </div>
+
+  <hr class="divider" />
+
+  <!-- Mensajes de carga, error o listado vacío -->
+  @if (loading()) {
+    <div class="alert alert-info">
+      <i class="bi bi-arrow-repeat bi-spin me-2"></i> Cargando registros de pagos...
+    </div>
+  } @else if (errorMessage()) {
+    <div class="alert alert-danger">
+      <i class="bi bi-exclamation-triangle-fill me-2"></i> {{ errorMessage() }}
+    </div>
+  } @else if (payments().length === 0) {
+    <div class="alert alert-warning">
+      <i class="bi bi-info-circle me-2"></i> No se encontraron pagos registrados en el sistema.
+    </div>
+  } @else {
+
+    <!-- Tabla de Datos -->
+    <div class="table-wrapper">
+      <table class="table">
+        <thead>
+          <tr>
+            <th class="ps-4">ID Pago</th>
+            <th>Huésped (Nombre y Apellido)</th>
+            <th>Registrado por</th>
+            <th>ID Cuenta</th>
+            <th style="text-align: right;">Monto ($)</th>
+            <th>Fecha y Hora</th>
+            <th>Método de Pago</th>
+            <th style="padding-right: 1.5rem;">Referencia / Transacción</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (payment of payments(); track payment.id) {
+            <tr>
+              <td class="ps-4"><strong>#{{ payment.id }}</strong></td>
+              
+              <!-- Columna Huésped -->
+              <td>
+                @if (payment.guestName || payment.guestSurname) {
+                  {{ payment.guestName }} {{ payment.guestSurname }}
+                } @else {
+                  <span class="subtitle">-</span>
+                }
+              </td>
+
+              <!-- Columna Registrado por -->
+              <td>
+                @if (payment.username) {
+                  {{ payment.username }}
+                } @else {
+                  <span class="subtitle">-</span>
+                }
+              </td>
+
+              <!-- Columna Cuenta -->
+              <td>
+                <span class="badge badge-secondary">
+                  <i class="bi bi-wallet2 me-1"></i> Cuenta #{{ payment.accountId }}
+                </span>
+              </td>
+
+              <!-- Columna Monto -->
+              <td style="text-align: right;" class="text-success">
+                <strong>${{ payment.amount | number:'1.2-2' }}</strong>
+              </td>
+
+              <!-- Columna Fecha -->
+              <td class="subtitle">{{ payment.paymentDate | date:'short' }}</td>
+
+              <!-- Columna Método de Pago -->
+              <td>
+                <span class="badge badge-secondary">
+                  <i class="bi bi-credit-card me-1"></i> {{ payment.paymentMethod || 'N/D' }}
+                </span>
+              </td>
+
+              <!-- Columna Referencia -->
+              <td class="subtitle" style="padding-right: 1.5rem;">
+                {{ payment.transactionReference || 'Sin referencia' }}
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+
+</div>

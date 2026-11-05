@@ -63,7 +63,14 @@ export const routes: Routes = [
                 path:'booking-create',
                 loadComponent:()=>import('./components/booking-form/booking-form.component').then(m=>m.BookingFormComponent)
             },
-            
+            {
+                path:'payment-list',
+                loadComponent:()=>import('./components/payment-list/payment-list.component').then(m=>m.PaymentListComponent)
+            },
+            {
+                path:'check-in-list',
+                loadComponent:()=>import('./components/check-in-list/check-in-list.component').then(m=>m.CheckInListComponent)
+            },
 
             
         ]
