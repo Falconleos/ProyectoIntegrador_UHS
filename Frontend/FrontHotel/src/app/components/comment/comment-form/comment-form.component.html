@@ -1,0 +1,98 @@
+
+<h2>
+  @if (isEditMode()) {
+    Editar comentario
+  } @else {
+    Nuevo comentario
+  }
+</h2>
+
+@if (errorMessage()) {
+  <p>{{ errorMessage() }}</p>
+}
+
+@if (loading()) {
+  <p>Cargando comentario...</p>
+} @else {
+
+  <form [formGroup]="commentForm" (ngSubmit)="saveComment()">
+
+    <div>
+      <label for="content">Comentario:</label>
+
+      <textarea
+        id="content"
+        formControlName="content"
+        rows="4"
+        maxlength="500">
+      </textarea>
+
+      @if (commentForm.controls.content.touched) {
+
+        @if (commentForm.controls.content.hasError('required')) {
+          <p>El comentario es obligatorio.</p>
+        }
+
+        @if (commentForm.controls.content.hasError('whitespace')) {
+          <p>El comentario no puede contener solo espacios.</p>
+        }
+
+        @if (commentForm.controls.content.hasError('maxlength')) {
+          <p>El comentario no puede superar los 500 caracteres.</p>
+        }
+
+      }
+    </div>
+
+    <div>
+      <label for="rating">Valoración:</label>
+
+      <input
+        type="number"
+        id="rating"
+        formControlName="rating"
+        min="1"
+        max="5"
+        step="1">
+
+      @if (commentForm.controls.rating.touched) {
+
+        @if (commentForm.controls.rating.hasError('required')) {
+          <p>La valoración es obligatoria.</p>
+        }
+
+        @if (commentForm.controls.rating.hasError('min')) {
+          <p>La valoración mínima es 1.</p>
+        }
+
+        @if (commentForm.controls.rating.hasError('max')) {
+          <p>La valoración máxima es 5.</p>
+        }
+
+      }
+    </div>
+
+    <div>
+      <button
+        type="submit"
+        [disabled]="saving() || loading() || commentForm.invalid">
+
+        @if (saving()) {
+          Guardando...
+        } @else if (isEditMode()) {
+          Actualizar comentario
+        } @else {
+          Crear comentario
+        }
+
+      </button>
+
+      <button
+        type="button"
+        (click)="goBack()">
+        Cancelar
+      </button>
+    </div>
+
+  </form>
+}
