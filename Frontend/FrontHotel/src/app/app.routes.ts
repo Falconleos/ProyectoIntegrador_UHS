@@ -51,6 +51,15 @@ export const routes: Routes = [
                 path:'employee-edit/:id',
                 loadComponent:()=>import('./components/employee/employee-edit/employee-edit.component').then(m=>m.EmployeeEditComponent)
             },
+            {
+                path:'booking-list',
+                loadComponent:()=>import('./components/booking-list/booking-list.component').then(m=>m.BookingListComponent)
+            },
+            {
+                path:'availability',
+                loadComponent:()=>import('./components/availability/availability.component').then(m=>m.AvailabilityComponent)
+            },
+            
 
             
         ]

@@ -1,0 +1,235 @@
+/* --- Corrección global de resaltado de texto para estética oscura --- */
+::selection {
+  background: var(--color-primary, #6366f1);
+  color: #ffffff;
+}
+
+::-moz-selection {
+  background: var(--color-primary, #6366f1);
+  color: #ffffff;
+}
+
+/* --- Contenedor Principal --- */
+.room-list-container {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 1.5rem;
+  color: var(--color-text-main, #e2e8f0);
+}
+
+/* --- Encabezado de Sección --- */
+.header-section {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-bottom: 0.5rem;
+}
+
+.header-section h2 {
+  color: var(--color-text-main);
+  font-size: var(--font-size-lg);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.header-section h2 i {
+  color: var(--color-primary);
+}
+
+.subtitle {
+  color: var(--color-text-muted, #94a3b8);
+  font-size: var(--font-size-xs, 0.875rem);
+}
+
+.divider {
+  border: none;
+  border-top: var(--border-glass, 1px solid rgba(255, 255, 255, 0.08));
+  margin-bottom: 1.5rem;
+}
+
+/* --- Alertas --- */
+.alert {
+  padding: 12px 16px;
+  border-radius: var(--radius-sm, 8px);
+  font-size: var(--font-size-xs, 0.875rem);
+  margin-bottom: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.alert-info {
+  background: rgba(129, 140, 248, 0.15);
+  border: 1px solid rgba(129, 140, 248, 0.3);
+  color: var(--color-primary, #818cf8);
+}
+
+.alert-danger {
+  background: rgba(239, 68, 68, 0.15);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  color: #fca5a5;
+}
+
+.alert-warning {
+  background: rgba(245, 158, 11, 0.15);
+  border: 1px solid rgba(245, 158, 11, 0.3);
+  color: #fcd34d;
+}
+
+/* --- Tarjeta del Formulario (Glassmorphism) --- */
+.room-type-card {
+  background: var(--bg-secondary, rgba(30, 41, 59, 0.7));
+  backdrop-filter: var(--backdrop-blur, blur(12px));
+  border-radius: var(--radius-lg, 16px);
+  border: var(--border-glass, 1px solid rgba(255, 255, 255, 0.08));
+  box-shadow: var(--shadow-main, 0 8px 32px 0 rgba(0, 0, 0, 0.37));
+}
+
+/* --- Inputs del Formulario --- */
+.form-control {
+  background: rgba(255, 255, 255, 0.05);
+  border: var(--border-input, 1px solid rgba(255, 255, 255, 0.1));
+  color: var(--color-text-main, #f8fafc);
+  border-radius: var(--radius-sm, 8px);
+  padding: 0.55rem 0.9rem;
+  height: 40px;
+  font-size: 0.9rem;
+  width: 100%;
+  transition: all 0.3s ease;
+}
+
+.form-control:focus {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(129, 140, 248, 0.5);
+  color: #ffffff;
+  box-shadow: 0 0 15px rgba(99, 102, 241, 0.25);
+  outline: none;
+}
+
+/* Soporte calendario para inputs tipo date */
+input[type="date"].form-control::-webkit-calendar-picker-indicator {
+  filter: invert(1);
+  opacity: 0.6;
+  cursor: pointer;
+}
+
+/* --- Grid de Detalles --- */
+.detail-grid {
+  display: grid;
+  gap: 1rem;
+}
+
+.detail-item {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.detail-label {
+  color: var(--color-text-muted, #94a3b8);
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+/* --- Tabla de Datos --- */
+.table-wrapper {
+  background: var(--bg-secondary, rgba(30, 41, 59, 0.7));
+  backdrop-filter: var(--backdrop-blur, blur(12px));
+  border-radius: var(--radius-lg, 16px);
+  border: var(--border-glass, 1px solid rgba(255, 255, 255, 0.08));
+  box-shadow: var(--shadow-main, 0 8px 32px 0 rgba(0, 0, 0, 0.37));
+  overflow-x: auto;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  font-size: var(--font-size-xs, 0.875rem);
+  color: var(--color-text-main, #e2e8f0);
+  margin-bottom: 0;
+}
+
+.table th {
+  background: rgba(15, 23, 42, 0.8);
+  color: var(--color-text-muted, #94a3b8);
+  font-weight: 600;
+  padding: 14px 16px;
+  border-bottom: var(--border-glass, 1px solid rgba(255, 255, 255, 0.08));
+  white-space: nowrap;
+}
+
+.table td {
+  padding: 14px 16px;
+  border-bottom: var(--border-glass, 1px solid rgba(255, 255, 255, 0.05));
+  vertical-align: middle;
+}
+
+.table tbody tr:hover {
+  background-color: rgba(255, 255, 255, 0.03);
+}
+
+/* --- Badges --- */
+.badge {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: var(--radius-sm, 6px);
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+.badge-secondary {
+  background: var(--bg-btn-secondary, rgba(255, 255, 255, 0.08));
+  border: var(--border-btn, 1px solid rgba(255, 255, 255, 0.15));
+  color: var(--color-text-muted, #cbd5e1);
+}
+
+/* --- Botones --- */
+.btn-primary {
+  padding: 10px 16px;
+  background: var(--color-primary, #6366f1);
+  color: #ffffff;
+  border: none;
+  border-radius: var(--radius-sm, 8px);
+  font-size: var(--font-size-xs, 0.875rem);
+  font-weight: 600;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  text-decoration: none;
+  transition: opacity 0.2s ease;
+}
+
+.btn-primary:hover:not(:disabled) {
+  opacity: 0.9;
+}
+
+.btn-primary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btn-secondary-action {
+  padding: 9px 14px;
+  background: var(--bg-btn-secondary, rgba(255, 255, 255, 0.08));
+  border: var(--border-btn, 1px solid rgba(255, 255, 255, 0.15));
+  color: var(--color-text-muted, #cbd5e1);
+  border-radius: var(--radius-sm, 8px);
+  font-size: var(--font-size-xs, 0.875rem);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  text-decoration: none;
+  transition: all 0.2s ease;
+}
+
+.btn-secondary-action:hover:not(:disabled) {
+  color: var(--color-text-main, #ffffff);
+  background: var(--bg-btn-secondary-hover, rgba(255, 255, 255, 0.15));
+}

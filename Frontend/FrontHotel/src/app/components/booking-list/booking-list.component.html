@@ -1,0 +1,239 @@
+<section class="room-list-container">
+
+  <!-- Sección de Encabezado -->
+  <div class="header-section">
+    <h2><i class="bi bi-calendar-check me-2"></i> Gestión de Reservas</h2>
+    <button 
+      class="btn-primary" 
+      [routerLink]="canModify() ? '/dashboard/availability' : null" 
+      [disabled]="!canModify()">
+      <i class="bi bi-search me-1"></i> Consultar Disponibilidad
+    </button>
+  </div>
+
+  <hr class="divider" />
+
+  <!-- Mensajes de carga, error o listado vacío -->
+  @if (loading()) {
+    <div class="alert alert-info">
+      <i class="fa-solid fa-spinner fa-spin"></i> Cargando registros...
+    </div>
+  } @else if (errorMessage()) {
+    <div class="alert alert-danger">
+      <i class="fa-solid fa-triangle-exclamation"></i> {{ errorMessage() }}
+    </div>
+  } @else if (bookings().length === 0) {
+    <div class="alert alert-warning">
+      <i class="fa-solid fa-circle-info"></i> No se encontraron reservas registradas en el sistema.
+    </div>
+  } @else {
+
+    <!-- Tabla de Datos -->
+    <div class="table-wrapper">
+      <table class="table">
+        <thead>
+          <tr>
+            <th class="ps-4">ID</th>
+            <th>Titular</th>
+            <th>Teléfono</th>
+            <th>Habitación</th>
+            <th>Check-In</th>
+            <th>Check-Out</th>
+            <th style="text-align: center;">Huéspedes</th>
+            <th style="text-align: right;">Total</th>
+            <th>Registrada por</th>
+            <th style="text-align: center;">Estado</th>
+            <th style="text-align: right; padding-right: 1.5rem;">Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (booking of bookings(); track booking.id) {
+            <tr>
+              <td class="ps-4"><strong>#{{ booking.id }}</strong></td>
+              <td>{{ booking.guestFirstName }} {{ booking.guestLastName }}</td>
+              <td class="subtitle">{{ booking.guestPhone || '-' }}</td>
+              <td>
+                @if (booking.roomNumber) {
+                  <span class="badge badge-secondary">Hab. #{{ booking.roomNumber }}</span>
+                } @else {
+                  <span class="subtitle">N/A</span>
+                }
+              </td>
+              <td class="subtitle">{{ booking.checkIn }}</td>
+              <td class="subtitle">{{ booking.checkOut }}</td>
+              <td style="text-align: center;">{{ booking.guestCount }}</td>
+              <td style="text-align: right;"><strong>${{ booking.totalPrice | number:'1.2-2' }}</strong></td>
+              <td>
+                @if (booking.userBookingUsername) {
+                  <span class="badge badge-secondary">
+                    <i class="bi bi-person-badge me-1"></i>{{ booking.userBookingUsername }}
+                  </span>
+                } @else {
+                  <span class="subtitle">-</span>
+                }
+              </td>
+              <td style="text-align: center;">
+                <span
+                  class="badge"
+                  [class.badge-warning]="booking.state === 'PENDING'"
+                  [class.badge-success]="booking.state === 'CONFIRMED' || booking.state === 'CHECKED_IN'"
+                  [class.badge-secondary]="booking.state === 'CONCLUDED'"
+                  [class.badge-danger]="booking.state === 'CANCELLED' || booking.state === 'NO_SHOW'"
+                >
+                  {{ booking.state }}
+                </span>
+              </td>
+              <td style="text-align: right; padding-right: 1.5rem;">
+                <div class="table-actions">
+                  <button
+                    type="button"
+                    class="btn-warning"
+                    (click)="confirmBooking(booking.id)"
+                    [disabled]="!canModify() || booking.state === 'CHECKED_IN' || booking.state === 'CONFIRMED'"
+                    title="Confirmar"
+                  >
+                    <i class="bi bi-check-lg"></i>
+                  </button>
+
+                  <button
+                    type="button"
+                    class="btn-info-action"
+                    (click)="openPaymentModal(booking)"
+                    [disabled]="!canModify()"
+                    title="Señas"
+                  >
+                    <i class="bi bi-cash-coin"></i>
+                  </button>
+
+                  <button
+                    type="button"
+                    class="btn-danger"
+                    (click)="cancelBooking(booking.id)"
+                    [disabled]="!canModify() || booking.state === 'CHECKED_IN' || booking.state === 'CANCELLED'"
+                    title="Cancelar"
+                  >
+                    <i class="bi bi-x-lg"></i>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+
+</section>
+
+
+<!-- MODAL DE GESTIÓN DE SEÑAS -->
+@if (selectedBookingForPayment(); as selectedBooking) {
+  <div class="modal-backdrop" (click)="closePaymentModal()">
+    <div
+      class="modal-card"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="payment-modal-title"
+      (click)="$event.stopPropagation()"
+    >
+
+      <!-- Botón Cerrar -->
+      <button
+        type="button"
+        class="btn-close"
+        aria-label="Cerrar modal"
+        (click)="closePaymentModal()"
+      >
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+
+      <!-- Encabezado del Modal -->
+      <div class="modal-header-profile">
+        <h3 id="payment-modal-title">Gestión de Señas</h3>
+        <p class="subtitle">
+          Reserva #{{ selectedBooking.id }} — Titular: {{ selectedBooking.guestFirstName }} {{ selectedBooking.guestLastName }}
+        </p>
+      </div>
+
+      <!-- Contenido en 2 Columnas dentro del Modal -->
+      <div class="row g-4" style="display: grid; grid-template-columns: 1fr 1.5fr; gap: 1.5rem; align-items: start;">
+        
+        <!-- Columna Izquierda: Formulario -->
+        <div class="detail-item" style="gap: 12px;">
+          <h4 style="font-size: var(--font-size-sm); color: var(--color-text-main); margin-bottom: 0;">Registrar Nueva Seña</h4>
+          
+          <div class="detail-item">
+            <span class="detail-label">Monto ($)</span>
+            <input type="number" class="form-control" [ngModel]="newPaymentAmount()" (ngModelChange)="newPaymentAmount.set($event)" placeholder="Ej: 5000" style="padding: 8px 12px; background: var(--bg-secondary); border: var(--border-input); color: var(--color-text-main); border-radius: var(--radius-sm);">
+          </div>
+          
+          <div class="detail-item">
+            <span class="detail-label">Método de Pago</span>
+            <select class="form-select" [ngModel]="newPaymentMethod()" (ngModelChange)="newPaymentMethod.set($event)" style="padding: 8px 12px; background: var(--bg-secondary); border: var(--border-input); color: var(--color-text-main); border-radius: var(--radius-sm);">
+              <option value="CASH">Efectivo (CASH)</option>
+              <option value="TRANSFER">Transferencia</option>
+              <option value="CREDIT_CARD">Tarjeta de Crédito</option>
+              <option value="DEBIT_CARD">Tarjeta de Débito</option>
+            </select>
+          </div>
+          
+          <div class="detail-item">
+            <span class="detail-label">Comprobante / Referencia</span>
+            <input type="text" class="form-control" [ngModel]="newPaymentReference()" (ngModelChange)="newPaymentReference.set($event)" placeholder="Número de voucher" style="padding: 8px 12px; background: var(--bg-secondary); border: var(--border-input); color: var(--color-text-main); border-radius: var(--radius-sm);">
+          </div>
+          
+          <button type="button" class="btn-primary" style="width: 100%; justify-content: center; margin-top: 5px;" (click)="submitBookingPayment()">Guardar Seña</button>
+        </div>
+
+        <!-- Columna Derecha: Listado de Señas -->
+        <div class="detail-item">
+          <h4 style="font-size: var(--font-size-sm); color: var(--color-text-main); margin-bottom: 0;">Señas Registradas</h4>
+
+          @if (loadingPayments()) {
+            <div class="alert alert-info" style="margin-top: 0.5rem; margin-bottom: 0;">
+              <i class="fa-solid fa-spinner fa-spin"></i> Cargando pagos...
+            </div>
+          } @else if (bookingPayments().length > 0) {
+            <div class="table-wrapper" style="margin-top: 0.5rem; max-height: 250px; overflow-y: auto;">
+              <table class="table" style="font-size: 0.75rem;">
+                <thead>
+                  <tr>
+                    <th class="ps-3">Fecha</th>
+                    <th>Método</th>
+                    <th>Ref</th>
+                    <th style="text-align: right; padding-right: 1rem;">Monto</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @for (p of bookingPayments(); track p.id) {
+                    <tr>
+                      <td class="ps-3 subtitle">{{ p.paymentDate | date:'short' }}</td>
+                      <td><span class="badge badge-secondary">{{ p.paymentMethod }}</span></td>
+                      <td class="subtitle">{{ p.transactionReference || '-' }}</td>
+                      <td style="text-align: right; padding-right: 1rem;"><strong>${{ p.amount | number:'1.2-2' }}</strong></td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+          } @else {
+            <p class="subtitle" style="margin-top: 0.5rem;">Esta reserva aún no registra señas previas.</p>
+          }
+        </div>
+
+      </div>
+
+      <!-- Acciones del Modal -->
+      <div class="modal-actions" style="margin-top: 2rem;">
+        <button
+          type="button"
+          class="btn-secondary-action"
+          (click)="closePaymentModal()"
+        >
+          Cerrar
+        </button>
+      </div>
+
+    </div>
+  </div>
+}

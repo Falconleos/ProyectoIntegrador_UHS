@@ -1,0 +1,126 @@
+<section class="room-list-container">
+
+  <!-- Sección de Encabezado -->
+  <div class="header-section">
+    <h2><i class="fa-solid fa-search me-2"></i> Consultar Disponibilidad de Habitaciones</h2>
+    <a class="btn-secondary-action" routerLink="/dashboard/booking-list">
+      <i class="fa-solid fa-arrow-left me-1"></i> Volver a Reservas
+    </a>
+  </div>
+
+  <p class="subtitle mb-4">Selecciona las fechas y la cantidad de huéspedes para buscar habitaciones disponibles en el sistema.</p>
+
+  <hr class="divider" />
+
+  <!-- Mensajes de Error o Carga -->
+  @if (errorMessage()) {
+    <div class="alert alert-danger">
+      <i class="fa-solid fa-triangle-exclamation me-2"></i> {{ errorMessage() }}
+    </div>
+  }
+  
+  @if (loading()) {
+    <div class="alert alert-info">
+      <i class="fa-solid fa-spinner fa-spin me-2"></i> Buscando habitaciones disponibles...
+    </div>
+  }
+
+  <!-- Formulario de Búsqueda con Estilo de Tarjeta / Glass -->
+  <div class="room-type-card mb-4" style="padding: 2rem;">
+    <form [formGroup]="availabilityForm" (ngSubmit)="onSearch()">
+      <h3 style="font-size: var(--font-size-sm); color: var(--color-text-main); margin-bottom: 1.25rem;">Criterios de Búsqueda</h3>
+      
+      <div class="detail-grid" style="grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); margin-bottom: 1.5rem;">
+        
+        <!-- Fecha de Check-In -->
+        <div class="detail-item">
+          <label for="checkIn" class="detail-label">Fecha de Check-In *</label>
+          <input type="date" id="checkIn" class="form-control" formControlName="checkIn">
+          
+          @if (availabilityForm.controls['checkIn'].touched && availabilityForm.controls['checkIn'].invalid) {
+            <small style="color: #f87171; font-size: 0.75rem; margin-top: 4px;">El check-in es obligatorio.</small>
+          }
+        </div>
+
+        <!-- Fecha de Check-Out -->
+        <div class="detail-item">
+          <label for="checkOut" class="detail-label">Fecha de Check-Out *</label>
+          <input type="date" id="checkOut" class="form-control" formControlName="checkOut">
+          
+          @if (availabilityForm.controls['checkOut'].touched && availabilityForm.controls['checkOut'].hasError('required')) {
+            <small style="color: #f87171; font-size: 0.75rem; margin-top: 4px;">El check-out es obligatorio.</small>
+          }
+        </div>
+
+        <!-- Cantidad de Personas -->
+        <div class="detail-item">
+          <label for="guestCount" class="detail-label">Cantidad de Personas *</label>
+          <input type="number" id="guestCount" class="form-control" formControlName="guestCount" min="1" placeholder="Ej: 2">
+          
+          @if (availabilityForm.controls['guestCount'].touched && availabilityForm.controls['guestCount'].invalid) {
+            <small style="color: #f87171; font-size: 0.75rem; margin-top: 4px;">Debe ingresar al menos 1 huésped.</small>
+          }
+        </div>
+
+      </div>
+
+      <hr class="divider" style="margin-bottom: 1.25rem;" />
+
+      <!-- Acciones del Formulario -->
+      <div style="display: flex; justify-content: flex-end; gap: 0.75rem;">
+        <button type="button" class="btn-secondary-action" routerLink="/dashboard/booking-list">
+          Volver a Reservas
+        </button>
+        <button type="submit" class="btn-primary" [disabled]="loading()">
+          <i class="fa-solid" [ngClass]="loading() ? 'fa-spinner fa-spin' : 'fa-magnifying-glass'"></i> 
+          {{ loading() ? 'Consultando...' : 'Consultar Disponibilidad' }}
+        </button>
+      </div>
+
+    </form>
+  </div>
+
+  <!-- Lista de Habitaciones Disponibles -->
+  @if (!loading() && hasSearched()) {
+    <div class="header-section" style="margin-top: 2rem;">
+      <div>
+        <h3 style="color: var(--color-text-main); font-size: var(--font-size-md); margin-bottom: 4px;">Habitaciones Disponibles</h3>
+        <p class="subtitle">Haz clic sobre la habitación que deseas reservar para avanzar.</p>
+      </div>
+    </div>
+    
+    @if (availableRooms().length > 0) {
+      <div class="table-wrapper">
+        <table class="table">
+          <thead>
+            <tr>
+              <th class="ps-4">ID</th>
+              <th>Nro. Habitación</th>
+              <th>Tipo</th>
+              <th>Capacidad</th>
+              <th>Precio por Noche</th>
+              <th style="text-align: right; padding-right: 1.5rem;">Total Est. ({{ calculateDays() }} noches)</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (room of availableRooms(); track room.id) {
+              <tr (click)="selectRoomAndRedirect(room)" style="cursor: pointer;" title="Haz clic para seleccionar esta habitación">
+                <td class="ps-4 subtitle">#{{ room.id }}</td>
+                <td><strong style="color: var(--color-text-main);">#{{ room.number }}</strong></td>
+                <td class="subtitle">{{ room.roomTypeDTOResponse?.name || room.roomTypeName || 'N/D' }}</td>
+                <td><span class="badge badge-secondary">{{ room.roomTypeDTOResponse?.capacity || room.capacity || 0 }} pers.</span></td>
+                <td class="subtitle">${{ getRoomPrice(room) | number:'1.2-2' }}</td>
+                <td style="text-align: right; padding-right: 1.5rem;"><strong style="color: var(--color-text-main);">${{ calculateTotalPrice(room) | number:'1.2-2' }}</strong></td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    } @else {
+      <div class="alert alert-warning text-center py-4" style="justify-content: center;">
+        <i class="fa-solid fa-circle-exclamation me-2"></i> No hay habitaciones disponibles para los criterios seleccionados.
+      </div>
+    }
+  }
+
+</section>
