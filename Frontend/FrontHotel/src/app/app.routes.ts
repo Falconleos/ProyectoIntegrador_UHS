@@ -47,6 +47,10 @@ export const routes: Routes = [
                 path:'employee-create',
                 loadComponent: ()=>import('./components/employee/employee-form/employee-form.component').then(m=>m.EmployeeFormComponent)
             },
+            {
+                path:'employee-edit/:id',
+                loadComponent:()=>import('./components/employee/employee-edit/employee-edit.component').then(m=>m.EmployeeEditComponent)
+            },
 
             
         ]

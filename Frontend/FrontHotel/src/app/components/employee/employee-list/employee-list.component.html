@@ -102,9 +102,9 @@
 
                     <!-- Editar empleado -->
                     <a
-                      class="btn-edit"
+                      class="btn-detail"
                       [routerLink]="[
-                        '/dashboard/employees/editar',
+                        '/dashboard/employee-edit',
                         employee.id
                       ]">
                       Editar
@@ -112,8 +112,9 @@
 
                     <!-- Cambiar turno -->
                     <button
+                    
                       type="button"
-                      class="btn-shift"
+                      class="btn-detail"
                       [disabled]="updatingShift()"
                       (click)="openShiftForm(employee)">
                       Cambiar turno
@@ -305,9 +306,9 @@
 
             <!-- Editar empleado -->
             <a
-              class="btn-edit"
+              class="btn-detail"
               [routerLink]="[
-                '/dashboard/employees/editar',
+                '/dashboard/employee-edit',
                 employee.id
               ]">
               Editar empleado
@@ -316,7 +317,7 @@
             <!-- Cambiar turno -->
             <button
               type="button"
-              class="btn-shift"
+              class="btn-detail"
               [disabled]="updatingShift()"
               (click)="closeEmployeeDetail(); openShiftForm(employee)">
               Cambiar turno

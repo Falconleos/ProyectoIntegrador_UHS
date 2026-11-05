@@ -138,7 +138,7 @@ export class EmployeeEditComponent implements OnInit {
       next: () => {
         this.saving.set(false);
         this.successMessage.set('Empleado actualizado correctamente.');
-        this.router.navigate(['/dashboard/employees']);
+        this.router.navigate(['/dashboard/employee-list']);
       },
 
       error: () => {

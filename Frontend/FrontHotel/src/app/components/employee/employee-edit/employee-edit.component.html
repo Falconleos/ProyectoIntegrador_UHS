@@ -1,178 +1,165 @@
+<div class="employee-container">
 
-<h2>Editar empleado</h2>
+  <!-- Encabezado -->
+  <header class="employee-header">
+    <h2>Editar empleado</h2>
+    <a class="btn-cancel" routerLink="/dashboard/employee-list">
+      Volver al listado
+    </a>
+  </header>
 
-<p>
-  Modifique los datos laborales del empleado.
-  Los campos marcados con (*) son obligatorios.
-</p>
-
-<!-- Estado de carga -->
-@if (loading()) {
-  <p>Cargando datos del empleado...</p>
-}
-
-<!-- Mensaje de error -->
-@if (errorMessage()) {
-  <p role="alert">
-    {{ errorMessage() }}
-  </p>
-}
-
-<!-- Mensaje de éxito -->
-@if (successMessage()) {
-  <p role="status">
-    {{ successMessage() }}
-  </p>
-}
-
-<!-- Formulario de edición -->
-@if (!loading() && employee(); as currentEmployee) {
-
-  <h3>
-    {{ currentEmployee.name }}
-    {{ currentEmployee.surname }}
-  </h3>
-
-  <p>
-    Usuario: {{ currentEmployee.username }}
+  <p class="employee-subtitle">
+    Modifique los datos laborales del empleado. Los campos marcados con (*) son obligatorios.
   </p>
 
-  <p>
-    ID del empleado: {{ currentEmployee.id }}
-  </p>
+  <!-- Estado de carga -->
+  @if (loading()) {
+    <p class="loading-message">
+      Cargando datos del empleado...
+    </p>
+  }
 
-  <form
-    [formGroup]="employeeForm"
-    (ngSubmit)="onSubmit()">
+  <!-- Mensaje de error -->
+  @if (errorMessage()) {
+    <p class="error-message" role="alert">
+      {{ errorMessage() }}
+    </p>
+  }
 
-    <fieldset>
-      <legend>Datos laborales</legend>
+  <!-- Mensaje de éxito -->
+  @if (successMessage()) {
+    <p class="success-message" role="status">
+      {{ successMessage() }}
+    </p>
+  }
 
-      <!-- Número de empleado -->
-      <div>
-        <label for="employeeNumber">
-          Número de empleado
-        </label>
+  <!-- Formulario de edición -->
+  @if (!loading() && employee(); as currentEmployee) {
 
-        <input
-          id="employeeNumber"
-          type="text"
-          formControlName="employeeNumber">
+    <div class="employee-edit-card">
+
+      <div class="employee-profile">
+        <h4>{{ currentEmployee.name }} {{ currentEmployee.surname }}</h4>
+        <p>Usuario: {{ currentEmployee.username }} | ID: {{ currentEmployee.id }}</p>
       </div>
 
-      <!-- Fecha de contratación -->
-      <div>
-        <label for="hireDate">
-          Fecha de contratación *
-        </label>
+      <form [formGroup]="employeeForm" (ngSubmit)="onSubmit()" class="employee-form">
 
-        <input
-          id="hireDate"
-          type="date"
-          formControlName="hireDate">
+        <fieldset class="employee-fieldset">
+          <legend class="employee-legend">Datos laborales</legend>
 
-        @if (
-          employeeForm.controls.hireDate.touched &&
-          employeeForm.controls.hireDate.hasError('required')
-        ) {
-          <small>
-            La fecha de contratación es obligatoria.
-          </small>
-        }
-      </div>
+          <div class="form-grid">
+            <!-- Número de empleado -->
+            <div class="form-group">
+              <label for="employeeNumber">Número de empleado</label>
+              <input
+                id="employeeNumber"
+                type="text"
+                formControlName="employeeNumber"
+                class="form-control">
+            </div>
 
-      <!-- Turno -->
-      <div>
-        <label for="shift">
-          Turno *
-        </label>
+            <!-- Fecha de contratación -->
+            <div class="form-group">
+              <label for="hireDate">Fecha de contratación *</label>
+              <input
+                id="hireDate"
+                type="date"
+                formControlName="hireDate"
+                class="form-control">
 
-        <select
-          id="shift"
-          formControlName="shift">
+              @if (
+                employeeForm.controls.hireDate.touched &&
+                employeeForm.controls.hireDate.hasError('required')
+              ) {
+                <small class="error-text">La fecha de contratación es obligatoria.</small>
+              }
+            </div>
 
-          @for (shift of availableShifts; track shift) {
-            <option [value]="shift">
-              {{ shift }}
-            </option>
-          }
+            <!-- Turno -->
+            <div class="form-group">
+              <label for="shift">Turno *</label>
+              <select
+                id="shift"
+                formControlName="shift"
+                class="form-control">
+                @for (shift of availableShifts; track shift) {
+                  <option [value]="shift">{{ shift }}</option>
+                }
+              </select>
 
-        </select>
+              @if (
+                employeeForm.controls.shift.touched &&
+                employeeForm.controls.shift.hasError('required')
+              ) {
+                <small class="error-text">Debe seleccionar un turno.</small>
+              }
+            </div>
 
-        @if (
-          employeeForm.controls.shift.touched &&
-          employeeForm.controls.shift.hasError('required')
-        ) {
-          <small>
-            Debe seleccionar un turno.
-          </small>
-        }
-      </div>
+            <!-- Salario -->
+            <div class="form-group">
+              <label for="salary">Salario *</label>
+              <input
+                id="salary"
+                type="number"
+                step="0.01"
+                min="0.01"
+                formControlName="salary"
+                class="form-control">
 
-      <!-- Salario -->
-      <div>
-        <label for="salary">
-          Salario *
-        </label>
+              @if (
+                employeeForm.controls.salary.touched &&
+                employeeForm.controls.salary.invalid
+              ) {
+                @if (employeeForm.controls.salary.hasError('required')) {
+                  <small class="error-text">El salario es obligatorio.</small>
+                }
+                @if (employeeForm.controls.salary.hasError('min')) {
+                  <small class="error-text">El salario debe ser mayor que cero.</small>
+                }
+              }
+            </div>
+          </div>
 
-        <input
-          id="salary"
-          type="number"
-          step="0.01"
-          min="0.01"
-          formControlName="salary">
+        </fieldset>
 
-        @if (
-          employeeForm.controls.salary.touched &&
-          employeeForm.controls.salary.invalid
-        ) {
+        <!-- Acciones del Formulario -->
+        <div class="employee-modal-actions">
+          <button
+            type="button"
+            class="btn-cancel"
+            routerLink="/dashboard/employee-list">
+            Cancelar
+          </button>
 
-          @if (employeeForm.controls.salary.hasError('required')) {
-            <small>
-              El salario es obligatorio.
-            </small>
-          }
+          <button
+            type="submit"
+            class="btn-save"
+            [disabled]="saving() || employeeForm.invalid">
+            @if (saving()) {
+              Guardando cambios...
+            } @else {
+              Guardar cambios
+            }
+          </button>
+        </div>
 
-          @if (employeeForm.controls.salary.hasError('min')) {
-            <small>
-              El salario debe ser mayor que cero.
-            </small>
-          }
+      </form>
 
-        }
-      </div>
+    </div>
+  }
 
-    </fieldset>
-
-    <!-- Acciones -->
-    <div>
+  <!-- Volver al listado cuando no se pudo cargar -->
+  @if (!loading() && !employee()) {
+    <div class="employee-edit-card text-center">
+      <p class="error-message">No se pudo cargar la información del empleado.</p>
       <button
         type="button"
-        routerLink="/dashboard/employees">
-        Cancelar
-      </button>
-
-      <button
-        type="submit"
-        [disabled]="saving() || employeeForm.invalid">
-
-        @if (saving()) {
-          Guardando cambios...
-        } @else {
-          Guardar cambios
-        }
-
+        class="btn-detail"
+        routerLink="/dashboard/employee-list">
+        Volver al listado
       </button>
     </div>
+  }
 
-  </form>
-}
-
-<!-- Volver al listado cuando no se pudo cargar -->
-@if (!loading() && !employee()) {
-  <button
-    type="button"
-    routerLink="/dashboard/employees">
-    Volver al listado
-  </button>
-}
+</div>
