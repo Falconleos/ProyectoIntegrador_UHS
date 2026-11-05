@@ -2,17 +2,22 @@
 import { Component, inject, OnInit, OnDestroy, signal } from '@angular/core';
 import { DecimalPipe } from '@angular/common';
 import { RouterLink } from '@angular/router';
+import {
+  ReactiveFormsModule,
+  NonNullableFormBuilder,
+  Validators
+} from '@angular/forms';
 
 import { EmployeeService } from '../../../core/services/employee.service';
 import { UserService } from '../../../core/services/user.service';
 
-import { EmployeeDtoResponse } from '../../../models/Employee-model';
+import { EmployeeDtoResponse , ShiftType} from '../../../models/Employee-model';
 import { UserDtoResponse } from '../../../models/User-model';
 
 @Component({
   selector: 'app-employee-list',
   standalone: true,
-  imports: [RouterLink, DecimalPipe],
+  imports: [RouterLink, DecimalPipe, ReactiveFormsModule],
   templateUrl: './employee-list.component.html',
   styleUrl: './employee-list.component.css'
 })
@@ -20,6 +25,8 @@ export class EmployeeListComponent implements OnInit, OnDestroy {
 
   private employeeService = inject(EmployeeService);
   private userService = inject(UserService);
+
+  private fb = inject(NonNullableFormBuilder);
 
   employees = signal<EmployeeDtoResponse[]>([]);
   loading = signal(false);
@@ -39,6 +46,22 @@ export class EmployeeListComponent implements OnInit, OnDestroy {
   deletingId = signal<number | null>(null);
 
   defaultAvatar = 'assets/default-avatar.png';
+
+  selectedEmployeeForShift = signal<EmployeeDtoResponse | null>(null);
+  updatingShift = signal(false);
+  shiftError = signal('');
+
+  readonly availableShifts: ShiftType[] = [
+    'MORNING',
+    'AFTERNOON',
+    'NIGHT'
+  ];
+
+  shiftForm = this.fb.group({
+    shift: this.fb.control<ShiftType>('MORNING', [
+      Validators.required
+    ])
+  });
 
   ngOnInit(): void {
     this.checkUserRole(); //verifica si el usuario actual es administrador.
@@ -195,6 +218,93 @@ private loadEmployeeRole(employeeId: number): void {
     this.detailLoading.set(false);
   }
 
+  
+openShiftForm(employee: EmployeeDtoResponse): void {
+  if (!this.isAdmin() || this.updatingShift()) {
+    return;
+  }
+
+  this.selectedEmployeeForShift.set(employee);
+  this.shiftError.set('');
+
+  this.shiftForm.reset({
+    shift: employee.shift
+  });
+}
+
+cancelShiftChange(): void {
+  if (this.updatingShift()) {
+    return;
+  }
+
+  this.selectedEmployeeForShift.set(null);
+  this.shiftError.set('');
+  this.shiftForm.reset();
+}
+
+saveShiftChange(): void {
+  if (!this.isAdmin()) {
+    this.shiftError.set(
+      'No tienes permisos para cambiar el turno.'
+    );
+    return;
+  }
+
+  const employee = this.selectedEmployeeForShift();
+
+  if (!employee || this.updatingShift()) {
+    return;
+  }
+
+  if (this.shiftForm.invalid) {
+    this.shiftForm.markAllAsTouched();
+    return;
+  }
+
+  const nuevoShift = this.shiftForm.controls.shift.value;
+
+  if (nuevoShift === employee.shift) {
+    this.shiftError.set(
+      'Debe seleccionar un turno diferente al actual.'
+    );
+    return;
+  }
+
+  this.updatingShift.set(true);
+  this.shiftError.set('');
+
+  this.employeeService.updateShift(
+    employee.id,
+    nuevoShift
+  ).subscribe({
+    next: (updatedEmployee) => {
+
+      this.employees.update(employees =>
+        employees.map(current =>
+          current.id === updatedEmployee.id
+            ? updatedEmployee
+            : current
+        )
+      );
+
+      if (this.selectedEmployee()?.id === updatedEmployee.id) {
+        this.selectedEmployee.set(updatedEmployee);
+      }
+
+      this.updatingShift.set(false);
+      this.selectedEmployeeForShift.set(null);
+      this.shiftForm.reset();
+    },
+
+    error: () => {
+
+      this.shiftError.set('No se pudo actualizar el turno del empleado.');
+      this.updatingShift.set(false);
+    }
+  });
+}
+
+
   deleteEmployee(id: number): void {
     if (!this.isAdmin()) {
       this.errorMessage.set('No tienes permisos para eliminar empleados.');
@@ -234,6 +344,10 @@ private loadEmployeeRole(employeeId: number): void {
 
         if (this.selectedEmployee()?.id === id) {
           this.closeEmployeeDetail();
+        }
+
+        if (this.selectedEmployeeForShift()?.id === id) {
+          this.cancelShiftChange();
         }
 
         this.deletingId.set(null);

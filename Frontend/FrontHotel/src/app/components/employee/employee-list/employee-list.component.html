@@ -22,7 +22,7 @@
   }
 
   @if (errorMessage()) {
-    <p class="error-message">
+    <p class="error-message" role="alert">
       {{ errorMessage() }}
     </p>
   }
@@ -99,6 +99,27 @@
                   </button>
 
                   @if (isAdmin()) {
+
+                    <!-- Editar empleado -->
+                    <a
+                      class="btn-edit"
+                      [routerLink]="[
+                        '/dashboard/employees/editar',
+                        employee.id
+                      ]">
+                      Editar
+                    </a>
+
+                    <!-- Cambiar turno -->
+                    <button
+                      type="button"
+                      class="btn-shift"
+                      [disabled]="updatingShift()"
+                      (click)="openShiftForm(employee)">
+                      Cambiar turno
+                    </button>
+
+                    <!-- Eliminar empleado -->
                     <button
                       type="button"
                       class="btn-delete"
@@ -177,7 +198,7 @@
         }
 
         @if (detailError()) {
-          <p class="error-message">
+          <p class="error-message" role="alert">
             {{ detailError() }}
           </p>
         }
@@ -281,8 +302,27 @@
           </button>
 
           @if (isAdmin()) {
-            
 
+            <!-- Editar empleado -->
+            <a
+              class="btn-edit"
+              [routerLink]="[
+                '/dashboard/employees/editar',
+                employee.id
+              ]">
+              Editar empleado
+            </a>
+
+            <!-- Cambiar turno -->
+            <button
+              type="button"
+              class="btn-shift"
+              [disabled]="updatingShift()"
+              (click)="closeEmployeeDetail(); openShiftForm(employee)">
+              Cambiar turno
+            </button>
+
+            <!-- Eliminar empleado -->
             <button
               type="button"
               class="btn-delete"
@@ -296,8 +336,6 @@
               }
             </button>
 
-           
-
           }
 
         </div>
@@ -305,4 +343,145 @@
       </section>
     </div>
   }
+
+  <!-- Modal para cambiar turno -->
+  @if (selectedEmployeeForShift(); as employee) {
+
+    <div class="employee-modal-overlay">
+
+      <section
+        class="employee-modal"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="shift-modal-title">
+
+        <div class="employee-modal-header">
+
+          <h3 id="shift-modal-title">
+            Cambiar turno
+          </h3>
+
+          <button
+            type="button"
+            class="btn-close"
+            [disabled]="updatingShift()"
+            (click)="cancelShiftChange()">
+            Cerrar
+          </button>
+
+        </div>
+
+        <!-- Información del empleado -->
+        <div class="employee-profile">
+
+          <h4>
+            {{ employee.name }}
+            {{ employee.surname }}
+          </h4>
+
+          <p>
+            Legajo:
+            {{ employee.employeeNumber || 'No especificado' }}
+          </p>
+
+          <p>
+            Turno actual:
+            <strong>{{ employee.shift }}</strong>
+          </p>
+
+        </div>
+
+        <!-- Mensaje de error -->
+        @if (shiftError()) {
+          <p class="error-message" role="alert">
+            {{ shiftError() }}
+          </p>
+        }
+
+        <!-- Formulario reactivo -->
+        <form
+          [formGroup]="shiftForm"
+          (ngSubmit)="saveShiftChange()">
+
+          <fieldset [disabled]="updatingShift()">
+
+            <legend>Nuevo turno</legend>
+
+            <div>
+
+              <label for="newShift">
+                Seleccione el nuevo turno *
+              </label>
+
+              <select
+                id="newShift"
+                formControlName="shift">
+
+                @for (shift of availableShifts; track shift) {
+                  <option [value]="shift">
+                    {{ shift }}
+                  </option>
+                }
+
+              </select>
+
+              @if (
+                shiftForm.controls.shift.touched &&
+                shiftForm.controls.shift.hasError('required')
+              ) {
+                <small class="error-message">
+                  Debe seleccionar un turno.
+                </small>
+              }
+
+              @if (
+                shiftForm.controls.shift.value === employee.shift
+              ) {
+                <p>
+                  Seleccione un turno diferente al actual.
+                </p>
+              }
+
+            </div>
+
+          </fieldset>
+
+          <!-- Acciones del formulario -->
+          <div class="employee-modal-actions">
+
+            <button
+              type="button"
+              class="btn-cancel"
+              [disabled]="updatingShift()"
+              (click)="cancelShiftChange()">
+              Cancelar
+            </button>
+
+            <button
+              type="submit"
+              class="btn-save"
+              [disabled]="
+                updatingShift() ||
+                shiftForm.invalid ||
+                shiftForm.controls.shift.value === employee.shift
+              ">
+
+              @if (updatingShift()) {
+                Actualizando turno...
+              } @else {
+                Confirmar cambio
+              }
+
+            </button>
+
+          </div>
+
+        </form>
+
+      </section>
+
+    </div>
+
+  }
+
 </div>
