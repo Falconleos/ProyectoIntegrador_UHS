@@ -171,6 +171,6 @@ export class AccountDetailComponent implements OnInit {
   }
 
   goBack(): void {
-    this.router.navigate(['../../'], { relativeTo: this.route });
+    this.router.navigate(['dashboard/check-in-list']);
   }
 }

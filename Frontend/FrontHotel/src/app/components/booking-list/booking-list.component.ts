@@ -28,6 +28,9 @@ export class BookingListComponent implements OnInit {
   errorMessage = signal<string>('');
   canModify = signal<boolean>(false);
 
+  // Bandera para rastrear qué IDs están en proceso de cancelación y evitar doble envío
+  cancellingIds = signal<number[]>([]);
+
   selectedBookingForPayment = signal<BookingDtoResponse | null>(null);
   bookingPayments = signal<PaymentDTOResponse[]>([]);
   loadingPayments = signal<boolean>(false);
@@ -75,21 +78,17 @@ export class BookingListComponent implements OnInit {
     this.loading.set(true);
     this.errorMessage.set('');
     
-    // 1. Primero procesamos los No-Shows en el backend para actualizar estados vencidos
     this.bookingService.processNoShows().subscribe({
       next: () => {
-        // 2. Una vez procesados, procedemos a listar las reservas con normalidad
         this.fetchAndFilterBookings();
       },
       error: (err) => {
         console.warn('No se pudo ejecutar el procesamiento automático de No-Shows, continuando carga...', err);
-        // Aun si falla el endpoint de process-no-shows, intentamos mostrar la lista
         this.fetchAndFilterBookings();
       }
     });
   }
 
-  // Extraemos la lógica original de carga a este método auxiliar
   activeTab = signal<'PENDING' | 'NO_SHOW'>('PENDING');
 
   private fetchAndFilterBookings(): void {
@@ -97,7 +96,6 @@ export class BookingListComponent implements OnInit {
       next: (data) => {
         const allBookings = Array.isArray(data) ? [...data] : [];
         
-        // Incluimos PENDING, CONFIRMED y NO_SHOW para que no se pierdan
         const filtered: BookingWithAccount[] = allBookings.filter(
           (b) => b.state === 'PENDING' || b.state === 'CONFIRMED' || b.state === 'NO_SHOW'
         );
@@ -105,7 +103,6 @@ export class BookingListComponent implements OnInit {
         this.bookings.set(filtered);
         this.loading.set(false);
 
-        // Iteramos cada reserva para consultar su cuenta con el AccountService
         filtered.forEach((booking) => {
           this.accountService.getAccountByBookingId(booking.id).subscribe({
             next: (account: any) => {
@@ -132,9 +129,18 @@ export class BookingListComponent implements OnInit {
     });
   }
 
+  isCancelling(id: number): boolean {
+    return this.cancellingIds().includes(id);
+  }
+
   cancelBooking(id: number): void {
     if (!this.canModify()) {
       alert('No tienes los permisos necesarios para realizar esta acción.');
+      return;
+    }
+
+    // Evitar múltiples peticiones paralelas para la misma reserva
+    if (this.isCancelling(id)) {
       return;
     }
 
@@ -143,8 +149,13 @@ export class BookingListComponent implements OnInit {
       return;
     }
 
+    // Marcamos esta reserva como "en proceso de cancelación"
+    this.cancellingIds.update(ids => [...ids, id]);
+
+    console.log('Iniciando obtención de cuenta para bookingId:', id);
     this.accountService.getAccountByBookingId(id).subscribe({
       next: (account: any) => {
+        console.log('Cuenta obtenida exitosamente:', account);
         const hasPayments = account && account.paidAmount > 0;
         let issueCreditNote = false;
 
@@ -162,13 +173,18 @@ export class BookingListComponent implements OnInit {
           issueCreditNote: issueCreditNote
         };
 
+        console.log('Enviando petición de cancelación (con cuenta):', request);
         this.bookingService.cancelBooking(request).subscribe({
           next: () => {
+            console.log('Cancelación exitosa (con cuenta)');
             alert(`Reserva ID ${id} cancelada exitosamente.`);
+            this.cancellingIds.update(ids => ids.filter(item => item !== id));
             this.loadBookings();
           },
           error: (err) => {
+            console.error('Error en el servicio al cancelar (con cuenta):', err);
             alert('Error al intentar cancelar la reserva.');
+            this.cancellingIds.update(ids => ids.filter(item => item !== id));
             console.error(err);
           }
         });
@@ -186,13 +202,18 @@ export class BookingListComponent implements OnInit {
           issueCreditNote: false
         };
 
+        console.log('Enviando petición de cancelación (alternativa sin cuenta):', request);
         this.bookingService.cancelBooking(request).subscribe({
           next: () => {
+            console.log('Cancelación exitosa (sin cuenta)');
             alert(`Reserva ID ${id} cancelada exitosamente.`);
+            this.cancellingIds.update(ids => ids.filter(item => item !== id));
             this.loadBookings();
           },
           error: (errBooking) => {
+            console.error('Error en el servicio al cancelar (sin cuenta):', errBooking);
             alert('Error al intentar cancelar la reserva.');
+            this.cancellingIds.update(ids => ids.filter(item => item !== id));
             console.error(errBooking);
           }
         });

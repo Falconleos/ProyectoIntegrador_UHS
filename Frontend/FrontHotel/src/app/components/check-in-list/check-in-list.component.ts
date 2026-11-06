@@ -330,7 +330,7 @@ export class CheckInListComponent implements OnInit {
   }
 
   viewAccountPlaceholder(id: number): void { 
-    this.router.navigate([`/dashboard/bookings/${id}/cuenta`]);
+    this.router.navigate([`/dashboard/account-detail/${id}`]);
   }
 
   servicesPlaceholder(id: number): void { 
