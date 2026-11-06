@@ -18,7 +18,7 @@ public class BookingCancellationEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @OneToOne(fetch = FetchType.LAZY, optional = false)
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "booking_id", referencedColumnName = "id", nullable = false, unique = true)
     private BookingEntity booking;
 
