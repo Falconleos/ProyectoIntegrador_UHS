@@ -1,0 +1,173 @@
+/* --- Estilos para CreditNoteListComponent --- */
+
+.container-fluid {
+  background-color: var(--bg-main);
+  background-image: var(--bg-gradient-1), var(--bg-gradient-2);
+  min-height: 100vh;
+  color: var(--color-text-main);
+  font-family: var(--font-family);
+}
+
+.paddingExtra {
+  padding: 2rem;
+}
+
+/* --- Encabezado --- */
+.header-section h2 {
+  font-size: var(--font-size-title-fluid);
+  color: var(--color-text-main);
+}
+
+.header-section p {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+}
+
+/* --- Alertas --- */
+.alert {
+  border-radius: var(--radius-sm);
+  font-size: var(--font-size-sm);
+  border: var(--border-glass);
+  backdrop-filter: var(--backdrop-blur);
+}
+
+.alert-info {
+  background-color: rgba(129, 140, 248, 0.1);
+  color: var(--color-primary);
+}
+
+.alert-danger {
+  background-color: rgba(239, 68, 68, 0.1);
+  color: #f87171;
+}
+
+/* --- Tabla Glassmorphism --- */
+.table-responsive {
+  background: var(--bg-secondary);
+  backdrop-filter: var(--backdrop-blur);
+  border: var(--border-glass);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-main);
+  overflow: hidden;
+}
+
+.table {
+  color: var(--color-text-main);
+  margin-bottom: 0;
+  font-size: var(--font-size-sm);
+}
+
+.table thead th {
+  background-color: rgba(15, 23, 42, 0.8);
+  color: var(--color-text-muted);
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: var(--font-size-xs);
+  letter-spacing: 0.05em;
+  border-bottom: var(--border-glass);
+  padding: 1rem;
+}
+
+.table tbody td {
+  padding: 1rem;
+  border-bottom: var(--border-glass);
+  color: var(--color-text-main);
+}
+
+.table tbody tr {
+  transition: background-color 0.2s ease;
+}
+
+.table tbody tr:hover {
+  background-color: rgba(255, 255, 255, 0.02);
+}
+
+.table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+/* --- Botones personalizados --- */
+.btn-dark-solid {
+  background-color: var(--bg-btn-secondary);
+  color: var(--color-text-main);
+  border: var(--border-btn);
+  border-radius: var(--radius-sm);
+  font-size: var(--font-size-xs);
+  font-weight: 500;
+  transition: all 0.2s ease-in-out;
+}
+
+.btn-dark-solid:hover {
+  background-color: var(--bg-btn-secondary-hover);
+  color: var(--color-primary);
+  border-color: rgba(129, 140, 248, 0.3);
+  transform: translateY(-1px);
+}
+
+/* --- Modal Personalizado (Glassmorphism) --- */
+.modal-backdrop-custom {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(10, 11, 21, 0.75);
+  backdrop-filter: blur(8px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1050;
+  animation: fadeIn 0.25s ease-out;
+}
+
+.modal-card-custom {
+  background: var(--bg-secondary);
+  backdrop-filter: var(--backdrop-blur);
+  border: var(--border-glass);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-main);
+  width: 100%;
+  max-width: 600px;
+  color: var(--color-text-main);
+  animation: scaleUp 0.25s ease-out;
+}
+
+.text-main {
+  color: var(--color-text-main) !important;
+}
+
+.d-small-label {
+  font-size: var(--font-size-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  display: block;
+  margin-bottom: 0.25rem;
+}
+
+.detail-item-box {
+  background: rgba(15, 23, 42, 0.4);
+  border: var(--border-input);
+  border-radius: var(--radius-md);
+  padding: 0.85rem 1rem;
+}
+
+.reason-box {
+  font-size: var(--font-size-sm);
+  line-height: 1.5;
+  color: var(--color-text-muted);
+  background: rgba(10, 11, 21, 0.3);
+  padding: 0.75rem;
+  border-radius: var(--radius-sm);
+  border: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+/* --- Animaciones del Modal --- */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes scaleUp {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}

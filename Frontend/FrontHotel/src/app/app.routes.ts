@@ -102,6 +102,10 @@ export const routes: Routes = [
             {
                 path: 'bookings/:id/servicios',
                 loadComponent: () => import('./components/room-attention/room-attention-list/room-attention-list.component').then(m => m.RoomAttentionListComponent)
+            },
+            {
+                path:'credit-notes',
+                loadComponent:()=>import('./components/credit-note-list/credit-note-list.component').then(m=>m.CreditNoteListComponent)
             }
 
             
