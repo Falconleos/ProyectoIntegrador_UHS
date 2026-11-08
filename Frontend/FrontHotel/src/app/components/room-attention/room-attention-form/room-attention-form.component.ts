@@ -1,4 +1,3 @@
-
 import {
   Component,
   OnInit,
@@ -50,7 +49,8 @@ export class RoomAttentionFormComponent implements OnInit {
   });
 
   ngOnInit(): void {
-    const idParam = this.route.snapshot.paramMap.get('bookingId');
+    // CORREGIDO: Cambiado de 'bookingId' a 'id' para que coincida con la ruta (:id)
+    const idParam = this.route.snapshot.paramMap.get('id');
     const id = Number(idParam);
 
     if (idParam && Number.isInteger(id) && id > 0) {
@@ -61,7 +61,7 @@ export class RoomAttentionFormComponent implements OnInit {
     }
   }
 
-  //Obtiene catálogo de productos y servicios
+  // Obtiene catálogo de productos y servicios
   loadAvailableItems(): void {
     this.loadingItems.set(true);
     this.errorMessage.set('');
@@ -78,11 +78,9 @@ export class RoomAttentionFormComponent implements OnInit {
     });
   }
 
-
-  //Busca el producto seleccionado
+  // Busca el producto seleccionado
   getSelectedItem(): ItemDtoResponse | undefined {
     const itemId = this.attentionForm.controls.itemId.value;
-
     return this.availableItems().find(item => item.id === itemId);
   }
 
@@ -94,11 +92,10 @@ export class RoomAttentionFormComponent implements OnInit {
     }
 
     const quantity = this.attentionForm.controls.quantity.value;
-
     return selectedItem.unitPrice * quantity;
   }
 
-  //Registra un producto o servicio consumido por un huésped durante su reserva
+  // Registra un producto o servicio consumido por un huésped durante su reserva
   onSubmit(): void {
     if (this.attentionForm.invalid) {
       this.attentionForm.markAllAsTouched();
@@ -125,7 +122,7 @@ export class RoomAttentionFormComponent implements OnInit {
     this.roomAttentionService.addAttention(request).subscribe({
       next: () => {
         this.saving.set(false);
-        this.router.navigate(['/dashboard/bookings', id,'servicios']);
+        this.router.navigate(['/dashboard/bookings', id, 'servicios']);
       },
       error: () => {
         this.errorMessage.set('Error al registrar el consumo o servicio.');
@@ -134,4 +131,3 @@ export class RoomAttentionFormComponent implements OnInit {
     });
   }
 }
-

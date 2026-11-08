@@ -106,8 +106,11 @@ export const routes: Routes = [
             {
                 path:'credit-notes',
                 loadComponent:()=>import('./components/credit-note-list/credit-note-list.component').then(m=>m.CreditNoteListComponent)
+            },
+            {
+                path:'bookings/:id/agregar-servicio', 
+                loadComponent:()=>import('./components/room-attention/room-attention-form/room-attention-form.component').then(m=>m.RoomAttentionFormComponent)
             }
-
             
         ]
     },
