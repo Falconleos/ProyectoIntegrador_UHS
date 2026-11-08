@@ -176,53 +176,71 @@ public class BookingServiceImpl implements BookingService {
     @Override
     @Transactional
     public BookingCancellationDTOResponse cancelBooking(BookingCancellationDTORequest request) {
+        System.out.println("[BACKEND DEBUG] --------------------------------------------------");
+        System.out.println("[BACKEND DEBUG] Iniciando cancelBooking para bookingId: " + (request != null ? request.getBookingId() : "null"));
+
         BookingEntity booking = findEntityById(request.getBookingId());
+        System.out.println("[BACKEND DEBUG] Reserva encontrada. ID: " + booking.getId() + ", Estado actual: " + booking.getState());
 
         if (booking.getState() == BookingState.CHECKED_IN) {
+            System.out.println("[BACKEND DEBUG] Conflicto: La reserva ya tiene check-in.");
             throw new BookingStateConflictException("The guest has already checked in. You can only interrupt the stay.");
         }
         if (booking.getState() == BookingState.NO_SHOW) {
+            System.out.println("[BACKEND DEBUG] Conflicto: La reserva está en No-Show.");
             throw new BookingStateConflictException("This booking is already inactive due to a No-Show.");
         }
         if (booking.getState() == BookingState.CONCLUDED) {
+            System.out.println("[BACKEND DEBUG] Conflicto: La reserva ya concluyó.");
             throw new BookingStateConflictException("Cannot cancel a concluded booking.");
         }
         if (booking.getState() == BookingState.CANCELLED) {
+            System.out.println("[BACKEND DEBUG] Conflicto: La reserva ya está cancelada.");
             throw new BookingStateConflictException("This booking is already cancelled.");
         }
 
-        if (bookingCancellationRepository.existsByBookingId(booking.getId())) {
+        boolean existsCancellation = bookingCancellationRepository.existsByBookingId(booking.getId());
+        System.out.println("[BACKEND DEBUG] ¿Ya existe registro de cancelación físico en DB?: " + existsCancellation);
+
+        if (existsCancellation) {
             throw new BookingStateConflictException("Esta reserva ya cuenta con un registro físico de cancelación en el sistema.");
         }
 
         // 1. Obtener la cuenta financiera asociada a la reserva
         AccountEntity account = accountRepository.findByBookingEntity_Id(booking.getId()).orElse(null);
+        System.out.println("[BACKEND DEBUG] Cuenta financiera asociada: " + (account != null ? "Encontrada (ID: " + account.getId() + ")" : "No encontrada"));
 
         // 2. Validar condiciones de negocio:
         // - Que la reserva anide un userEntity
         // - Que existan pagos asociados a la cuenta de esta reserva
         boolean hasUserEntity = (booking.getUserEntity() != null);
         boolean hasPayments = (account != null && account.getPayments() != null && !account.getPayments().isEmpty() && account.getPaidAmount() > 0);
+        System.out.println("[BACKEND DEBUG] hasUserEntity: " + hasUserEntity + ", hasPayments: " + hasPayments);
 
         // - Que el front-end confirme explícitamente la creación de la nota de crédito
         boolean wantsCreditNote = Boolean.TRUE.equals(request.getIssueCreditNote());
+        System.out.println("[BACKEND DEBUG] wantsCreditNote: " + wantsCreditNote);
 
         if (hasUserEntity && hasPayments && wantsCreditNote) {
+            System.out.println("[BACKEND DEBUG] Generando nota de crédito...");
             creditNoteService.createCreditNote(account, request.getReason());
             account.setState(com.example.ultimate_hotel_software_v30.enums.AccountState.REFUNDED);
         } else {
             if (account != null) {
+                System.out.println("[BACKEND DEBUG] Cambiando estado de cuenta a CANCELLED...");
                 account.setState(com.example.ultimate_hotel_software_v30.enums.AccountState.CANCELLED);
             }
         }
 
         if (account != null) {
             accountRepository.save(account);
+            System.out.println("[BACKEND DEBUG] Cuenta financiera guardada exitosamente.");
         }
 
         booking.setState(BookingState.CANCELLED);
         booking.setActive(false);
         bookingRepository.save(booking);
+        System.out.println("[BACKEND DEBUG] Reserva actualizada a CANCELLED y guardada en DB.");
 
         Object principal = SecurityContextHolder.getContext()
                 .getAuthentication().getPrincipal();
@@ -231,21 +249,32 @@ public class BookingServiceImpl implements BookingService {
         if (principal instanceof UserDetails) {
             currentUsername = ((UserDetails) principal).getUsername();
         }
+        System.out.println("[BACKEND DEBUG] Usuario autenticado ejecutando la acción: " + currentUsername);
 
         UserEntity currentUser = userService.findEntityByUsername(currentUsername);
 
         if (!currentUser.isEnabled()) {
+            System.out.println("[BACKEND DEBUG] El usuario actual está deshabilitado.");
             throw new DisabledUserException("A disabled user cannot generate a cancellation.");
         }
 
+        // Construcción limpia utilizando únicamente la relación de la entidad Booking
         BookingCancellationEntity cancellation = BookingCancellationEntity.builder()
                 .userEntity(currentUser)
                 .booking(booking)
                 .reason(request.getReason())
                 .build();
 
-        BookingCancellationEntity savedCancellation = bookingCancellationService.create(cancellation);
-        return bookingCancellationMapper.toBookingCancellationDTOResponse(savedCancellation);
+        try {
+            System.out.println("[BACKEND DEBUG] Intentando guardar BookingCancellationEntity...");
+            BookingCancellationEntity savedCancellation = bookingCancellationService.create(cancellation);
+            System.out.println("[BACKEND DEBUG] ¡BookingCancellation guardado con éxito! Retornando respuesta...");
+            return bookingCancellationMapper.toBookingCancellationDTOResponse(savedCancellation);
+        } catch (Exception e) {
+            System.err.println("[BACKEND ERROR CRÍTICO] Falló al intentar guardar BookingCancellationEntity para la reserva ID: " + booking.getId());
+            e.printStackTrace(); // Imprime la traza completa en rojo en IntelliJ
+            throw e;
+        }
     }
 
     @Override

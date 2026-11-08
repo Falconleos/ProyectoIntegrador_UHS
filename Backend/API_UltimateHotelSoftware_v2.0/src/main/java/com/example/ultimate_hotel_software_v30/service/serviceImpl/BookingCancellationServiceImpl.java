@@ -63,11 +63,21 @@ public class BookingCancellationServiceImpl implements BookingCancellationServic
     @Override
     @Transactional
     public BookingCancellationEntity create(BookingCancellationEntity cancellation) {
+        System.out.println("[CANCELLATION SERVICE DEBUG] --------------------------------");
+        System.out.println("[CANCELLATION SERVICE DEBUG] Iniciando create().");
+        System.out.println("[CANCELLATION SERVICE DEBUG] cancellation.getId() = " + cancellation.getId());
+
+        if (cancellation.getBooking() != null) {
+            System.out.println("[CANCELLATION SERVICE DEBUG] cancellation.getBooking().getId() = " + cancellation.getBooking().getId());
+        } else {
+            System.out.println("[CANCELLATION SERVICE DEBUG] ¡ADVERTENCIA! cancellation.getBooking() es NULL.");
+        }
+
         if (cancellation.getBooking() != null && cancellation.getBooking().getId() != null) {
             Long bookingId = cancellation.getBooking().getId();
 
-            // Verificamos directamente en la BD si ya existe una cancelación para esta reserva
             if (repository.existsByBookingId(bookingId)) {
+                System.out.println("[CANCELLATION SERVICE DEBUG] Validación fallida: ya existe cancelación para bookingId: " + bookingId);
                 throw new IllegalStateException("La reserva con ID " + bookingId + " ya se encuentra cancelada.");
             }
         }
@@ -75,10 +85,13 @@ public class BookingCancellationServiceImpl implements BookingCancellationServic
         cancellation.setCancellationDate(LocalDateTime.now());
 
         try {
-            return repository.save(cancellation);
+            BookingCancellationEntity saved = repository.save(cancellation);
+            System.out.println("[CANCELLATION SERVICE DEBUG] ¡Guardado exitoso! ID de cancelación guardado: " + saved.getId());
+            return saved;
         } catch (DataIntegrityViolationException e) {
-            // Captura defensiva por si la base de datos tiene un índice único duplicado
             Long bookingId = cancellation.getBooking() != null ? cancellation.getBooking().getId() : null;
+            System.err.println("[CANCELLATION SERVICE ERROR] DataIntegrityViolationException al intentar guardar la cancelación para bookingId: " + bookingId);
+            e.printStackTrace();
             throw new IllegalStateException("Ya existe un registro físico de cancelación para la reserva con ID " + bookingId + ".");
         }
     }

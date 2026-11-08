@@ -73,7 +73,7 @@ public class BookingEntity {
     private Double totalPrice;
 
     // Relación uno a uno con la cancelación
-    @OneToOne(mappedBy = "booking", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToOne(mappedBy = "booking", fetch = FetchType.LAZY)
     private BookingCancellationEntity cancellation;
 
     private LocalDateTime createdAt;
