@@ -1,0 +1,208 @@
+<div class="landing-container">
+  
+  <!-- ================= NAVBAR SUPERIOR ================= -->
+  <nav class="landing-navbar glass-card">
+    <div class="nav-brand">
+      <a routerLink="/" class="brand-link">
+        <i class="bi bi-building-fill-gear me-2 text-primary"></i>
+        <span>Ultimate Hotel</span>
+      </a>
+    </div>
+
+    <div class="nav-menu">
+      <a routerLink="/" class="nav-link">Inicio</a>
+      <a href="#amenities" class="nav-link">Comodidades</a>
+      <a href="#testimonials" class="nav-link">Reseñas</a>
+      <a href="#contact" class="nav-link">Ubicación & Contacto</a>
+    </div>
+
+    <div class="nav-auth">
+      @if (isLoggedIn()) {
+        <!-- Si el usuario está logueado -->
+        <div class="user-logged-info">
+          @if (avatarUrl()) {
+            <img [src]="avatarUrl()" (error)="onAvatarError()" alt="Avatar" class="navbar-avatar" />
+          } @else {
+            <div class="navbar-avatar-default">
+              <i class="bi bi-person-fill"></i>
+            </div>
+          }
+          <span class="user-name">{{ username() }}</span>
+          
+          <!-- Enlace al Panel -->
+          <a routerLink="/dashboard" class="btn-primary-action btn-sm">
+            <i class="bi bi-speedometer2 me-1"></i> Panel
+          </a>
+
+          <!-- Botón Logout -->
+          <button type="button" class="btn-secondary-action btn-sm" (click)="logout()">
+            <i class="bi bi-box-arrow-right"></i>
+          </button>
+        </div>
+      } @else {
+        <!-- Si NO hay nadie logueado -->
+        <div class="auth-buttons">
+          <a routerLink="/login" class="btn-secondary-action">
+            <i class="bi bi-box-arrow-in-right me-1"></i> Iniciar Sesión
+          </a>
+          <a routerLink="/register" class="btn-primary-action">
+            <i class="bi bi-person-plus me-1"></i> Registrarse
+          </a>
+        </div>
+      }
+    </div>
+  </nav>
+
+  <!-- ================= SECCIÓN 1: PRESENTACIÓN Y HERO (CTA) ================= -->
+  <section class="hero-section glass-card">
+    <div class="hero-content">
+      <span class="badge badge-primary mb-3">
+        <i class="bi bi-stars me-1"></i> Ultimate Hotel Software Experience
+      </span>
+      <h1 class="hero-title">Servicio de hotelería</h1>
+      <p class="hero-subtitle">
+        Disfruta de una estadía única con servicios exclusivos, habitaciones de alta gama y gestión automatizada para hacer de tu viaje una experiencia perfecta.
+      </p>
+      
+      <div class="hero-actions">
+        <a routerLink="/dashboard/availability" class="btn-primary-action">
+          <i class="bi bi-calendar-check me-2"></i> Reservar Ahora
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= SECCIÓN 2: COMODIDADES ================= -->
+  <section id="amenities" class="amenities-section">
+    <div class="section-header text-center mb-4">
+      <h2><i class="bi bi-gem me-2"></i> Nuestras Comodidades</h2>
+      <p class="subtitle">Espacios diseñados para tu máximo descanso y bienestar.</p>
+    </div>
+
+    <div class="amenities-grid">
+      <!-- Comodidad 1 -->
+      <div class="glass-card amenity-card">
+        <div class="amenity-img-wrapper">
+          <img src="https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?auto=format&fit=crop&w=800&q=80" alt="Habitaciones de Lujo" class="amenity-img" />
+        </div>
+        <div class="amenity-content">
+          <h3>Habitaciones de Lujo</h3>
+          <p class="subtitle">Diseño moderno con tecnología integrada, climatización inteligente y vistas panorámicas excepcionales.</p>
+        </div>
+      </div>
+
+      <!-- Comodidad 2 -->
+      <div class="glass-card amenity-card">
+        <div class="amenity-img-wrapper">
+          <img src="https://images.unsplash.com/photo-1540555700478-4be289fbecef?auto=format&fit=crop&w=800&q=80" alt="Spa y Relax" class="amenity-img" />
+        </div>
+        <div class="amenity-content">
+          <h3>Áreas de Bienestar y Spa</h3>
+          <p class="subtitle">Disfruta de piscinas climatizadas, masajes profesionales y zonas de relajación exclusivas para huéspedes.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= SECCIÓN 3: COMENTARIOS (CARRUSEL CON FOTO) ================= -->
+  <section id="testimonials" class="testimonials-section glass-card">
+    <div class="section-header text-center mb-4">
+      <h2><i class="bi bi-chat-square-quote me-2"></i> Lo que dicen nuestros Huéspedes</h2>
+      <p class="subtitle">Experiencias y opiniones compartidas por nuestra comunidad.</p>
+    </div>
+
+    @if (fiveStarComments().length > 0) {
+      <div class="carousel-container">
+        @let current = fiveStarComments()[currentCommentIndex()];
+        
+        <div class="carousel-card glass-subcard">
+          <div class="comment-rating mb-3">
+            @for (star of [1, 2, 3, 4, 5]; track star) {
+              <i class="bi bi-star-fill text-warning"></i>
+            }
+          </div>
+          
+          <p class="carousel-text">"{{ current['comment'] ?? current['content'] ?? 'Excelente estadía' }}"</p>
+          
+          <!-- Datos y foto del autor del comentario -->
+          <div class="carousel-author d-flex align-items-center justify-content-center gap-3 mt-4">
+            @if (current['authorAvatar']) {
+              <img [src]="current['authorAvatar']" (error)="onCommentAvatarError($event)" alt="Avatar Autor" class="comment-author-avatar">
+            } @else {
+              <div class="comment-author-avatar-default">
+                <i class="bi bi-person-fill"></i>
+              </div>
+            }
+            <div class="d-flex flex-column text-start">
+              <strong>{{ current['username'] ?? current['name'] ?? 'Huésped Verificado' }}</strong>
+              <span class="subtitle">Huésped Ultimate Hotel</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="carousel-controls mt-4">
+          <button type="button" class="btn-secondary-action" (click)="prevComment()">
+            <i class="bi bi-chevron-left me-1"></i> Anterior
+          </button>
+          <span class="subtitle">{{ currentCommentIndex() + 1 }} de {{ fiveStarComments().length }}</span>
+          <button type="button" class="btn-secondary-action" (click)="nextComment()">
+            Siguiente <i class="bi bi-chevron-right ms-1"></i>
+          </button>
+        </div>
+      </div>
+    } @else {
+      <div class="text-center py-4">
+        <p class="subtitle"><i class="bi bi-info-circle me-1"></i> No hay comentarios destacados disponibles en este momento.</p>
+      </div>
+    }
+  </section>
+
+  <!-- ================= SECCIÓN 4: MAPA Y DATOS DE CONTACTO ================= -->
+  <section id="contact" class="contact-info-section">
+    <div class="glass-card contact-info-card">
+      <div class="section-header mb-4 text-center">
+        <h2><i class="bi bi-geo-alt-fill me-2"></i> Ubicación y Contacto</h2>
+        <p class="subtitle">Visítanos o comunícate con nosotros directamente.</p>
+      </div>
+
+      <div class="contact-grid">
+        <div class="contact-details">
+          <div class="contact-item mb-3">
+            <i class="bi bi-geo-alt text-primary fs-4 me-3"></i>
+            <div>
+              <strong>Dirección</strong>
+              <p class="subtitle m-0">Av. Luro 1234, Mar del Plata, Argentina</p>
+            </div>
+          </div>
+          <div class="contact-item mb-3">
+            <i class="bi bi-telephone text-primary fs-4 me-3"></i>
+            <div>
+              <strong>Teléfono</strong>
+              <p class="subtitle m-0">+54 223 456-7890</p>
+            </div>
+          </div>
+          <div class="contact-item mb-3">
+            <i class="bi bi-envelope text-primary fs-4 me-3"></i>
+            <div>
+              <strong>Correo Electrónico</strong>
+              <p class="subtitle m-0">contacto&#64;ultimatehotel.com</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="map-wrapper">
+          <!-- Mapa embebido de ejemplo (Google Maps) -->
+          <iframe 
+            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3143.456789!2d-57.555!3d-38.005!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMzjCsDAwJzE4LjAiUyA1N8KwMzMnMTguMCJX!5e0!3m2!1ses!2sar!4v1650000000000!5m2!1ses!2sar" 
+            width="100%" 
+            height="250" 
+            style="border:0; border-radius: 8px;" 
+            allowfullscreen="" 
+            loading="lazy">
+          </iframe>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</div>
