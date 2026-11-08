@@ -134,37 +134,54 @@ export class BookingListComponent implements OnInit {
   }
 
   cancelBooking(id: number): void {
+    console.log(`[DEBUG] Iniciando proceso de cancelación para la reserva ID: ${id}`);
+
     if (!this.canModify()) {
+      console.warn('[DEBUG] Acción bloqueada: El usuario no cuenta con permisos de modificación.');
       alert('No tienes los permisos necesarios para realizar esta acción.');
       return;
     }
 
     // Evitar múltiples peticiones paralelas para la misma reserva
     if (this.isCancelling(id)) {
+      console.warn(`[DEBUG] La reserva ID ${id} ya se encuentra en proceso de cancelación.`);
       return;
     }
 
     const reason = prompt('Por favor, ingrese el motivo de la cancelación:');
     if (reason === null) {
+      console.log('[DEBUG] Cancelación abortada por el usuario (prompt cerrado o cancelado).');
+      return;
+    }
+
+    if (!reason.trim()) {
+      console.warn('[DEBUG] El motivo de cancelación ingresado está vacío.');
+      alert('Debes ingresar un motivo válido.');
       return;
     }
 
     // Marcamos esta reserva como "en proceso de cancelación"
     this.cancellingIds.update(ids => [...ids, id]);
+    console.log(`[DEBUG] Reserva ID ${id} agregada a cancellingIds. Consultando cuenta financiera...`);
 
-    console.log('Iniciando obtención de cuenta para bookingId:', id);
+    const userIdStr = localStorage.getItem('userId');
+    const userId = userIdStr ? Number(userIdStr) : 1;
+    console.log(`[DEBUG] ID de usuario recuperado para la cancelación: ${userId}`);
+
+    // Consultamos la cuenta específica de esta reserva
     this.accountService.getAccountByBookingId(id).subscribe({
       next: (account: any) => {
-        console.log('Cuenta obtenida exitosamente:', account);
+        console.log(`[DEBUG] Cuenta obtenida exitosamente para bookingId ${id}:`, account);
+        
         const hasPayments = account && account.paidAmount > 0;
         let issueCreditNote = false;
 
         if (hasPayments) {
+          console.log(`[DEBUG] La cuenta posee pagos registrados (paidAmount: ${account.paidAmount}). Consultando emisión de nota de crédito...`);
           issueCreditNote = confirm('Esta reserva cuenta con pagos registrados. ¿Desea emitir una nota de crédito/reintegro?');
+        } else {
+          console.log('[DEBUG] La cuenta no registra pagos previos. No se requiere nota de crédito.');
         }
-
-        const userIdStr = localStorage.getItem('userId');
-        const userId = userIdStr ? Number(userIdStr) : 1;
 
         const request = {
           bookingId: id,
@@ -173,28 +190,12 @@ export class BookingListComponent implements OnInit {
           issueCreditNote: issueCreditNote
         };
 
-        console.log('Enviando petición de cancelación (con cuenta):', request);
-        this.bookingService.cancelBooking(request).subscribe({
-          next: () => {
-            console.log('Cancelación exitosa (con cuenta)');
-            alert(`Reserva ID ${id} cancelada exitosamente.`);
-            this.cancellingIds.update(ids => ids.filter(item => item !== id));
-            this.loadBookings();
-          },
-          error: (err) => {
-            console.error('Error en el servicio al cancelar (con cuenta):', err);
-            alert('Error al intentar cancelar la reserva.');
-            this.cancellingIds.update(ids => ids.filter(item => item !== id));
-            console.error(err);
-          }
-        });
+        console.log(`[DEBUG] Enviando petición final de cancelación (con cuenta) para bookingId ${id}:`, request);
+        this.executeCancellation(request, id);
       },
       error: (err) => {
-        console.warn('No se pudo obtener la cuenta para validar pagos, procediendo a cancelar...', err);
+        console.warn(`[DEBUG] No se pudo obtener la cuenta para la reserva ID ${id} (o no existe). Procediendo a cancelar sin cuenta...`, err);
         
-        const userIdStr = localStorage.getItem('userId');
-        const userId = userIdStr ? Number(userIdStr) : 1;
-
         const request = {
           bookingId: id,
           reason: reason.trim(),
@@ -202,21 +203,25 @@ export class BookingListComponent implements OnInit {
           issueCreditNote: false
         };
 
-        console.log('Enviando petición de cancelación (alternativa sin cuenta):', request);
-        this.bookingService.cancelBooking(request).subscribe({
-          next: () => {
-            console.log('Cancelación exitosa (sin cuenta)');
-            alert(`Reserva ID ${id} cancelada exitosamente.`);
-            this.cancellingIds.update(ids => ids.filter(item => item !== id));
-            this.loadBookings();
-          },
-          error: (errBooking) => {
-            console.error('Error en el servicio al cancelar (sin cuenta):', errBooking);
-            alert('Error al intentar cancelar la reserva.');
-            this.cancellingIds.update(ids => ids.filter(item => item !== id));
-            console.error(errBooking);
-          }
-        });
+        console.log(`[DEBUG] Enviando petición final de cancelación (alternativa sin cuenta) para bookingId ${id}:`, request);
+        this.executeCancellation(request, id);
+      }
+    });
+  }
+
+  private executeCancellation(request: any, id: number): void {
+    this.bookingService.cancelBooking(request).subscribe({
+      next: (response) => {
+        console.log(`[DEBUG] ¡Cancelación exitosa en servidor para la reserva ID ${id}! Respuesta:`, response);
+        alert(`Reserva ID ${id} cancelada exitosamente.`);
+        this.cancellingIds.update(ids => ids.filter(item => item !== id));
+        this.loadBookings();
+      },
+      error: (err) => {
+        console.error(`[DEBUG ERROR] Falló el servicio al intentar cancelar la reserva ID ${id}. Objeto de error HTTP:`, err);
+        console.error(`[DEBUG ERROR] Status code: ${err.status}, Mensaje: ${err.message}, Body error:`, err.error);
+        alert('Error al intentar cancelar la reserva.');
+        this.cancellingIds.update(ids => ids.filter(item => item !== id));
       }
     });
   }
