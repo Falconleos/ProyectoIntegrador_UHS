@@ -3,44 +3,52 @@
   <aside class="sidebar">
     <div class="sidebar-header">
       <a routerLink="/landing" routerLinkActive="active">
-       <h2><span>Ultimate Hotel</span></h2>
+        <h2><span>Ultimate Hotel</span></h2>
       </a>
     </div>
     
     <nav class="sidebar-nav">
-      <a routerLink="/dashboard" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">
-        <i class="fa-solid fa-table-cells-large"></i> Inicio
-      </a>
-      <a routerLink="/dashboard/booking-list" routerLinkActive="active">
-        <i class="fa-solid fa-calendar-days"></i> Reservas
-      </a>
-      <a routerLink="/dashboard/check-in-list" routerLinkActive="active">
-        <i class="fa-solid fa-circle-check"></i> Estadías
-      </a>
-      <a routerLink="/dashboard/room-list" routerLinkActive="active">
-        <i class="fa-solid fa-bed"></i> Habitaciones
-      </a>
-      <a routerLink="/dashboard/item-list" routerLinkActive="active">
-        <i class="fa-solid fa-box-archive"></i> Items
-      </a>
-      <a routerLink="/dashboard/comment-list" routerLinkActive="active">
-        <i class="fa-solid fa-comments"></i> Comentarios
-      </a>
-      <a routerLink="/dashboard/payment-list" routerLinkActive="active">
-        <i class="fa-solid fa-wallet"></i> Pagos
-      </a>
-      <a routerLink="/dashboard/account-list" routerLinkActive="active">
-        <i class="fa-solid fa-file-invoice-dollar"></i> Cuentas
-      </a>
-      <a routerLink="/dashboard/credit-notes" routerLinkActive="active">
-        <i class="fa-solid fa-file-invoice"></i> Notas de Crédito
-      </a>
-      <a routerLink="/dashboard/usuarios" routerLinkActive="active">
-        <i class="fa-solid fa-users"></i> Usuarios
-      </a>
-      <a routerLink="/dashboard/employee-list" routerLinkActive="active">
-        <i class="fa-solid fa-id-badge"></i> Empleados
-      </a>
+      @if (userRole.toLowerCase() === 'guest') {
+        <!-- Menú exclusivo para Huéspedes (Guest): Solo Reservas -->
+        <a routerLink="/dashboard/booking-list" routerLinkActive="active">
+          <i class="fa-solid fa-calendar-days"></i> Mis Reservas
+        </a>
+      } @else {
+        <!-- Menú completo para Administradores, Recepcionistas u otros roles -->
+        <a routerLink="/dashboard" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">
+          <i class="fa-solid fa-table-cells-large"></i> Inicio
+        </a>
+        <a routerLink="/dashboard/booking-list" routerLinkActive="active">
+          <i class="fa-solid fa-calendar-days"></i> Reservas
+        </a>
+        <a routerLink="/dashboard/check-in-list" routerLinkActive="active">
+          <i class="fa-solid fa-circle-check"></i> Estadías
+        </a>
+        <a routerLink="/dashboard/room-list" routerLinkActive="active">
+          <i class="fa-solid fa-bed"></i> Habitaciones
+        </a>
+        <a routerLink="/dashboard/item-list" routerLinkActive="active">
+          <i class="fa-solid fa-box-archive"></i> Items
+        </a>
+        <a routerLink="/dashboard/comment-list" routerLinkActive="active">
+          <i class="fa-solid fa-comments"></i> Comentarios
+        </a>
+        <a routerLink="/dashboard/payment-list" routerLinkActive="active">
+          <i class="fa-solid fa-wallet"></i> Pagos
+        </a>
+        <a routerLink="/dashboard/account-list" routerLinkActive="active">
+          <i class="fa-solid fa-file-invoice-dollar"></i> Cuentas
+        </a>
+        <a routerLink="/dashboard/credit-notes" routerLinkActive="active">
+          <i class="fa-solid fa-file-invoice"></i> Notas de Crédito
+        </a>
+        <a routerLink="/dashboard/usuarios" routerLinkActive="active">
+          <i class="fa-solid fa-users"></i> Usuarios
+        </a>
+        <a routerLink="/dashboard/employee-list" routerLinkActive="active">
+          <i class="fa-solid fa-id-badge"></i> Empleados
+        </a>
+      }
     </nav>
 
     <div class="sidebar-footer">
@@ -53,7 +61,13 @@
   <!-- Contenido Principal -->
   <main class="main-content">
     <header class="top-bar">
-      <h3>Panel de Administración</h3>
+      <h3>
+        @if (userRole.toLowerCase() === 'guest') {
+          Panel de Huésped
+        } @else {
+          Panel de Administración
+        }
+      </h3>
       
       <div class="top-bar-right">
         <div class="top-actions">
@@ -71,7 +85,6 @@
         <div class="user-profile">
           <div class="user-avatar-wrapper">
             @if (avatarUrl) {
-              <!-- CORREGIDO: Llama a la función del componente en lugar de mutar la variable directo -->
               <img [src]="avatarUrl" 
                    (error)="onAvatarError()" 
                    alt="Avatar" 

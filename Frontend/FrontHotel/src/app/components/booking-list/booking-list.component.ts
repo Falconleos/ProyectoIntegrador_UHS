@@ -28,6 +28,7 @@ export class BookingListComponent implements OnInit {
   loading = signal<boolean>(true);
   errorMessage = signal<string>('');
   canModify = signal<boolean>(false);
+  isGuest = signal<boolean>(false); // Bandera para identificar si es huésped
 
   // Bandera para rastrear qué IDs están en proceso de cancelación y evitar doble envío
   cancellingIds = signal<number[]>([]);
@@ -58,20 +59,33 @@ export class BookingListComponent implements OnInit {
       try {
         const roles = JSON.parse(storedRoles);
         if (Array.isArray(roles)) {
-          const hasAccess = roles.some((r: any) => {
+          const hasAdminAccess = roles.some((r: any) => {
             const val = typeof r === 'string' ? r : (r.authority || '');
             return val === 'ADMIN' || val === 'ROLE_ADMIN' || val === 'RECEPCIONIST' || val === 'ROLE_RECEPCIONIST';
           });
-          this.canModify.set(hasAccess);
+          const hasGuestAccess = roles.some((r: any) => {
+            const val = typeof r === 'string' ? r : (r.authority || '');
+            return val === 'GUEST' || val === 'ROLE_GUEST';
+          });
+          
+          this.canModify.set(hasAdminAccess);
+          this.isGuest.set(hasGuestAccess && !hasAdminAccess);
         } else {
           const val = typeof roles === 'string' ? roles : '';
-          this.canModify.set(val === 'ADMIN' || val === 'ROLE_ADMIN' || val === 'RECEPCIONIST' || val === 'ROLE_RECEPCIONIST');
+          const isAdm = val === 'ADMIN' || val === 'ROLE_ADMIN' || val === 'RECEPCIONIST' || val === 'ROLE_RECEPCIONIST';
+          const isGst = val === 'GUEST' || val === 'ROLE_GUEST';
+          this.canModify.set(isAdm);
+          this.isGuest.set(isGst && !isAdm);
         }
       } catch (e) {
-        this.canModify.set(storedRoles.includes('ADMIN') || storedRoles.includes('RECEPCIONIST'));
+        const isAdm = storedRoles.includes('ADMIN') || storedRoles.includes('RECEPCIONIST');
+        const isGst = storedRoles.includes('GUEST');
+        this.canModify.set(isAdm);
+        this.isGuest.set(isGst && !isAdm);
       }
     } else {
       this.canModify.set(false);
+      this.isGuest.set(false);
     }
   }
 
@@ -79,27 +93,36 @@ export class BookingListComponent implements OnInit {
     this.loading.set(true);
     this.errorMessage.set('');
     
-    this.bookingService.processNoShows().subscribe({
-      next: () => {
-        this.fetchAndFilterBookings();
-      },
-      error: (err) => {
-        console.warn('No se pudo ejecutar el procesamiento automático de No-Shows, continuando carga...', err);
-        this.fetchAndFilterBookings();
-      }
-    });
+    // Si es admin/recepcionista ejecutamos el proceso de no-shows, si es guest vamos directo a filtrar sus reservas
+    if (!this.isGuest()) {
+      this.bookingService.processNoShows().subscribe({
+        next: () => {
+          this.fetchAndFilterBookings();
+        },
+        error: (err) => {
+          console.warn('No se pudo ejecutar el procesamiento automático de No-Shows, continuando carga...', err);
+          this.fetchAndFilterBookings();
+        }
+      });
+    } else {
+      this.fetchAndFilterBookings();
+    }
   }
 
-  activeTab = signal<'PENDING' | 'NO_SHOW'>('PENDING');
-
   private fetchAndFilterBookings(): void {
-    this.bookingService.getAll().subscribe({
+    // Si es GUEST, consultamos las reservas del usuario autenticado; si es admin/recepcionista, todas.
+    const requestObservable = this.isGuest() && this.bookingService.getMyBookings 
+      ? this.bookingService.getMyBookings() 
+      : this.bookingService.getAll();
+
+    requestObservable.subscribe({
       next: (data) => {
         const allBookings = Array.isArray(data) ? [...data] : [];
         
-        const filtered: BookingWithAccount[] = allBookings.filter(
-          (b) => b.state === 'PENDING' || b.state === 'CONFIRMED' || b.state === 'NO_SHOW'
-        );
+        // Si es guest, ya vienen filtradas por el backend, de lo contrario aplicamos los filtros de estados activos
+        const filtered: BookingWithAccount[] = this.isGuest() 
+          ? allBookings 
+          : allBookings.filter((b) => b.state === 'PENDING' || b.state === 'CONFIRMED' || b.state === 'NO_SHOW');
         
         this.bookings.set(filtered);
         this.loading.set(false);
@@ -135,53 +158,23 @@ export class BookingListComponent implements OnInit {
   }
 
   cancelBooking(id: number): void {
-    console.log(`[DEBUG] Iniciando proceso de cancelación para la reserva ID: ${id}`);
-
-    if (!this.canModify()) {
-      console.warn('[DEBUG] Acción bloqueada: El usuario no cuenta con permisos de modificación.');
-      alert('No tienes los permisos necesarios para realizar esta acción.');
-      return;
-    }
-
-    // Evitar múltiples peticiones paralelas para la misma reserva
-    if (this.isCancelling(id)) {
-      console.warn(`[DEBUG] La reserva ID ${id} ya se encuentra en proceso de cancelación.`);
-      return;
-    }
-
     const reason = prompt('Por favor, ingrese el motivo de la cancelación:');
-    if (reason === null) {
-      console.log('[DEBUG] Cancelación abortada por el usuario (prompt cerrado o cancelado).');
+    if (reason === null || !reason.trim()) {
       return;
     }
 
-    if (!reason.trim()) {
-      console.warn('[DEBUG] El motivo de cancelación ingresado está vacío.');
-      alert('Debes ingresar un motivo válido.');
-      return;
-    }
-
-    // Marcamos esta reserva como "en proceso de cancelación"
     this.cancellingIds.update(ids => [...ids, id]);
-    console.log(`[DEBUG] Reserva ID ${id} agregada a cancellingIds. Consultando cuenta financiera...`);
 
     const userIdStr = localStorage.getItem('userId');
     const userId = userIdStr ? Number(userIdStr) : 1;
-    console.log(`[DEBUG] ID de usuario recuperado para la cancelación: ${userId}`);
 
-    // Consultamos la cuenta específica de esta reserva
     this.accountService.getAccountByBookingId(id).subscribe({
       next: (account: any) => {
-        console.log(`[DEBUG] Cuenta obtenida exitosamente para bookingId ${id}:`, account);
-        
         const hasPayments = account && account.paidAmount > 0;
         let issueCreditNote = false;
 
         if (hasPayments) {
-          console.log(`[DEBUG] La cuenta posee pagos registrados (paidAmount: ${account.paidAmount}). Consultando emisión de nota de crédito...`);
           issueCreditNote = confirm('Esta reserva cuenta con pagos registrados. ¿Desea emitir una nota de crédito/reintegro?');
-        } else {
-          console.log('[DEBUG] La cuenta no registra pagos previos. No se requiere nota de crédito.');
         }
 
         const request = {
@@ -191,12 +184,9 @@ export class BookingListComponent implements OnInit {
           issueCreditNote: issueCreditNote
         };
 
-        console.log(`[DEBUG] Enviando petición final de cancelación (con cuenta) para bookingId ${id}:`, request);
         this.executeCancellation(request, id);
       },
-      error: (err) => {
-        console.warn(`[DEBUG] No se pudo obtener la cuenta para la reserva ID ${id} (o no existe). Procediendo a cancelar sin cuenta...`, err);
-        
+      error: () => {
         const request = {
           bookingId: id,
           reason: reason.trim(),
@@ -204,7 +194,6 @@ export class BookingListComponent implements OnInit {
           issueCreditNote: false
         };
 
-        console.log(`[DEBUG] Enviando petición final de cancelación (alternativa sin cuenta) para bookingId ${id}:`, request);
         this.executeCancellation(request, id);
       }
     });
@@ -212,15 +201,13 @@ export class BookingListComponent implements OnInit {
 
   private executeCancellation(request: any, id: number): void {
     this.bookingService.cancelBooking(request).subscribe({
-      next: (response) => {
-        console.log(`[DEBUG] ¡Cancelación exitosa en servidor para la reserva ID ${id}! Respuesta:`, response);
+      next: () => {
         alert(`Reserva ID ${id} cancelada exitosamente.`);
         this.cancellingIds.update(ids => ids.filter(item => item !== id));
         this.loadBookings();
       },
       error: (err) => {
-        console.error(`[DEBUG ERROR] Falló el servicio al intentar cancelar la reserva ID ${id}. Objeto de error HTTP:`, err);
-        console.error(`[DEBUG ERROR] Status code: ${err.status}, Mensaje: ${err.message}, Body error:`, err.error);
+        console.error('Error al intentar cancelar la reserva:', err);
         alert('Error al intentar cancelar la reserva.');
         this.cancellingIds.update(ids => ids.filter(item => item !== id));
       }
@@ -311,7 +298,6 @@ export class BookingListComponent implements OnInit {
     });
   }
 
-  // --- Método para descargar el Código QR desde la lista ---
   async downloadQr(booking: BookingDtoResponse): Promise<void> {
     if (!booking.qrBooking) {
       alert('Esta reserva no cuenta con un código QR generado.');

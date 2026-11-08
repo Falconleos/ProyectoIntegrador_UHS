@@ -45,35 +45,42 @@ export class LoginComponent {
       })
     ).subscribe({
       next: (response: any) => {
-        // Guardar el token principal
-        localStorage.setItem('authToken', response.token);
+    // Guardar el token principal
+    localStorage.setItem('authToken', response.token);
 
-        // Decodificar el JWT para extraer el ID, username y roles
-        try {
-          const payloadBase64 = response.token.split('.')[1];
-          const decodedJson = atob(payloadBase64);
-          const decodedToken = JSON.parse(decodedJson);
+    // Decodificar el JWT para extraer el ID, username, roles, nombre y apellido
+    try {
+      const payloadBase64 = response.token.split('.')[1];
+      const decodedJson = atob(payloadBase64);
+      const decodedToken = JSON.parse(decodedJson);
 
-          // 1. Extraer y guardar el ID del usuario desde  la respuesta
-          const userId =  response.id;
-          if (userId) {
-            localStorage.setItem('userId', userId.toString());
-          }
+      // 1. Extraer y guardar el ID del usuario desde la respuesta
+      const userId = response.id;
+      if (userId) {
+        localStorage.setItem('userId', userId.toString());
+      }
 
-          // 2. Guardar el username desde el formulario como respaldo
-          const username = loginData.username;
-          localStorage.setItem('username', username);
+      // 2. Guardar el username desde el formulario como respaldo
+      const username = loginData.username;
+      localStorage.setItem('username', username);
 
-          // 3. Spring Security suele guardar el rol en "role", "roles", "authorities"
-          const roles = decodedToken.roles || [];
-          localStorage.setItem('role', JSON.stringify(roles));
-        } catch (e) {
-          console.error('Error al decodificar el token:', e);
-          localStorage.setItem('username', loginData.username);
-        }
+      // 3. Guardar roles, nombre y apellido desde el token JWT
+      const roles = decodedToken.roles || [];
+      localStorage.setItem('role', JSON.stringify(roles));
 
-        this.router.navigate(['/dashboard']);
-      },
+      if (decodedToken.name) {
+        localStorage.setItem('name', decodedToken.name);
+      }
+      if (decodedToken.surname) {
+        localStorage.setItem('surname', decodedToken.surname);
+      }
+    } catch (e) {
+      console.error('Error al decodificar el token:', e);
+      localStorage.setItem('username', loginData.username);
+    }
+
+    this.router.navigate(['/dashboard']);
+  },
       error: (err) => {
         this.errorMessage = err.error?.mensaje || 'Usuario o contraseña incorrectos.';
         this.cdr.markForCheck();

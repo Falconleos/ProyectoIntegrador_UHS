@@ -2,8 +2,11 @@ import { Component, ChangeDetectionStrategy, signal, inject, OnInit } from '@ang
 import { CommonModule } from '@angular/common';
 import { Router, RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
+import { forkJoin, of } from 'rxjs';
+import { catchError, map } from 'rxjs/operators';
 import { CommentService } from '../../core/services/comment.service';
 import { CommentDtoResponse } from '../../models/Comment-model';
+import { UserService } from '../../core/services/user.service';
 
 @Component({
   selector: 'app-landing',
@@ -17,6 +20,7 @@ export class LandingComponent implements OnInit {
   
   private commentService = inject(CommentService);
   private router = inject(Router);
+  private userService = inject(UserService);
 
   // --- Estados de Autenticación para el Navbar ---
   isLoggedIn = signal<boolean>(false);
@@ -81,7 +85,7 @@ export class LandingComponent implements OnInit {
   }
 
   /**
-   * Carga los comentarios y filtra los de 5 estrellas
+   * Carga los comentarios, filtra los de 5 estrellas y busca el ID del usuario por su username para su foto
    */
   loadFiveStarComments(): void {
     this.commentService.getAll().subscribe({
@@ -90,17 +94,32 @@ export class LandingComponent implements OnInit {
         const filtered = comments.filter((c: any) => c.rating === 5 || c.puntuacion === 5);
         const listToProcess = filtered.length > 0 ? filtered : comments;
 
-        // Mapeamos para adjuntar la URL de la foto de perfil usando el ID del autor
-        const processed = listToProcess.map((c: any) => {
-          // Buscamos el ID del usuario en cualquiera de las propiedades posibles del DTO
-          const userId = c.userId || c.usuarioId || c.idUser || c.user?.id || c.id;
-          return {
-            ...c,
-            authorAvatar: userId ? `http://localhost:8080/public/auth/${userId}/profile-picture?t=${new Date().getTime()}` : null
-          };
+        // Consultamos en paralelo el ID de usuario usando el username de cada comentario
+        const requests = listToProcess.map((c: any) => {
+          if (!c.username) {
+            return of({ ...c, authorAvatar: null });
+          }
+          return this.userService.getUserByUsername(c.username).pipe(
+            map((user: any) => {
+              const uId = user?.id || user?.userId;
+              return {
+                ...c,
+                authorAvatar: uId ? `http://localhost:8080/public/auth/${uId}/profile-picture?t=${new Date().getTime()}` : null
+              };
+            }),
+            catchError(() => of({ ...c, authorAvatar: null }))
+          );
         });
 
-        this.fiveStarComments.set(processed);
+        forkJoin(requests).subscribe({
+          next: (processedComments) => {
+            this.fiveStarComments.set(processedComments);
+          },
+          error: (err) => {
+            console.error('Error al procesar avatares de comentarios:', err);
+            this.fiveStarComments.set(listToProcess);
+          }
+        });
       },
       error: (err) => {
         console.error('Error al cargar comentarios:', err);

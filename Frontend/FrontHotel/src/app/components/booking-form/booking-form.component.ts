@@ -8,6 +8,7 @@ import { BookingStateService } from '../../core/services/booking-state.service';
 import { UserDtoResponse } from '../../models/User-model';
 import * as QRCode from 'qrcode';
 import { BookingDtoResponse } from '../../models/Booking-model';
+import { UserService } from '../../core/services/user.service';
 
 @Component({
   selector: 'app-booking-form',
@@ -24,6 +25,7 @@ export class BookingFormComponent implements OnInit {
   // --- Estados con Signals ---
   usersList = signal<UserDtoResponse[]>([]);
   isRegisteredUser = signal<boolean>(false);
+  isGuestUser = signal<boolean>(false); // Bandera para bloquear si es Guest
   loading = signal<boolean>(false);
   errorMessage = signal<string>('');
 
@@ -31,6 +33,7 @@ export class BookingFormComponent implements OnInit {
     private fb: FormBuilder,
     private bookingService: BookingService,
     private bookingStateService: BookingStateService,
+    private userService: UserService, 
     private http: HttpClient,
     private router: Router
   ) {}
@@ -40,12 +43,34 @@ export class BookingFormComponent implements OnInit {
 
     if (!this.bookingData) {
       alert('No se ha seleccionado ninguna habitación previa.');
-      this.router.navigate(['/dashboard/bookings/disponibilidad']);
+      this.router.navigate(['/dashboard/availability']);
       return;
     }
 
     this.initForm();
-    this.loadUsers();
+
+    // Verificamos si el usuario logueado es GUEST
+    const storedRoles = localStorage.getItem('role');
+    const isGuest = storedRoles ? storedRoles.includes('GUEST') : false;
+    const currentUserId = localStorage.getItem('userId');
+
+    this.isGuestUser.set(isGuest);
+
+    if (isGuest && currentUserId) {
+      // Si es GUEST, fijamos el checkbox en true, asignamos su ID y deshabilitamos el control
+      this.isRegisteredUser.set(true);
+      this.bookingForm.patchValue({
+        isRegisteredUser: true,
+        userId: Number(currentUserId)
+      });
+      this.bookingForm.get('isRegisteredUser')?.disable();
+      this.bookingForm.get('userId')?.disable();
+
+      // Opcional: Cargamos la lista para asegurarnos de que el select muestre su nombre correctamente
+      this.loadUsersForGuest(Number(currentUserId));
+    } else {
+      this.loadUsers();
+    }
   }
 
   loadUsers(): void {
@@ -56,6 +81,21 @@ export class BookingFormComponent implements OnInit {
       error: (err: any) => {
         console.error('Error al cargar la lista de usuarios', err);
         this.usersList.set([]);
+      }
+    });
+  }
+
+  loadUsersForGuest(userId: number): void {
+    this.http.get<UserDtoResponse[]>('http://localhost:8080/private/user', { withCredentials: true }).subscribe({
+      next: (users: UserDtoResponse[]) => {
+        const list = Array.isArray(users) ? users : [];
+        this.usersList.set(list);
+        // Si el usuario no viene en la lista general, intentamos agregarlo o buscarlo para que el select lo muestre
+      },
+      error: () => {
+        // Fallback: Creamos un objeto básico con el id si no se puede listar la API general
+        const username = localStorage.getItem('username') || 'Mi Usuario';
+        this.usersList.set([{ id: userId, username, name: username, surname: '', email: '', enabled: true } as any]);
       }
     });
   }
@@ -108,31 +148,52 @@ export class BookingFormComponent implements OnInit {
     this.loading.set(true);
     this.errorMessage.set('');
 
-    const formValues = this.bookingForm.value;
+    const formValues = this.bookingForm.getRawValue();
 
+    // Determinamos qué ID de usuario corresponde (si es Guest logueado o seleccionado)
+    const currentUserIdStr = localStorage.getItem('userId');
+    const storedRoles = localStorage.getItem('role');
+    const isGuestUser = storedRoles ? storedRoles.includes('GUEST') : false;
+
+    const targetUserId = isGuestUser && currentUserIdStr 
+      ? Number(currentUserIdStr) 
+      : (formValues.isRegisteredUser ? Number(formValues.userId) : null);
+
+    // Determinamos los datos del huésped de forma local y directa
     let firstName = formValues.guestFirstName;
     let lastName = formValues.guestLastName;
     let phone = formValues.guestPhone;
 
-    if (formValues.isRegisteredUser && formValues.userId) {
+    if (isGuestUser) {
+      // Tomamos el nombre y apellido directamente del localStorage (cargados desde el JWT en el login)
+      firstName = localStorage.getItem('name') || 'Huésped';
+      lastName = localStorage.getItem('surname') || 'Titular';
+    } else if (formValues.isRegisteredUser && formValues.userId) {
+      // Si es un admin seleccionando un usuario de la lista desplegable
       const selectedUser = this.usersList().find(u => u.id === Number(formValues.userId));
       if (selectedUser) {
         firstName = selectedUser.name;
         lastName = selectedUser.surname;
-        phone = selectedUser.phoneNumber || 'Sin teléfono';
+        phone = selectedUser.phoneNumber || phone;
       }
     }
 
+    // Disparamos el envío de la reserva con los datos listos
+    this.enviarCreacionReserva(targetUserId, firstName, lastName, phone, formValues.observation);
+  }
+
+  // Método auxiliar para aislar el envío y evitar duplicar código
+  private enviarCreacionReserva(userId: number | null, firstName: string, lastName: string, phone: string, observation: string): void {
     const requestPayload = {
       checkIn: this.bookingData.checkIn,
       checkOut: this.bookingData.checkOut,
       guestCount: this.bookingData.guestCount,
       roomId: this.bookingData.room.id,
-      userId: formValues.isRegisteredUser ? Number(formValues.userId) : null,
-      guestFirstName: firstName,
-      guestLastName: lastName,
+      userId: userId,
+      guestFirstName: firstName || 'Huésped',
+      guestLastName: lastName || 'Titular',
       guestPhone: phone || 'Sin teléfono',
-      observation: formValues.observation || undefined,
+      observation: observation || undefined,
       totalPrice: this.bookingData.totalPrice
     };
 
@@ -140,7 +201,6 @@ export class BookingFormComponent implements OnInit {
       next: async (response: BookingDtoResponse) => {
         this.loading.set(false);
 
-        // Si la API devuelve el token qrBooking, generamos y descargamos la imagen automáticamente
         if (response.qrBooking) {
           try {
             const qrDataUrl = await QRCode.toDataURL(response.qrBooking, {
@@ -150,7 +210,7 @@ export class BookingFormComponent implements OnInit {
 
             const link = document.createElement('a');
             link.href = qrDataUrl;
-            link.download = `qr-reserva-${response.id}-${response.guestLastName}.png`;
+            link.download = `qr-reserva-${response.id}-${response.guestLastName || 'guest'}.png`;
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);

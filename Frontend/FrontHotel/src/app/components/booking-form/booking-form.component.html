@@ -52,14 +52,18 @@
         </label>
       </div>
       <small class="subtitle d-block mt-1">
-        Si se deja desmarcado, se creará una reserva rápida (telefónica) y el pasajero podrá registrarse o vincularse en el momento del Check-In.
+        @if (isGuestUser()) {
+          Su cuenta de huésped ha sido vinculada automáticamente a esta reserva.
+        } @else {
+          Si se deja desmarcado, se creará una reserva rápida (telefónica) y el pasajero podrá registrarse o vincularse en el momento del Check-In.
+        }
       </small>
     </div>
 
     <!-- OPCIÓN A: Selección de Usuario Registrado -->
     @if (isRegisteredUser()) {
       <div class="form-section">
-        <h4 class="section-title">Seleccionar Usuario del Sistema</h4>
+        <h4 class="section-title">Usuario Vinculado</h4>
         <div class="form-group">
           <label for="userId" class="form-label">Usuario Registrado *</label>
           <div class="input-wrapper">
@@ -77,8 +81,8 @@
       </div>
     }
 
-    <!-- OPCIÓN B: Datos Manuales del Titular -->
-    @if (!isRegisteredUser()) {
+    <!-- OPCIÓN B: Datos Manuales del Titular (Solo si NO es GUEST) -->
+    @if (!isRegisteredUser() && !isGuestUser()) {
       <div class="form-section">
         <h4 class="section-title">Información del Huésped Titular</h4>
         <div class="grid-2">
@@ -123,7 +127,7 @@
 
     <!-- Botones de Acción -->
     <div class="actions-container">
-      <button type="button" class="btn-secondary-action" routerLink="/dashboard/bookings">
+      <button type="button" class="btn-secondary-action" routerLink="/dashboard/booking-list">
         <i class="bi bi-arrow-left me-1"></i> Volver
       </button>
       <button type="submit" class="btn-primary" [disabled]="bookingForm.invalid || loading()">

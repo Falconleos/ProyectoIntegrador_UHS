@@ -18,6 +18,11 @@ export class BookingService {
     return this.http.get<BookingDtoResponse[]>(this.apiUrl, { withCredentials: true });
   }
 
+  // --- NUEVO: Obtener las reservas del usuario autenticado (GUEST) ---
+  getMyBookings(): Observable<BookingDtoResponse[]> {
+    return this.http.get<BookingDtoResponse[]>(`${this.apiUrl}/my-bookings`, { withCredentials: true });
+  }
+
   getAvailableRooms(checkIn: string, checkOut: string, guestCount: number): Observable<RoomDtoResponse[]> {
     return this.http.get<RoomDtoResponse[]>(`${this.apiUrl}/available-rooms/${checkIn}/${checkOut}/${guestCount}`, {
       withCredentials: true
@@ -37,8 +42,8 @@ export class BookingService {
   }
 
   getCancellationHistory(): Observable<BookingCancellationDtoResponse[]> {
-  return this.http.get<BookingCancellationDtoResponse[]>(this.cancellationUrl, { withCredentials: true });
-}
+    return this.http.get<BookingCancellationDtoResponse[]>(this.cancellationUrl, { withCredentials: true });
+  }
 
   // --- MÉTODOS PARA SEÑAS DE RESERVAS ---
 
@@ -53,5 +58,4 @@ export class BookingService {
   processNoShows(): Observable<void> {
     return this.http.post<void>(`${this.apiUrl}/process-no-shows`, {}, { withCredentials: true });
   }
-
 }
