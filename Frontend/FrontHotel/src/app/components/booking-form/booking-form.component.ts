@@ -6,6 +6,8 @@ import { HttpClient } from '@angular/common/http';
 import { BookingService } from '../../core/services/booking.service';
 import { BookingStateService } from '../../core/services/booking-state.service';
 import { UserDtoResponse } from '../../models/User-model';
+import * as QRCode from 'qrcode';
+import { BookingDtoResponse } from '../../models/Booking-model';
 
 @Component({
   selector: 'app-booking-form',
@@ -135,9 +137,29 @@ export class BookingFormComponent implements OnInit {
     };
 
     this.bookingService.createBooking(requestPayload).subscribe({
-      next: () => {
+      next: async (response: BookingDtoResponse) => {
         this.loading.set(false);
-        alert('¡Reserva creada con éxito!');
+
+        // Si la API devuelve el token qrBooking, generamos y descargamos la imagen automáticamente
+        if (response.qrBooking) {
+          try {
+            const qrDataUrl = await QRCode.toDataURL(response.qrBooking, {
+              width: 300,
+              margin: 2
+            });
+
+            const link = document.createElement('a');
+            link.href = qrDataUrl;
+            link.download = `qr-reserva-${response.id}-${response.guestLastName}.png`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+          } catch (err) {
+            console.error('Error al generar la imagen QR de la reserva', err);
+          }
+        }
+
+        alert('¡Reserva creada con éxito y código QR descargado!');
         this.bookingStateService.clear();
         this.router.navigate(['/dashboard/booking-list']);
       },

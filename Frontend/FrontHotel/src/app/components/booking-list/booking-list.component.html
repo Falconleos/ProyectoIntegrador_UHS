@@ -85,6 +85,17 @@
               </td>
               <td style="text-align: right; padding-right: 1.5rem;">
                 <div class="table-actions">
+                  <!-- Botón Descargar QR -->
+                  <button
+                    type="button"
+                    class="btn-secondary-action"
+                    (click)="downloadQr(booking)"
+                    [disabled]="!booking.qrBooking"
+                    [title]="booking.qrBooking ? 'Descargar Código QR' : 'Sin QR disponible'"
+                  >
+                    <i class="bi bi-qr-code"></i>
+                  </button>
+
                   <button
                     type="button"
                     class="btn-warning"

@@ -7,6 +7,7 @@ import { BookingDtoResponse } from '../../models/Booking-model';
 import { PaymentDTOResponse } from '../../models/Payment-model'; 
 import { AuthService } from '../../core/services/auth.service';
 import { AccountService } from '../../core/services/account.service';
+import * as QRCode from 'qrcode';
 
 export interface BookingWithAccount extends BookingDtoResponse {
   hasAccount?: boolean;
@@ -308,5 +309,30 @@ export class BookingListComponent implements OnInit {
         console.error(err);
       }
     });
+  }
+
+  // --- Método para descargar el Código QR desde la lista ---
+  async downloadQr(booking: BookingDtoResponse): Promise<void> {
+    if (!booking.qrBooking) {
+      alert('Esta reserva no cuenta con un código QR generado.');
+      return;
+    }
+
+    try {
+      const qrDataUrl = await QRCode.toDataURL(booking.qrBooking, {
+        width: 300,
+        margin: 2
+      });
+
+      const link = document.createElement('a');
+      link.href = qrDataUrl;
+      link.download = `qr-reserva-${booking.id}-${booking.guestLastName}.png`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    } catch (err) {
+      console.error('Error al generar la imagen QR para la descarga', err);
+      alert('No se pudo generar la imagen del código QR.');
+    }
   }
 }

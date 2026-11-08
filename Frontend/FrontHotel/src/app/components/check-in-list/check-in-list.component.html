@@ -7,24 +7,21 @@
 
   <hr class="divider" />
 
-  <!-- BARRA DE LECTURA DE QR / INGRESO MANUAL -->
+  <!-- BARRA DE ADJUNTO DE IMAGEN QR -->
   <div class="card-box mb-4">
     <div class="row align-items-center">
       <div class="col-md-8">
-        <label for="qrInput" class="form-label">📷 Escaneo o Ingreso Manual de Código QR</label>
+        <label for="qrFile" class="form-label">📷 Adjuntar Imagen PNG de Código QR para Check-In</label>
         <div class="input-wrapper">
           <span class="input-icon"><i class="bi bi-qr-code-scan"></i></span>
           <input 
-            type="text" 
-            id="qrInput" 
+            type="file" 
+            id="qrFile" 
             class="form-control" 
-            [ngModel]="qrInputCode()" 
-            (ngModelChange)="qrInputCode.set($event)"
-            (keyup.enter)="onQrInputEnter()"
-            placeholder="Escanee el QR con la pistola o escriba el código y presione Enter...">
-          <button class="btn-primary" type="button" (click)="onQrInputEnter()">Buscar</button>
+            accept="image/png, image/jpeg"
+            (change)="onQrFileSelected($event)">
         </div>
-        <small class="subtitle d-block mt-2">El lector de QR simulará la entrada de texto de forma automática.</small>
+        <small class="subtitle d-block mt-2">Seleccione o adjunte el archivo PNG del código QR del huésped para iniciar el proceso de Check-In automáticamente.</small>
       </div>
       <div class="col-md-4 mt-3 mt-md-0">
         @if (qrError()) {
@@ -75,12 +72,12 @@
             </div>
           </div>
 
-          <!-- Bloque Inferior -->
+          <!-- Bloque Inferior con Miniatura QR -->
           <div>
-            @if (booking.qrBooking) {
-              <div class="qr-box mb-3">
-                <span class="qr-label">QR Asociado:</span>
-                <code class="qr-code" title="{{ booking.qrBooking }}">{{ booking.qrBooking }}</code>
+            @if (booking.qrBooking && qrDataUrls()[booking.id]) {
+              <div class="qr-box mb-3 text-center" style="background: rgba(2, 6, 23, 0.4); padding: 10px; border-radius: var(--radius-sm);">
+                <span class="qr-label d-block mb-1" style="font-size: 0.75rem;">Código QR Asociado:</span>
+                <img [src]="qrDataUrls()[booking.id]" alt="QR Reserva #{{ booking.id }}" style="width: 90px; height: 90px; border-radius: 4px; border: 1px solid rgba(255,255,255,0.1);" />
               </div>
             }
 
@@ -205,42 +202,6 @@
               <button class="btn-primary w-100 mt-2" (click)="createNewUserAndProceed()">Crear Usuario y Hacer Check-In</button>
             </div>
           }
-        </div>
-
-      </div>
-    </div>
-  }
-
-  <!-- MODAL FLOTANTE SUPERPUESTO (QR) -->
-  @if (selectedBookingForQr(); as qrBooking) {
-    <div class="modal-backdrop" (click)="closeQrModal()">
-      <div class="modal-card" style="max-width: 360px;" (click)="$event.stopPropagation()">
-        
-        <div class="modal-header-profile border-bottom pb-2 mb-3">
-          <h3 class="m-0" style="font-size: 1.1rem;"><i class="bi bi-qr-code me-2"></i> Confirmar Check-In</h3>
-        </div>
-
-        @if (qrSuccess()) {
-          <div class="alert alert-success mb-3">{{ qrSuccess() }}</div>
-        }
-        @if (qrError()) {
-          <div class="alert alert-danger mb-3">{{ qrError() }}</div>
-        }
-
-        @if (!qrSuccess()) {
-          <div class="summary-card mb-3 p-3" style="background: rgba(2, 6, 23, 0.5); border-radius: var(--radius-sm);">
-            <h6 class="text-primary fw-bold mb-2">Reserva #{{ qrBooking.id }}</h6>
-            <p class="mb-1 subtitle text-light"><strong>Huésped:</strong> {{ qrBooking.guestFirstName }} {{ qrBooking.guestLastName }}</p>
-            <p class="mb-1 subtitle text-light"><strong>Habitación:</strong> Hab. {{ qrBooking.roomNumber }}</p>
-            <p class="mb-1 subtitle text-light"><strong>Estadía:</strong> {{ qrBooking.checkIn }} al {{ qrBooking.checkOut }}</p>
-            <p class="mb-1 subtitle text-light"><strong>Total:</strong> ${{ qrBooking.totalPrice | number:'1.2-2' }}</p>
-            <p class="mb-0 subtitle text-light"><strong>Estado:</strong> <span class="badge badge-secondary">{{ qrBooking.state }}</span></p>
-          </div>
-        }
-
-        <div class="actions-container mt-0" *ngIf="!qrSuccess()">
-          <button class="btn-secondary-action w-100" (click)="closeQrModal()">Cancelar</button>
-          <button class="btn-primary w-100" (click)="confirmCheckInByQr()">Confirmar</button>
         </div>
 
       </div>

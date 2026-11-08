@@ -6,6 +6,9 @@ import { CheckInService } from '../../core/services/check-in.service';
 import { BookingDtoResponse } from '../../models/Booking-model';
 import { AuthService } from '../../core/services/auth.service';
 import { UserService } from '../../core/services/user.service';
+import * as QRCode from 'qrcode';
+// @ts-ignore
+import jsQR from 'jsqr';
 
 @Component({
   selector: 'app-check-in-list',
@@ -39,11 +42,14 @@ export class CheckInListComponent implements OnInit {
   checkInError = signal<string>('');
   checkInSuccess = signal<string>('');
 
-  // --- PROPIEDADES PARA LECTURA DE QR ---
+  // --- PROPIEDADES PARA LECTURA DE QR MEDIANTE ARCHIVO ---
   qrInputCode = signal<string>('');
   selectedBookingForQr = signal<BookingDtoResponse | null>(null);
   qrError = signal<string>('');
   qrSuccess = signal<string>('');
+
+  // Mapa interno para almacenar las URLs de las miniaturas de QR por ID de reserva
+  qrDataUrls = signal<{ [key: number]: string }>({});
 
   constructor(
     private checkInService: CheckInService,
@@ -84,6 +90,7 @@ export class CheckInListComponent implements OnInit {
           : [];
         
         this.pendingBookingsToday.set(filtered);
+        this.generateQrThumbnails(filtered);
         this.loadCheckedInBookings();
       },
       error: (err) => {
@@ -93,6 +100,21 @@ export class CheckInListComponent implements OnInit {
         this.loadCheckedInBookings();
       }
     });
+  }
+
+  // Genera las miniaturas de QR en base64 para cada tarjeta
+  private async generateQrThumbnails(bookings: BookingDtoResponse[]): Promise<void> {
+    const map: { [key: number]: string } = {};
+    for (const b of bookings) {
+      if (b.qrBooking) {
+        try {
+          map[b.id] = await QRCode.toDataURL(b.qrBooking, { width: 120, margin: 1 });
+        } catch (e) {
+          console.error(`Error generando QR para reserva #${b.id}`, e);
+        }
+      }
+    }
+    this.qrDataUrls.set(map);
   }
 
   loadCheckedInBookings(): void {
@@ -117,59 +139,59 @@ export class CheckInListComponent implements OnInit {
     });
   }
 
-  // --- GESTIÓN DE LECTURA QR / BÚSQUEDA ---
-  onQrInputEnter(): void {
-    const code = this.qrInputCode();
-    if (!code || code.trim() === '') return;
-    
-    const cleanCode = code.trim();
+  // --- GESTIÓN DE LECTURA QR MEDIANTE ADJUNTO DE IMAGEN PNG ---
+  onQrFileSelected(event: any): void {
+    const file = event.target.files[0];
+    if (!file) return;
+
     this.qrError.set('');
     this.qrSuccess.set('');
 
-    // 1. Buscamos primero en las reservas de hoy pendientes
+    const reader = new FileReader();
+    reader.onload = (e: any) => {
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        const context = canvas.getContext('2d');
+        if (!context) {
+          this.qrError.set('No se pudo inicializar el contexto de lectura de imagen.');
+          return;
+        }
+
+        canvas.width = img.width;
+        canvas.height = img.height;
+        context.drawImage(img, 0, 0, img.width, img.height);
+
+        const imgData = context.getImageData(0, 0, canvas.width, canvas.height);
+        const code = jsQR(imgData.data, imgData.width, imgData.height);
+
+        if (code) {
+          this.processDecodedQrCode(code.data);
+        } else {
+          this.qrError.set('No se pudo detectar un código QR válido en la imagen adjunta.');
+        }
+      };
+      img.src = e.target.result;
+    };
+    reader.readAsDataURL(file);
+    event.target.value = '';
+  }
+
+  private processDecodedQrCode(cleanCode: string): void {
+    this.qrError.set('');
+    this.qrSuccess.set('');
+
     const found = this.pendingBookingsToday().find(
       (b: any) => b.qrBooking === cleanCode
     );
 
     if (found) {
-      this.selectedBookingForQr.set(found);
-      this.qrInputCode.set('');
+      // En vez de abrir un modal QR estático, disparamos directamente el flujo normal de Check-In
+      // que valida el usuario asociado y abre el modal correspondiente si le falta.
+      this.goToCreateCheckIn(found);
     } else {
-      // 2. Si no está en las de hoy, buscamos de manera global
-      this.checkInService.getAll().subscribe({
-        next: () => {
-          this.qrError.set('No se encontró ninguna reserva activa para hoy con ese código QR.');
-        },
-        error: () => {
-          this.qrError.set('Error al buscar el código QR en el sistema.');
-        }
-      });
+      this.qrError.set('No se encontró ninguna reserva activa para hoy con el código QR decodificado.');
     }
-  }
-
-  confirmCheckInByQr(): void {
-    const booking = this.selectedBookingForQr();
-    if (!booking) return;
-
-    const qrCodeToProcess = (booking as any).qrBooking;
-    if (!qrCodeToProcess) {
-      this.qrError.set('La reserva seleccionada no posee un código QR válido.');
-      return;
-    }
-
-    this.checkInService.checkInByQr(qrCodeToProcess).subscribe({
-      next: () => {
-        this.qrSuccess.set('¡Check-in realizado con éxito mediante QR!');
-        setTimeout(() => {
-          this.selectedBookingForQr.set(null);
-          this.qrSuccess.set('');
-          this.loadData();
-        }, 1200);
-      },
-      error: (err: any) => {
-        this.qrError.set(err.error?.message || 'Error al ejecutar el check-in con el QR.');
-      }
-    });
   }
 
   closeQrModal(): void {
@@ -334,11 +356,11 @@ export class CheckInListComponent implements OnInit {
   }
 
   servicesPlaceholder(id: number): void { 
-  console.log('ID de reserva recibido:', id);
-  if (!id) {
-    console.error('¡El ID es nulo o indefinido!');
-    return;
+    console.log('ID de reserva recibido:', id);
+    if (!id) {
+      console.log('¡El ID es nulo o indefinido!');
+      return;
+    }
+    this.router.navigate([`/dashboard/bookings/${id}/servicios`]);
   }
-  this.router.navigate([`/dashboard/bookings/${id}/servicios`]);
-}
 }
