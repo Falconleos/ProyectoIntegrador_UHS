@@ -33,9 +33,9 @@ public class BookingController {
 
     private final BookingService bookingService;
 
-    /*--------- 1. Crear una Reserva (ADMIN o RECEPCIONIST) ---------------*/
+    /*--------- 1. Crear una Reserva (ADMIN, RECEPCIONIST o GUEST) ---------------*/
     @PostMapping
-    @PreAuthorize("hasAnyRole('ADMIN', 'RECEPCIONIST')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'RECEPCIONIST', 'GUEST')")
     @Operation(summary = "Crear una nueva reserva", description = "Registra una reserva asociando empleado, habitación, fechas y calcula el precio total.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "Reserva creada con éxito"),
@@ -79,6 +79,15 @@ public class BookingController {
     @Operation(summary = "Listar todas las reservas", description = "Devuelve el historial completo de reservas (activas e inactivas).")
     public ResponseEntity<List<BookingDTOResponse>> getAllBookings() {
         List<BookingDTOResponse> bookings = bookingService.getBookings(null);
+        return ResponseEntity.ok(bookings);
+    }
+
+    /*--------- 5.1. Listar mis propias reservas (Exclusivo para GUEST / ADMIN) ---------------*/
+    @GetMapping("/my-bookings")
+    @PreAuthorize("hasAnyRole('GUEST', 'ADMIN', 'RECEPCIONIST')")
+    @Operation(summary = "Listar reservas del usuario autenticado", description = "Devuelve únicamente las reservas vinculadas al usuario que ha iniciado sesión.")
+    public ResponseEntity<List<BookingDTOResponse>> getMyBookings() {
+        List<BookingDTOResponse> bookings = bookingService.getMyBookings();
         return ResponseEntity.ok(bookings);
     }
 

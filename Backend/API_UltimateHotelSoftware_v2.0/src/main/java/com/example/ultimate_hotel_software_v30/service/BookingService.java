@@ -2,10 +2,10 @@ package com.example.ultimate_hotel_software_v30.service;
 
 import com.example.ultimate_hotel_software_v30.dto.request.BookingCancellationDTORequest;
 import com.example.ultimate_hotel_software_v30.dto.request.BookingDTORequest;
-import com.example.ultimate_hotel_software_v30.dto.request.PaymentDTORequest; // Asegúrate de importar tu DTO de request de pago
+import com.example.ultimate_hotel_software_v30.dto.request.PaymentDTORequest;
 import com.example.ultimate_hotel_software_v30.dto.response.BookingCancellationDTOResponse;
 import com.example.ultimate_hotel_software_v30.dto.response.BookingDTOResponse;
-import com.example.ultimate_hotel_software_v30.dto.response.PaymentDTOResponse; // Asegúrate de importar tu DTO de respuesta de pago
+import com.example.ultimate_hotel_software_v30.dto.response.PaymentDTOResponse;
 import com.example.ultimate_hotel_software_v30.dto.response.RoomDTOResponse;
 import com.example.ultimate_hotel_software_v30.enums.BookingState;
 import com.example.ultimate_hotel_software_v30.model.BookingEntity;
@@ -20,6 +20,9 @@ public interface BookingService {
     BookingDTOResponse findById(Long id);
 
     List<BookingDTOResponse> getBookings(Boolean active);
+
+    // --- NUEVO: Obtener las reservas del usuario autenticado ---
+    List<BookingDTOResponse> getMyBookings();
 
     BookingDTOResponse createBooking(BookingDTORequest request);
 
@@ -47,11 +50,11 @@ public interface BookingService {
 
     BookingDTOResponse assignUserToBooking(Long bookingId, Long userId);
 
-    // --- NUEVOS MÉTODOS PARA PAGOS / SEÑAS ---
+    // --- MÉTODOS PARA PAGOS / SEÑAS ---
     List<PaymentDTOResponse> getPaymentsByBookingId(Long bookingId);
 
     PaymentDTOResponse addPaymentToBooking(PaymentDTORequest request);
 
     BookingDTOResponse checkInByQr(String qrBooking);
-    
+
 }

@@ -1,5 +1,6 @@
 package com.example.ultimate_hotel_software_v30.jwt;
 
+import com.example.ultimate_hotel_software_v30.security.CustomUserDetails;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import lombok.RequiredArgsConstructor;
@@ -26,13 +27,24 @@ public class JwtService {
                 .map(GrantedAuthority::getAuthority)
                 .toList();
 
+        String name = "";
+        String surname = "";
+
+        // Extraemos el nombre y apellido desde la entidad envuelta en CustomUserDetails
+        if (userDetails instanceof CustomUserDetails customUser) {
+            name = customUser.userEntity().getName();
+            surname = customUser.userEntity().getSurname();
+        }
+
         long expirationTimeInMs = accessExpiration;
 
         return Jwts.builder()
                 .setSubject(userDetails.getUsername())
                 .claim("roles", roles)
+                .claim("name", name)         // <-- Incluimos el nombre en el claim
+                .claim("surname", surname)   // <-- Incluimos el apellido en el claim
                 .setIssuedAt(new Date())
-                .setExpiration(new Date(System.currentTimeMillis()+expirationTimeInMs))
+                .setExpiration(new Date(System.currentTimeMillis() + expirationTimeInMs))
                 .signWith(Keys.hmacShaKeyFor(secretKey.getBytes()))
                 .compact();
     }

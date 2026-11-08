@@ -426,6 +426,21 @@ public class BookingServiceImpl implements BookingService {
         return bookingMapper.toBookingDTOResponse(savedBooking);
     }
 
+    @Override
+    @Transactional(readOnly = true)
+    public List<BookingDTOResponse> getMyBookings() {
+        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        String currentUsername = "";
+        if (principal instanceof UserDetails) {
+            currentUsername = ((UserDetails) principal).getUsername();
+        }
+
+        List<BookingEntity> bookings = bookingRepository.findByUsername(currentUsername);
+        return bookings.stream()
+                .map(bookingMapper::toBookingDTOResponse)
+                .toList();
+    }
+
     // --- IMPLEMENTACIÓN DE LOS MÉTODOS DE PAGOS / SEÑAS ---
 
     @Override
@@ -560,5 +575,7 @@ public class BookingServiceImpl implements BookingService {
         BookingEntity savedBooking = bookingRepository.save(booking);
         return bookingMapper.toBookingDTOResponse(savedBooking);
     }
+
+
 
 }
