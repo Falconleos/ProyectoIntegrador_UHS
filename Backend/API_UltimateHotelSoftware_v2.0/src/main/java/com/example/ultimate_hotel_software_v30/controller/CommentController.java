@@ -16,12 +16,13 @@ import org.springframework.web.bind.annotation.*;
 
 import com.example.ultimate_hotel_software_v30.model.UserEntity;
 import com.example.ultimate_hotel_software_v30.repository.UserRepository;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 
 import java.util.List;
 
 @RestController
-@RequestMapping("/private/comments")
+@RequestMapping("/public/comments")
 @RequiredArgsConstructor
 @CrossOrigin(origins = "http://localhost:4200", allowCredentials = "true")
 @Tag(name = "GestionComentarios", description = "Endpoints para la gestión de valoraciones y comentarios")
@@ -44,10 +45,17 @@ public class CommentController {
     }
 
     @GetMapping
-    @PreAuthorize("hasAnyAuthority('ADMIN', 'RECEPCIONIST', 'GUEST', 'ROLE_ADMIN', 'ROLE_RECEPCIONIST', 'ROLE_GUEST')")
-    @Operation(summary = "Listar comentarios (Todos para Admin/Recepcionista, propios para Guest)")
+    @Operation(summary = "Listar comentarios (Público para visitantes, filtrado por roles si está logueado)")
     public ResponseEntity<List<CommentDTOResponse>> getAllComments() {
-        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        // Si el usuario es anónimo (no ha iniciado sesión), retornamos todos los comentarios de forma pública para la landing
+        if (authentication == null || !authentication.isAuthenticated() || authentication.getPrincipal().equals("anonymousUser")) {
+            return ResponseEntity.ok(commentService.getAllComments());
+        }
+
+        // Si el usuario SÍ está autenticado, aplicamos la lógica según su rol
+        String username = authentication.getName();
         UserEntity user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
