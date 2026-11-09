@@ -87,9 +87,9 @@ private getHeaders(): HttpHeaders {
   });
 }
 
-  getUserByUsername(username: string): Observable<any> {
-  return this.http.get<any>(`${this.apiUrl}/username/${username}`);
-}
+ getUserByUsername(username: string): Observable<any> {
+    return this.http.get<any>(`http://localhost:8080/public/auth/by-username/${username}`);
+  }
 
 updateProfilePicture(id: number, formData: FormData): Observable<any> {
     return this.http.post<any>(`${this.apiUrl}/${id}/profile-picture`, formData, { withCredentials: true });

@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { UserLoginDtoRequest, AuthTokenResponse } from '../../models/Auth-model';
+import { UserDtoRequest } from '../../models/User-model';
 
 @Injectable({
   providedIn: 'root'
@@ -13,6 +14,10 @@ export class AuthService {
 
   login(credentials: UserLoginDtoRequest): Observable<AuthTokenResponse> {
     return this.http.post<AuthTokenResponse>(`${this.apiUrl}/login`, credentials, { withCredentials: true });
+  }
+
+  register(userData: UserDtoRequest): Observable<AuthTokenResponse> {
+    return this.http.post<AuthTokenResponse>(`${this.apiUrl}/register`, userData, { withCredentials: true });
   }
 
   logout(): Observable<void> {

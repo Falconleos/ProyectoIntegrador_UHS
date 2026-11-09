@@ -15,7 +15,7 @@ export class CommentService {
 
   private http = inject(HttpClient);
 
-  private apiUrl = 'http://localhost:8080/private/comments';
+  private apiUrl = 'http://localhost:8080/public/comments';
 
   // Obtener comentarios según el rol del usuario (todos para admin y recep y los propios para guest)
   getAll(): Observable<CommentDtoResponse[]> {

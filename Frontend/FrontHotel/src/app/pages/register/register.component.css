@@ -1,0 +1,182 @@
+/* --- Estilos de la Vista de Registro (Glassmorphism) --- */
+
+.register-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  padding: 2rem 1rem;
+  background-color: var(--bg-main);
+  background-image: var(--bg-gradient-1), var(--bg-gradient-2);
+  background-attachment: fixed;
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+
+.register-card {
+  width: 100%;
+  max-width: 650px;
+  background: var(--bg-secondary);
+  backdrop-filter: var(--backdrop-blur);
+  -webkit-backdrop-filter: var(--backdrop-blur);
+  border: var(--border-glass);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-main);
+  padding: 2.5rem;
+  animation: fadeIn 0.4s ease-out;
+}
+
+.register-card h2 {
+  font-size: var(--font-size-title-fluid);
+  color: var(--color-text-main);
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+  text-align: center;
+}
+
+.register-card h2 span {
+  color: var(--color-primary);
+}
+
+.subtitle {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+/* --- Alerta de Error --- */
+.alert-error {
+  background: rgba(239, 68, 68, 0.15);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  color: #fca5a5;
+  padding: 0.75rem 1rem;
+  border-radius: var(--radius-sm);
+  font-size: var(--font-size-sm);
+  margin-bottom: 1.5rem;
+  text-align: center;
+}
+
+/* --- Estructura del Formulario --- */
+form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+@media (max-width: 576px) {
+  .form-row {
+    grid-template-columns: 1fr;
+  }
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.form-group label {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.form-group input,
+.form-group select {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  background-color: var(--bg-input-icon);
+  border: var(--border-input);
+  border-radius: var(--radius-sm);
+  color: var(--color-text-main);
+  font-size: var(--font-size-sm);
+  transition: all 0.2s ease-in-out;
+  outline: none;
+}
+
+.form-group input::placeholder {
+  color: rgba(148, 163, 184, 0.4);
+}
+
+.form-group input:focus,
+.form-group select:focus {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 2px rgba(129, 140, 248, 0.2);
+}
+
+/* Soporte para que las opciones del select tengan buen contraste en modo oscuro */
+.form-group select option {
+  background-color: #0f172a;
+  color: var(--color-text-main);
+}
+
+/* --- Botón de Envío --- */
+.submit-btn {
+  margin-top: 1rem;
+  width: 100%;
+  padding: 0.875rem;
+  background-color: var(--color-primary);
+  color: #0a0b15;
+  font-weight: 600;
+  font-size: var(--font-size-sm);
+  border: none;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: background-color 0.2s ease, transform 0.1s ease;
+  box-shadow: 0 4px 12px rgba(129, 140, 248, 0.25);
+}
+
+.submit-btn:hover:not(:disabled) {
+  background-color: var(--color-primary-hover);
+  color: #0a0b15;
+  transform: translateY(-1px);
+}
+
+.submit-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* --- Enlace de redirección a Login --- */
+.login-redirect {
+  margin-top: 1.5rem;
+  text-align: center;
+}
+
+.login-redirect p {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+}
+
+.login-redirect a {
+  color: var(--color-primary);
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.2s ease;
+}
+
+.login-redirect a:hover {
+  text-decoration: underline;
+  color: var(--color-primary-hover);
+}
+
+/* --- Animación de entrada --- */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
