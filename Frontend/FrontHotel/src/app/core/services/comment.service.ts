@@ -1,4 +1,3 @@
-
 import { inject, Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
@@ -29,6 +28,12 @@ export class CommentService {
       { withCredentials: true });
   }
 
+  // NUEVO: Obtener solo los comentarios visibles (público general)
+  getVisibleComments(): Observable<CommentDtoResponse[]> {
+    return this.http.get<CommentDtoResponse[]>(`${this.apiUrl}/visible`,
+      { withCredentials: true });
+  }
+
   // Crear un comentario
   create(comment: CommentDtoRequest): Observable<CommentDtoResponse> {
     return this.http.post<CommentDtoResponse>(this.apiUrl, comment,
@@ -38,6 +43,12 @@ export class CommentService {
   // Actualizar un comentario existente
   update( id: number, comment: CommentDtoRequest): Observable<CommentDtoResponse> {
     return this.http.put<CommentDtoResponse>(`${this.apiUrl}/${id}`, comment,
+      { withCredentials: true });
+  }
+
+  // Cambiar el estado showable de un comentario (Exclusivo Admin)
+  toggleVisibility(id: number): Observable<CommentDtoResponse> {
+    return this.http.patch<CommentDtoResponse>(`${this.apiUrl}/admin/${id}/toggle-visibility`, {},
       { withCredentials: true });
   }
 
