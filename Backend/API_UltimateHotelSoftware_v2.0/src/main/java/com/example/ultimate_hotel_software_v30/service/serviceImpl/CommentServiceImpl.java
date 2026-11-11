@@ -2,12 +2,14 @@ package com.example.ultimate_hotel_software_v30.service.serviceImpl;
 
 import com.example.ultimate_hotel_software_v30.dto.request.CommentDTORequest;
 import com.example.ultimate_hotel_software_v30.dto.response.CommentDTOResponse;
+import com.example.ultimate_hotel_software_v30.exceptions.InvalidIdException;
 import com.example.ultimate_hotel_software_v30.mapper.CommentMapper;
 import com.example.ultimate_hotel_software_v30.model.CommentEntity;
 import com.example.ultimate_hotel_software_v30.model.UserEntity;
 import com.example.ultimate_hotel_software_v30.repository.CommentRepository;
 import com.example.ultimate_hotel_software_v30.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.crossstore.ChangeSetPersister;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -102,4 +104,24 @@ public class CommentServiceImpl implements com.example.ultimate_hotel_software_v
         CommentEntity updatedComment = commentRepository.save(comment);
         return commentMapper.toCommentDTOResponse(updatedComment);
     }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<CommentDTOResponse> getVisibleComments() {
+        List<CommentEntity> comments = commentRepository.findByShowableTrue();
+        return comments.stream()
+                .map(commentMapper::toCommentDTOResponse)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    @Transactional
+    public CommentDTOResponse toggleCommentVisibility(Long commentId) {
+        CommentEntity comment = commentRepository.findById(commentId)
+                .orElseThrow(() -> new InvalidIdException("Comment not found with id: " + commentId));
+        comment.setShowable(!comment.isShowable());
+        CommentEntity updatedComment = commentRepository.save(comment);
+        return commentMapper.toCommentDTOResponse(updatedComment);
+    }
+
 }

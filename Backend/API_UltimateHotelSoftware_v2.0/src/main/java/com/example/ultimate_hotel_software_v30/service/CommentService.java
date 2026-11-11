@@ -11,4 +11,6 @@ public interface CommentService {
     List<CommentDTOResponse> getAllComments();
     List<CommentDTOResponse> getMyComments();
     void deleteComment(Long id);
+    List<CommentDTOResponse> getVisibleComments();
+    CommentDTOResponse toggleCommentVisibility(Long commentId);
 }

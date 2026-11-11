@@ -32,7 +32,7 @@ public class CommentController {
     private final UserRepository userRepository;
 
     @PostMapping
-    @PreAuthorize("hasAnyAuthority('GUEST', 'ADMIN', 'ROLE_GUEST', 'ROLE_ADMIN')")
+    @PreAuthorize("hasAnyAuthority('GUEST', 'ADMIN', 'ROLE_GUEST', 'ROLE_ADMIN','RECEPCIONIST')")
     @Operation(summary = "Crear un comentario", description = "Permite a un usuario comentar y valorar (1-5).")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "Comentario creado con éxito"),
@@ -99,4 +99,24 @@ public class CommentController {
         CommentDTOResponse response = commentService.updateComment(id, request);
         return ResponseEntity.ok(response);
     }
+
+    @GetMapping("/visible")
+    @Operation(summary = "Listar comentarios visibles (Público)", description = "Devuelve únicamente los comentarios aprobados por el administrador (showable = true).")
+    public ResponseEntity<List<CommentDTOResponse>> getVisibleComments() {
+        return ResponseEntity.ok(commentService.getVisibleComments());
+    }
+
+    @PatchMapping("/admin/{id}/toggle-visibility")
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'ROLE_ADMIN')")
+    @Operation(summary = "Cambiar visibilidad de un comentario (Admin)", description = "Permite al administrador alternar el estado 'showable' de un comentario.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Visibilidad actualizada con éxito"),
+            @ApiResponse(responseCode = "404", description = "Comentario no encontrado")
+    })
+    public ResponseEntity<CommentDTOResponse> toggleCommentVisibility(@PathVariable Long id) {
+        CommentDTOResponse response = commentService.toggleCommentVisibility(id);
+        return ResponseEntity.ok(response);
+    }
+
+
 }

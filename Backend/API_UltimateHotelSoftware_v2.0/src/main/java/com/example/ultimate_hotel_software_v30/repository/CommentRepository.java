@@ -10,4 +10,5 @@ import java.util.List;
 public interface CommentRepository extends JpaRepository<CommentEntity, Long> {
 
     List<CommentEntity> findByUserEntity_Id(Long id);
+    List<CommentEntity> findByShowableTrue();
 }
