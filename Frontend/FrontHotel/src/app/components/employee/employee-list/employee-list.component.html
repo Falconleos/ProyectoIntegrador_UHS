@@ -1,4 +1,3 @@
-
 <div class="employee-container">
 
   <!-- Encabezado -->
@@ -112,7 +111,6 @@
 
                     <!-- Cambiar turno -->
                     <button
-                    
                       type="button"
                       class="btn-detail"
                       [disabled]="updatingShift()"
@@ -189,7 +187,7 @@
           }
 
           <h4>{{ employee.name }} {{ employee.surname }}</h4>
-          <p>{{ employee.username }}</p>
+          <p>@if(selectedUser(); as u) { {{ u.username }} } @else { {{ employee.username }} }</p>
         </div>
 
         @if (detailLoading()) {
@@ -253,8 +251,13 @@
           <div class="employee-detail-grid">
 
             <div>
+              <strong>Usuario:</strong>
+              <span>{{ user.username }}</span>
+            </div>
+
+            <div>
               <strong>DNI:</strong>
-              <span>{{ user.dni }}</span>
+              <span>{{ user.dni || 'No especificado' }}</span>
             </div>
 
             <div>
@@ -279,7 +282,7 @@
 
             <div>
               <strong>Fecha de nacimiento:</strong>
-              <span>{{ user.birthDay }}</span>
+              <span>{{ user.birthDay || 'No especificada' }}</span>
             </div>
 
             <div>

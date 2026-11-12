@@ -1,4 +1,3 @@
-
 import { Component, inject, OnInit, OnDestroy, signal } from '@angular/core';
 import { DecimalPipe } from '@angular/common';
 import { RouterLink } from '@angular/router';
@@ -11,7 +10,7 @@ import {
 import { EmployeeService } from '../../../core/services/employee.service';
 import { UserService } from '../../../core/services/user.service';
 
-import { EmployeeDtoResponse , ShiftType} from '../../../models/Employee-model';
+import { EmployeeDtoResponse, ShiftType } from '../../../models/Employee-model';
 import { UserDtoResponse } from '../../../models/User-model';
 
 @Component({
@@ -25,7 +24,6 @@ export class EmployeeListComponent implements OnInit, OnDestroy {
 
   private employeeService = inject(EmployeeService);
   private userService = inject(UserService);
-
   private fb = inject(NonNullableFormBuilder);
 
   employees = signal<EmployeeDtoResponse[]>([]);
@@ -44,7 +42,6 @@ export class EmployeeListComponent implements OnInit, OnDestroy {
   employeeRoles = signal<Record<number, string>>({});
 
   deletingId = signal<number | null>(null);
-
   defaultAvatar = 'assets/default-avatar.png';
 
   selectedEmployeeForShift = signal<EmployeeDtoResponse | null>(null);
@@ -64,12 +61,12 @@ export class EmployeeListComponent implements OnInit, OnDestroy {
   });
 
   ngOnInit(): void {
-    this.checkUserRole(); //verifica si el usuario actual es administrador.
-    this.loadEmployees(); //consulta los empleados al backend.
+    this.checkUserRole();
+    this.loadEmployees();
   }
 
   checkUserRole(): void {
-    const storedRoles = localStorage.getItem('role'); //Busca una propiedad llamada role dentro del almacenamiento local del navegador. Puede contener un unico rol o varios roles en un arreglo
+    const storedRoles = localStorage.getItem('role');
 
     if (!storedRoles) {
       this.isAdmin.set(false);
@@ -78,9 +75,9 @@ export class EmployeeListComponent implements OnInit, OnDestroy {
 
     try {
       const roles = JSON.parse(storedRoles); 
-      const roleList = Array.isArray(roles) ? roles : [roles]; //Si ya es un arreglo, lo conserva. Si no lo es, crea un arreglo con ese único elemento.
+      const roleList = Array.isArray(roles) ? roles : [roles];
 
-      const admin = roleList.some((role: unknown) => { //some() devuelve true cuando al menos un elemento del arreglo cumple la condición.
+      const admin = roleList.some((role: unknown) => {
         if (typeof role === 'string') {
           return role === 'ADMIN' || role === 'ROLE_ADMIN';
         }
@@ -119,7 +116,7 @@ export class EmployeeListComponent implements OnInit, OnDestroy {
         this.loading.set(false);
 
         employees.forEach(employee => {
-          this.loadEmployeeAvatar(employee.id);  //Solicitudes asincronas
+          this.loadEmployeeAvatar(employee.id); 
           this.loadEmployeeRole(employee.id);
         });
       },
@@ -130,29 +127,25 @@ export class EmployeeListComponent implements OnInit, OnDestroy {
     });
   }
 
-  
-private loadEmployeeRole(employeeId: number): void {
-  this.userService.getById(employeeId).subscribe({
-    next: (user) => {
+  private loadEmployeeRole(employeeId: number): void {
+    this.userService.getById(employeeId).subscribe({
+      next: (user: any) => {
+        const roleNames = user.roles.map((role: any) => role.name);
+        const roles = roleNames.join(', ') || 'N/A';
 
-      const roleNames = user.roles.map(role => role.name);
-
-      const roles = roleNames.join(', ') || 'N/A';
-
-      this.employeeRoles.update(currentRoles => ({
-        ...currentRoles,
-        [employeeId]: roles
-      }));
-    },
-    error: () => {
-      this.employeeRoles.update(currentRoles => ({
-        ...currentRoles,
-        [employeeId]: 'N/A'
-      }));
-    }
-  });
-}
-
+        this.employeeRoles.update(currentRoles => ({
+          ...currentRoles,
+          [employeeId]: roles
+        }));
+      },
+      error: () => {
+        this.employeeRoles.update(currentRoles => ({
+          ...currentRoles,
+          [employeeId]: 'N/A'
+        }));
+      }
+    });
+  }
 
   getEmployeeRole(employeeId: number): string {
     return this.employeeRoles()[employeeId] || 'Cargando...';
@@ -166,7 +159,6 @@ private loadEmployeeRole(employeeId: number): void {
     this.userService.getProfilePicture(employeeId).subscribe({
       next: (blob) => {
         const url = URL.createObjectURL(blob);
-
         this.employeeAvatars.update(avatars => ({
           ...avatars,
           [employeeId]: url
@@ -218,92 +210,78 @@ private loadEmployeeRole(employeeId: number): void {
     this.detailLoading.set(false);
   }
 
-  
-openShiftForm(employee: EmployeeDtoResponse): void {
-  if (!this.isAdmin() || this.updatingShift()) {
-    return;
-  }
-
-  this.selectedEmployeeForShift.set(employee);
-  this.shiftError.set('');
-
-  this.shiftForm.reset({
-    shift: employee.shift
-  });
-}
-
-cancelShiftChange(): void {
-  if (this.updatingShift()) {
-    return;
-  }
-
-  this.selectedEmployeeForShift.set(null);
-  this.shiftError.set('');
-  this.shiftForm.reset();
-}
-
-saveShiftChange(): void {
-  if (!this.isAdmin()) {
-    this.shiftError.set(
-      'No tienes permisos para cambiar el turno.'
-    );
-    return;
-  }
-
-  const employee = this.selectedEmployeeForShift();
-
-  if (!employee || this.updatingShift()) {
-    return;
-  }
-
-  if (this.shiftForm.invalid) {
-    this.shiftForm.markAllAsTouched();
-    return;
-  }
-
-  const nuevoShift = this.shiftForm.controls.shift.value;
-
-  if (nuevoShift === employee.shift) {
-    this.shiftError.set(
-      'Debe seleccionar un turno diferente al actual.'
-    );
-    return;
-  }
-
-  this.updatingShift.set(true);
-  this.shiftError.set('');
-
-  this.employeeService.updateShift(
-    employee.id,
-    nuevoShift
-  ).subscribe({
-    next: (updatedEmployee) => {
-
-      this.employees.update(employees =>
-        employees.map(current =>
-          current.id === updatedEmployee.id
-            ? updatedEmployee
-            : current
-        )
-      );
-
-      if (this.selectedEmployee()?.id === updatedEmployee.id) {
-        this.selectedEmployee.set(updatedEmployee);
-      }
-
-      this.updatingShift.set(false);
-      this.selectedEmployeeForShift.set(null);
-      this.shiftForm.reset();
-    },
-
-    error: () => {
-
-      this.shiftError.set('No se pudo actualizar el turno del empleado.');
-      this.updatingShift.set(false);
+  openShiftForm(employee: EmployeeDtoResponse): void {
+    if (!this.isAdmin() || this.updatingShift()) {
+      return;
     }
-  });
-}
 
+    this.selectedEmployeeForShift.set(employee);
+    this.shiftError.set('');
+
+    this.shiftForm.reset({
+      shift: employee.shift
+    });
+  }
+
+  cancelShiftChange(): void {
+    if (this.updatingShift()) {
+      return;
+    }
+
+    this.selectedEmployeeForShift.set(null);
+    this.shiftError.set('');
+    this.shiftForm.reset();
+  }
+
+  saveShiftChange(): void {
+    if (!this.isAdmin()) {
+      this.shiftError.set('No tienes permisos para cambiar el turno.');
+      return;
+    }
+
+    const employee = this.selectedEmployeeForShift();
+
+    if (!employee || this.updatingShift()) {
+      return;
+    }
+
+    if (this.shiftForm.invalid) {
+      this.shiftForm.markAllAsTouched();
+      return;
+    }
+
+    const nuevoShift = this.shiftForm.controls.shift.value;
+
+    if (nuevoShift === employee.shift) {
+      this.shiftError.set('Debe seleccionar un turno diferente al actual.');
+      return;
+    }
+
+    this.updatingShift.set(true);
+    this.shiftError.set('');
+
+    this.employeeService.updateShift(employee.id, nuevoShift).subscribe({
+      next: (updatedEmployee) => {
+        this.employees.update(employees =>
+          employees.map(current =>
+            current.id === updatedEmployee.id ? updatedEmployee : current
+          )
+        );
+
+        if (this.selectedEmployee()?.id === updatedEmployee.id) {
+          this.selectedEmployee.set(updatedEmployee);
+        }
+
+        this.updatingShift.set(false);
+        this.selectedEmployeeForShift.set(null);
+        this.shiftForm.reset();
+      },
+      error: () => {
+        this.shiftError.set('No se pudo actualizar el turno del empleado.');
+        this.updatingShift.set(false);
+      }
+    });
+  }
 
   deleteEmployee(id: number): void {
     if (!this.isAdmin()) {
@@ -353,11 +331,7 @@ saveShiftChange(): void {
         this.deletingId.set(null);
       },
       error: () => {
-
-        this.errorMessage.set(
-          'No se pudo eliminar el empleado.'
-        );
-
+        this.errorMessage.set('No se pudo eliminar el empleado.');
         this.deletingId.set(null);
       }
     });
@@ -370,5 +344,4 @@ saveShiftChange(): void {
       }
     });
   }
-
 }

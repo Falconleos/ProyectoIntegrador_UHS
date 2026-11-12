@@ -10,7 +10,7 @@ import { RoleType, UserDtoRequest } from '../../models/User-model';
   standalone: true,
   imports: [CommonModule, FormsModule, RouterLink],
   templateUrl: './user-edit.component.html',
-  styleUrls: ['../user-form/user-form.component.css'] // Reutilizamos los estilos del formulario de creación
+  styleUrls: ['../user-form/user-form.component.css'] 
 })
 export class UserEditComponent implements OnInit {
   userId: number | null = null;
