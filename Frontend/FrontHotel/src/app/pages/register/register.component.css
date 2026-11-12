@@ -70,6 +70,10 @@ form {
   gap: 1rem;
 }
 
+h4{
+  color: var(--color-text-main);
+}
+
 @media (max-width: 576px) {
   .form-row {
     grid-template-columns: 1fr;
@@ -84,7 +88,7 @@ form {
 
 .form-group label {
   font-size: var(--font-size-xs);
-  color: var(--color-text-muted);
+  color: var(--color-text-main);
   font-weight: 500;
   text-transform: uppercase;
   letter-spacing: 0.05em;

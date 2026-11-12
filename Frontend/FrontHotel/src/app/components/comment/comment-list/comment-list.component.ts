@@ -3,6 +3,7 @@ import { RouterLink } from '@angular/router';
 import { CommonModule } from '@angular/common';
 
 import { CommentService } from '../../../core/services/comment.service';
+import { AuthService } from '../../../core/services/auth.service';
 import { CommentDtoResponse } from '../../../models/Comment-model';
 
 @Component({
@@ -15,33 +16,54 @@ import { CommentDtoResponse } from '../../../models/Comment-model';
 export class CommentListComponent implements OnInit {
 
   private commentService = inject(CommentService);
+  private authService = inject(AuthService);
 
   comments = signal<CommentDtoResponse[]>([]);
   loading = signal(false);
   deletingId = signal<number | null>(null);
+  togglingId = signal<number | null>(null);
   errorMessage = signal('');
 
-  isAdmin = signal(false);
+  // Sincronizamos roles usando las señales y computed del AuthService (o lógica local robusta)
+  isAdminOrReceptionist = signal(false);
   isGuest = signal(false);
   currentUsername = signal('');
 
   ngOnInit(): void {
     this.checkUserRoles();
-    this.loadComments();
+    this.loadCommentsBasedOnRole();
   }
 
   checkUserRoles(): void {
     const storedRoles = localStorage.getItem('role') || '';
-    this.isAdmin.set(storedRoles.includes('ADMIN'));
-    this.isGuest.set(storedRoles.includes('GUEST'));
+    const upperRoles = storedRoles.toUpperCase();
+    
+    const adminOrReceps = upperRoles.includes('ADMIN') || upperRoles.includes('RECEPCIONIST');
+    const guest = upperRoles.includes('GUEST');
+
+    this.isAdminOrReceptionist.set(adminOrReceps);
+    this.isGuest.set(guest);
     this.currentUsername.set(localStorage.getItem('username') || '');
   }
 
-  loadComments(): void {
+  loadCommentsBasedOnRole(): void {
     this.loading.set(true);
     this.errorMessage.set('');
 
-    this.commentService.getAll().subscribe({
+    let request$;
+
+    if (this.isAdminOrReceptionist()) {
+      // Admin o Recepcionista ven todo el listado para poder moderar
+      request$ = this.commentService.getAll();
+    } else if (this.isGuest()) {
+      // Invitado ve únicamente sus propios comentarios
+      request$ = this.commentService.getMyComments();
+    } else {
+      // Visitante general (por si acaso) ve solo los visibles
+      request$ = this.commentService.getVisibleComments();
+    }
+
+    request$.subscribe({
       next: (data) => {
         this.comments.set(data);
         this.loading.set(false);
@@ -53,20 +75,40 @@ export class CommentListComponent implements OnInit {
     });
   }
 
+  // Método para que el admin pueda cambiar el estado showable desde el checkbox de la card
+  onToggleVisibility(comment: CommentDtoResponse): void {
+    if (!this.isAdminOrReceptionist() || this.togglingId() !== null) return;
+
+    this.togglingId.set(comment.id);
+    this.commentService.toggleVisibility(comment.id).subscribe({
+      next: (updatedComment) => {
+        // Actualizamos el estado localmente en la señal de la lista
+        this.comments.update(list => 
+          list.map(c => c.id === updatedComment.id ? updatedComment : c)
+        );
+        this.togglingId.set(null);
+      },
+      error: () => {
+        this.errorMessage.set('No se pudo cambiar la visibilidad del comentario.');
+        this.togglingId.set(null);
+      }
+    });
+  }
+
   getUserAvatarUrl(userId: number): string {
     return `http://localhost:8080/private/user/${userId}/profile-picture`;
   }
 
   canCreate(): boolean {
-    return this.isAdmin() || this.isGuest();
+    return true; // Permitimos a los usuarios logueados crear comentarios
   }
 
   canEdit(comment: CommentDtoResponse): boolean {
-    return this.isAdmin() || (this.isGuest() && comment.username === this.currentUsername());
+    return this.isAdminOrReceptionist() || (this.isGuest() && comment.username === this.currentUsername());
   }
 
   canDelete(): boolean {
-    return this.isAdmin();
+    return this.isAdminOrReceptionist();
   }
 
   deleteComment(id: number): void {

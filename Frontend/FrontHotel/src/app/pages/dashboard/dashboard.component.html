@@ -9,9 +9,12 @@
     
     <nav class="sidebar-nav">
       @if (userRole.toLowerCase() === 'guest') {
-        <!-- Menú exclusivo para Huéspedes (Guest): Solo Reservas -->
+        <!-- Menú exclusivo para Huéspedes (Guest): Reservas y Comentarios -->
         <a routerLink="/dashboard/booking-list" routerLinkActive="active">
           <i class="fa-solid fa-calendar-days"></i> Mis Reservas
+        </a>
+        <a routerLink="/dashboard/comment-list" routerLinkActive="active">
+          <i class="fa-solid fa-comments"></i> Comentarios
         </a>
       } @else {
         <!-- Menú completo para Administradores, Recepcionistas u otros roles -->

@@ -1,4 +1,3 @@
-
 import { Component, inject, OnInit, signal } from '@angular/core';
 import {
   ReactiveFormsModule,
@@ -144,7 +143,8 @@ export class CommentFormComponent implements OnInit {
       this.commentService.update(id, payload).subscribe({
         next: () => {
           this.saving.set(false);
-          this.router.navigate(['/comments']);
+          // Redirige al listado de comentarios en el dashboard (ajusta la ruta si difiere en tu proyecto)
+          this.router.navigate(['/dashboard/comments']); 
         },
         error: () => {
           this.errorMessage.set('No se pudo actualizar el comentario.');
@@ -156,7 +156,8 @@ export class CommentFormComponent implements OnInit {
       this.commentService.create(payload).subscribe({
         next: () => {
           this.saving.set(false);
-          this.router.navigate(['/comment-list']);
+          // Redirige al listado tras crear exitosamente
+          this.router.navigate(['/dashboard/comments']); 
         },
         error: () => {
           this.errorMessage.set('No se pudo crear el comentario.');
@@ -168,6 +169,6 @@ export class CommentFormComponent implements OnInit {
 
   // Volver al listado
   goBack(): void {
-    this.router.navigate(['/comments']);
+    this.router.navigate(['/dashboard/comments']);
   }
 }

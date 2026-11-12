@@ -14,7 +14,7 @@ export class CommentService {
 
   private http = inject(HttpClient);
 
-  private apiUrl = 'http://localhost:8080/public/comments';
+  private apiUrl = 'http://localhost:8080/private/comments';
 
   // Obtener comentarios según el rol del usuario (todos para admin y recep y los propios para guest)
   getAll(): Observable<CommentDtoResponse[]> {
@@ -28,11 +28,9 @@ export class CommentService {
       { withCredentials: true });
   }
 
-  // NUEVO: Obtener solo los comentarios visibles (público general)
   getVisibleComments(): Observable<CommentDtoResponse[]> {
-    return this.http.get<CommentDtoResponse[]>(`${this.apiUrl}/visible`,
-      { withCredentials: true });
-  }
+  return this.http.get<CommentDtoResponse[]>('http://localhost:8080/public/comments/visible');
+}
 
   // Crear un comentario
   create(comment: CommentDtoRequest): Observable<CommentDtoResponse> {

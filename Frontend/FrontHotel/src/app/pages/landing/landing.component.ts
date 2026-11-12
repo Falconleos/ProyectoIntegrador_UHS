@@ -88,7 +88,8 @@ export class LandingComponent implements OnInit {
    * Carga los comentarios, filtra los de 5 estrellas y busca el ID del usuario por su username para su foto
    */
   loadFiveStarComments(): void {
-    this.commentService.getAll().subscribe({
+    // Llamar al endpoint público que solo trae showable = true
+    this.commentService.getVisibleComments().subscribe({
       next: (comments) => {
         // Filtramos los de 5 estrellas (o usamos todos si no hay)
         const filtered = comments.filter((c: any) => c.rating === 5 || c.puntuacion === 5);
@@ -101,10 +102,9 @@ export class LandingComponent implements OnInit {
           }
           return this.userService.getUserByUsername(c.username).pipe(
             map((user: any) => {
-              const uId = user?.id || user?.userId;
               return {
                 ...c,
-                authorAvatar: uId ? `http://localhost:8080/public/auth/${uId}/profile-picture?t=${new Date().getTime()}` : null
+                authorAvatar: c.username ? `http://localhost:8080/public/users/username/${c.username}/profile-picture?t=${new Date().getTime()}` : null
               };
             }),
             catchError(() => of({ ...c, authorAvatar: null }))
@@ -122,7 +122,7 @@ export class LandingComponent implements OnInit {
         });
       },
       error: (err) => {
-        console.error('Error al cargar comentarios:', err);
+        console.error('Error al cargar comentarios visibles:', err);
       }
     });
   }
@@ -144,4 +144,18 @@ export class LandingComponent implements OnInit {
     if (total === 0) return;
     this.currentCommentIndex.update(index => (index - 1 + total) % total);
   }
+
+  // --- Manejo de redirección para reservas con validación de sesión ---
+  onReservarClick(event: Event): void {
+    event.preventDefault();
+    const token = localStorage.getItem('authToken');
+
+    if (!token) {
+      alert('Debes iniciar sesión en el sistema antes de realizar una reserva.');
+      this.router.navigate(['/login']);
+    } else {
+      this.router.navigate(['/dashboard/availability']); 
+    }
+  }
+
 }

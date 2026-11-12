@@ -2,6 +2,7 @@ export interface CommentDtoResponse {
   id: number;
   content: string;
   rating: number;
+  showable:boolean;
   createdAt: string;
   name: string;
   surname: string;
