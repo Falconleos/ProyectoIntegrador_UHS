@@ -18,6 +18,12 @@ public interface EmployeeMapper {
     @Mapping(target = "name", source = "userEntity.name")
     @Mapping(target = "surname", source = "userEntity.surname")
     @Mapping(target = "email", source = "userEntity.email")
+    // --- NUEVOS CAMPOS DE USUARIO MAPEADOS ---
+    @Mapping(target = "dni", source = "userEntity.dni")
+    @Mapping(target = "gender", source = "userEntity.gender")
+    @Mapping(target = "phoneNumber", source = "userEntity.phoneNumber")
+    @Mapping(target = "address", source = "userEntity.address")
+    @Mapping(target = "birthDay", source = "userEntity.birthDay")
     EmployeeDTOResponse toEmployeeDTOResponse(EmployeeEntity entity);
 
 }

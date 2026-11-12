@@ -2,9 +2,11 @@ package com.example.ultimate_hotel_software_v30.dto.request;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import lombok.Builder;
 import lombok.Data;
 
 @Data
+@Builder
 public class UserDtoRequestModification {
 
     @NotBlank(message = "El nombre de usuario es obligatorio")

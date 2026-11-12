@@ -2,6 +2,7 @@ package com.example.ultimate_hotel_software_v30.service.serviceImpl;
 
 import com.example.ultimate_hotel_software_v30.dto.request.EmployeeCreateUnifiedDTO;
 import com.example.ultimate_hotel_software_v30.dto.request.EmployeeDTORequest;
+import com.example.ultimate_hotel_software_v30.dto.request.UserDtoRequestModification;
 import com.example.ultimate_hotel_software_v30.dto.response.EmployeeDTOResponse;
 import com.example.ultimate_hotel_software_v30.enums.Role;
 import com.example.ultimate_hotel_software_v30.enums.Shift;
@@ -189,15 +190,38 @@ public class EmployeeServiceImpl implements EmployeeService {
     @Override
     @Transactional
     public EmployeeDTOResponse updateEmployee(Long id, EmployeeDTORequest request) {
-        EmployeeEntity employee = findEntityById(id);
+        System.out.println("==================================================");
+        System.out.println("--- [BACKEND DEBUG] INICIO updateEmployee ID: " + id + " ---");
 
-        // Actualizamos los campos editables del empleado
+        // 1. Reutilizamos el DTO de modificación que usa UserService
+        UserDtoRequestModification userModification = UserDtoRequestModification.builder()
+                .username(request.getUsername())
+                .name(request.getName())
+                .surname(request.getSurname())
+                .dni(request.getDni())
+                .gender(request.getGender())
+                .email(request.getEmail())
+                .phoneNumber(request.getPhoneNumber())
+                .address(request.getAddress())
+                .birthDay(request.getBirthDay() != null ? request.getBirthDay().toString() : null)
+                .build();
+
+        // 2. Actualizamos el usuario de forma segura con las validaciones de DNI/Email
+        userService.updateUser(id, userModification);
+
+        // 3. Buscamos y actualizamos la parte laboral del empleado
+        EmployeeEntity employee = findEntityById(id);
         employee.setEmployeeNumber(request.getEmployeeNumber());
+        employee.setEmergencyPhoneNumber(request.getEmergencyPhoneNumber());
         employee.setHireDate(request.getHireDate());
         employee.setShift(request.getShift());
         employee.setSalary(request.getSalary());
 
-        EmployeeEntity updatedEmployee = employeeRepository.save(employee);
+        EmployeeEntity updatedEmployee = employeeRepository.saveAndFlush(employee);
+
+        System.out.println("--- [BACKEND DEBUG] FIN updateEmployee exitoso ---");
+        System.out.println("==================================================");
+
         return employeeMapper.toEmployeeDTOResponse(updatedEmployee);
     }
 

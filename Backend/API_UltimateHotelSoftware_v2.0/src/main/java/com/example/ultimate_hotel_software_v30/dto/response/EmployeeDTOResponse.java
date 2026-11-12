@@ -31,6 +31,7 @@ public class EmployeeDTOResponse {
     @Schema(description = "Sueldo o salario actual del empleado", example = "650000.00")
     private Double salary;
 
+    // --- CAMPOS DE USUARIO ---
     @Schema(description = "Nombre de usuario asociado al empleado", example = "jperez")
     private String username;
 
@@ -40,7 +41,22 @@ public class EmployeeDTOResponse {
     @Schema(description = "Apellido del empleado", example = "Pérez")
     private String surname;
 
+    @Schema(description = "Documento Nacional de Identidad (DNI)", example = "45678912")
+    private String dni;
+
+    @Schema(description = "Género del usuario", example = "Masculino")
+    private String gender;
+
     @Schema(description = "Correo electrónico de contacto", example = "juan.perez@hotel.com")
     private String email;
+
+    @Schema(description = "Número de teléfono celular", example = "2231234567")
+    private String phoneNumber;
+
+    @Schema(description = "Dirección física", example = "Av. Colón 1234")
+    private String address;
+
+    @Schema(description = "Fecha de nacimiento", example = "1995-05-15")
+    private LocalDate birthDay;
 
 }

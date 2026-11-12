@@ -14,11 +14,21 @@ import java.time.LocalDate;
 @Builder
 public class EmployeeDTORequest {
 
-    @NotNull(message = "User ID is required to link the employee profile")
     private Long userId;
 
-    private String employeeNumber;
+    // --- CAMPOS DE USUARIO ---
+    private String username;
+    private String name;
+    private String surname;
+    private String dni;
+    private String gender;
+    private String email;
+    private String phoneNumber;
+    private String address;
+    private String birthDay;
 
+    // --- CAMPOS LABORALES ---
+    private String employeeNumber;
     private String emergencyPhoneNumber;
 
     @NotNull(message = "hire date is required")
@@ -30,5 +40,4 @@ public class EmployeeDTORequest {
     @NotNull(message = "Salary is required")
     @Positive(message = "Salary must be a positive number greater than zero")
     private Double salary;
-
 }
