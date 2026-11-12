@@ -27,28 +27,29 @@
         </div>
 
         <!-- Botones de Acción (Crear, Editar, Eliminar) -->
+        <!-- Botones de Acción (Crear, Editar, Eliminar) -->
         <div class="room-type-actions">
           <button 
             type="button" 
             class="btn-info-action" 
             title="Crear tipo similar / Nuevo"
-            (click)="nuevaHabitacion(type.id)"> <!-- Agregamos type.id aquí -->
+            (click)="nuevaHabitacion(type.id)">
             <i class="fa-solid fa-plus"></i>
           </button>
 
-          <button 
-            type="button" 
-            class="btn-warning" 
+          <a
+            [routerLink]="['/dashboard/room-type-edit', type.id]"
+            class="btn-warning"
             title="Editar tipo de habitación"
-            (click)="null">
+          >
             <i class="fa-solid fa-pen-to-square"></i>
-          </button>
+          </a>
 
           <button 
             type="button" 
             class="btn-danger" 
             title="Eliminar tipo de habitación"
-            (click)="null">
+            (click)="deleteRoomType(type.id)">
             <i class="fa-solid fa-trash-can"></i>
           </button>
         </div>
