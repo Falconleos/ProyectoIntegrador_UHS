@@ -42,13 +42,15 @@ export class RoomTypeListComponent implements OnInit {
   }
 
   deleteRoomType(id: number): void {
+    console.log('¡Clic en eliminar detectado para el ID:', id); // <--- Agrega esto
     this.actionError.set('');
 
     this.roomTypeService.deleteRoomType(id).subscribe({
       next: () => {
-        this.roomTypes.update(types =>types.filter(type => type.id !== id));
+        this.roomTypes.update(types => types.filter(type => type.id !== id));
       },
-      error: () => {
+      error: (err) => {
+        console.error('Error al eliminar:', err);
         this.actionError.set('No se pudo eliminar el tipo de habitación.');
       }
     });

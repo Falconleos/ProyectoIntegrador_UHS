@@ -63,7 +63,7 @@ export class RoomListComponent implements OnInit, OnDestroy {
         this.roomTypes.set(Array.isArray(data) ? data : []);
       },
       error: () => {
-        // Manejo opcional de error para tipos de habitación
+        
         console.error('No se pudieron cargar los tipos de habitación.');
       }
     });
@@ -196,6 +196,24 @@ export class RoomListComponent implements OnInit, OnDestroy {
     } else {
       this.route.navigate(['/dashboard/room-form']);
     }
+  }
+
+  deleteRoomType(id: number): void {
+    if (!window.confirm('¿Estás seguro de que deseas eliminar este tipo de habitación?')) {
+      return;
+    }
+    this.actionError.set('');
+
+    this.roomTypeService.deleteRoomType(id).subscribe({
+      next: () => {
+        this.roomTypes.update(types => types.filter(type => type.id !== id));
+      },
+      error: (err) => {
+        console.error('Error al eliminar tipo de habitación:', err);
+        const msg = err.error?.message || 'No se pudo eliminar el tipo de habitación. Es posible que existan habitaciones asociadas.';
+        this.actionError.set(msg);
+      }
+    });
   }
 
 }
