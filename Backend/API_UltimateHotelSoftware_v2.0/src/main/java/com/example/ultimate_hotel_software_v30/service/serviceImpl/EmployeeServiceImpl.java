@@ -167,14 +167,23 @@ public class EmployeeServiceImpl implements EmployeeService {
     @Override
     @Transactional
     public void deleteEmployee(Long id) {
+        // 1. Buscamos el empleado (lanza excepción si no existe)
         EmployeeEntity employee = findEntityById(id);
 
-        // Rompemos la relación bidireccional con el usuario para evitar problemas de persistencia en cascada si aplica
-        if (employee.getUserEntity() != null) {
-            employee.getUserEntity().setEmployeeEntity(null);
-        }
+        // 2. Obtenemos el usuario asociado
+        UserEntity user = employee.getUserEntity();
 
-        employeeRepository.delete(employee);
+        if (user != null) {
+            // Rompemos la relación bidireccional para evitar problemas de caché en la sesión de Hibernate
+            user.setEmployeeEntity(null);
+            employee.setUserEntity(null);
+
+            // 3. Borramos el UserEntity directamente (lo que borrará en cascada o por ID al empleado asociado)
+            userRepository.delete(user);
+        } else {
+            // Fallback por si acaso no tuviera usuario asociado
+            employeeRepository.delete(employee);
+        }
     }
 
     @Override
