@@ -2,6 +2,7 @@ package com.example.ultimate_hotel_software_v30.controller;
 
 import com.example.ultimate_hotel_software_v30.dto.request.ResetPasswordDTORequest;
 import com.example.ultimate_hotel_software_v30.dto.request.UserDTORequest;
+import com.example.ultimate_hotel_software_v30.dto.request.UserDTORequestCreation;
 import com.example.ultimate_hotel_software_v30.dto.request.UserLoginDTORequest;
 import com.example.ultimate_hotel_software_v30.dto.response.AuthSuccessDtoResponse;
 import com.example.ultimate_hotel_software_v30.dto.response.AuthTokenResponse;
@@ -22,6 +23,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequestMapping("/public/auth")
@@ -33,17 +35,23 @@ public class AuthController {
     private final AuthService authService;
     private final UserService userService;
 
-    @PostMapping("/register")
+    @PostMapping(value = "/register", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @Operation(
-            summary = "Registrar un nuevo usuario",
-            description = "Crea una cuenta en el sistema con el rol base GUEST. Retorna el token de acceso JWT en el cuerpo y setea la cookie HttpOnly con el Refresh Token."
+            summary = "Registrar un nuevo usuario con foto opcional",
+            description = "Crea una cuenta en el sistema con el rol base GUEST y soporta subida de imagen de perfil."
     )
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "Usuario creado exitosamente",
                     content = @Content(schema = @Schema(implementation = AuthTokenResponse.class))),
             @ApiResponse(responseCode = "400", description = "Datos de entrada inválidos o conflicto con datos existentes")
     })
-    public ResponseEntity<AuthTokenResponse> register(@Valid @RequestBody UserDTORequest request){
+    public ResponseEntity<AuthTokenResponse> register(
+            @ModelAttribute UserDTORequestCreation request,
+            @RequestParam(value = "profilePictureFile", required = false) MultipartFile profilePictureFile){
+
+        // Asignamos la foto al DTO gracias a que UserDTORequestCreation incluye el @Setter y el campo MultipartFile
+        request.setProfilePictureFile(profilePictureFile);
+
         AuthSuccessDtoResponse token = authService.register(request);
         return ResponseEntity.status(HttpStatus.CREATED)
                 .header(HttpHeaders.SET_COOKIE, token.responseCookie().toString())

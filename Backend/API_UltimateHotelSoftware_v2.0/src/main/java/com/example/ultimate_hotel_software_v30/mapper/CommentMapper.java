@@ -11,12 +11,14 @@ public interface CommentMapper {
 
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "userEntity", ignore = true)
+    @Mapping(target = "showable", ignore = true) // Por defecto se inicializa en false mediante @Builder.Default o PrePersist
     @Mapping(target = "createdAt", expression = "java(java.time.LocalDateTime.now())")
     CommentEntity toCommentEntity(CommentDTORequest request);
 
     @Mapping(source = "userEntity.name", target = "name")
     @Mapping(source = "userEntity.surname", target = "surname")
     @Mapping(source = "userEntity.username", target = "username")
+    @Mapping(source = "showable", target = "showable")
     CommentDTOResponse toCommentDTOResponse(CommentEntity entity);
 
 }

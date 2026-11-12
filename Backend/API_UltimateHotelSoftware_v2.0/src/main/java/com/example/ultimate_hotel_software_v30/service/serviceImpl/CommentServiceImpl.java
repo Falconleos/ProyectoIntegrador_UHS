@@ -9,7 +9,6 @@ import com.example.ultimate_hotel_software_v30.model.UserEntity;
 import com.example.ultimate_hotel_software_v30.repository.CommentRepository;
 import com.example.ultimate_hotel_software_v30.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.crossstore.ChangeSetPersister;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -29,6 +28,9 @@ public class CommentServiceImpl implements com.example.ultimate_hotel_software_v
     @Transactional
     public CommentDTOResponse createComment(CommentDTORequest request) {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        System.out.println(">>> [DEBUG createComment] Username extraído del token: " + username);
+        System.out.println(">>> [DEBUG createComment] Authorities: " + SecurityContextHolder.getContext().getAuthentication().getAuthorities());
+
         UserEntity user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new RuntimeException("User not found: " + username));
 
@@ -43,6 +45,9 @@ public class CommentServiceImpl implements com.example.ultimate_hotel_software_v
     @Transactional(readOnly = true)
     public List<CommentDTOResponse> getMyComments() {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        System.out.println(">>> [DEBUG getMyComments] Username extraído del token: " + username);
+        System.out.println(">>> [DEBUG getMyComments] Authorities: " + SecurityContextHolder.getContext().getAuthentication().getAuthorities());
+
         UserEntity user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new RuntimeException("User not found: " + username));
 

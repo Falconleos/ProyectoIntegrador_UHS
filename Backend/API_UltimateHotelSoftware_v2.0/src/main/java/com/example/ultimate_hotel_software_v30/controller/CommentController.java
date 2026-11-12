@@ -22,7 +22,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import java.util.List;
 
 @RestController
-@RequestMapping("/public/comments")
+@RequestMapping("/private/comments")
 @RequiredArgsConstructor
 @CrossOrigin(origins = "http://localhost:4200", allowCredentials = "true")
 @Tag(name = "GestionComentarios", description = "Endpoints para la gestión de valoraciones y comentarios")
@@ -45,19 +45,13 @@ public class CommentController {
     }
 
     @GetMapping
-    @Operation(summary = "Listar comentarios (Público para visitantes, filtrado por roles si está logueado)")
+    @Operation(summary = "Listar todos los comentarios (Admin/Receptionist)")
     public ResponseEntity<List<CommentDTOResponse>> getAllComments() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
-        // Si el usuario es anónimo (no ha iniciado sesión), retornamos todos los comentarios de forma pública para la landing
-        if (authentication == null || !authentication.isAuthenticated() || authentication.getPrincipal().equals("anonymousUser")) {
-            return ResponseEntity.ok(commentService.getAllComments());
-        }
-
-        // Si el usuario SÍ está autenticado, aplicamos la lógica según su rol
         String username = authentication.getName();
         UserEntity user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new RuntimeException("User not found: " + username));
 
         boolean isAdminOrReceptionist = user.getRoles().stream()
                 .anyMatch(r -> r.getRole().name().equalsIgnoreCase("ADMIN") ||
@@ -117,6 +111,4 @@ public class CommentController {
         CommentDTOResponse response = commentService.toggleCommentVisibility(id);
         return ResponseEntity.ok(response);
     }
-
-
 }

@@ -1,9 +1,6 @@
 package com.example.ultimate_hotel_software_v30.service.serviceImpl;
 
-import com.example.ultimate_hotel_software_v30.dto.request.ChangePasswordDTORequest;
-import com.example.ultimate_hotel_software_v30.dto.request.ResetPasswordDTORequest;
-import com.example.ultimate_hotel_software_v30.dto.request.UserDTORequest;
-import com.example.ultimate_hotel_software_v30.dto.request.UserLoginDTORequest;
+import com.example.ultimate_hotel_software_v30.dto.request.*;
 import com.example.ultimate_hotel_software_v30.dto.response.AuthSuccessDtoResponse;
 import com.example.ultimate_hotel_software_v30.dto.response.AuthTokenResponse;
 import com.example.ultimate_hotel_software_v30.dto.response.RefreshTokenDTOResponse;
@@ -57,12 +54,13 @@ public class AuthService {
 
     private final PasswordResetTokenRepository passwordResetTokenRepository;
 
-    public AuthSuccessDtoResponse register(UserDTORequest request){
+    public AuthSuccessDtoResponse register(UserDTORequestCreation request){
 
         RoleEntity guestRole = roleRepository.findByRole(Role.GUEST)
                 .orElseThrow(() -> new InvalidNameException("no rol named GUEST"));
 
-        UserEntity userEntity = userMapper.toUserEntity(request);
+        // Usamos el método correcto del mapper para UserDTORequestCreation
+        UserEntity userEntity = userMapper.toUserEntityFromCreation(request);
         userEntity.setPassword(passwordEncoder.encode(request.getPassword()));
         userEntity.setRoles(Set.of(guestRole));
         userEntity.setCreateAt(LocalDate.now());
@@ -70,6 +68,15 @@ public class AuthService {
         userEntity.setAccountNonLocked(true);
         userEntity.setCredentialsNonExpired(true);
         userEntity.setEnabled(true);
+
+        // --- PERSISTIR FOTO DE PERFIL SI EXISTE ---
+        if (request.getProfilePictureFile() != null && !request.getProfilePictureFile().isEmpty()) {
+            try {
+                userEntity.setProfilePicture(request.getProfilePictureFile().getBytes());
+            } catch (Exception e) {
+                throw new RuntimeException("Error al procesar la foto de perfil", e);
+            }
+        }
 
         userRepository.save(userEntity);
 
@@ -81,7 +88,7 @@ public class AuthService {
 
         AuthTokenResponse authTokenResponse = new AuthTokenResponse(token);
 
-        return new AuthSuccessDtoResponse(authTokenResponse,cookie);
+        return new AuthSuccessDtoResponse(authTokenResponse, cookie);
     }
 
     public AuthSuccessDtoResponse login(UserLoginDTORequest request){

@@ -21,6 +21,9 @@ public class CommentDTOResponse {
     @Schema(description = "Calificación otorgada (de 1 a 5)", example = "5")
     private Integer rating;
 
+    @Schema(description = "Indica si el comentario es visible en la landing page", example = "false")
+    private boolean showable;
+
     @Schema(description = "Fecha y hora exacta en la que se realizó el comentario", example = "2026-08-13T14:30:00")
     private LocalDateTime createdAt;
 
