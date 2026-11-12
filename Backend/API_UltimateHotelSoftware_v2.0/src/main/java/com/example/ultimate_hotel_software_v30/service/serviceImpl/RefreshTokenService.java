@@ -48,4 +48,11 @@ public class RefreshTokenService {
                 .orElseThrow(()->new UsernameNotFoundException("incorrect user"));
         refreshTokenRepository.deleteByUserEntity(userEntity);
     }
+
+    public void deleteByUserEntity(UserEntity userEntity) {
+        if (userEntity != null) {
+            refreshTokenRepository.deleteByUserEntity(userEntity);
+        }
+    }
+
 }

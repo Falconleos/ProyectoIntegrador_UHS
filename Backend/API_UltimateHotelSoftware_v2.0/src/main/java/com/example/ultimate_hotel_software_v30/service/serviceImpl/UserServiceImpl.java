@@ -35,6 +35,7 @@ public class UserServiceImpl implements UserService {
     private final UserMapper userMapper;
     private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
+    private final RefreshTokenService refreshTokenService;
 
     @Override
     public UserDTOResponse getById(Long id) {
@@ -117,10 +118,16 @@ public class UserServiceImpl implements UserService {
         return userMapper.toUserDTOResponse(savedUser);
     }
 
-    @Override
+    @Transactional
     public void deleteUser(Long id) {
-        UserEntity userEntity = findEntityById(id);
-        userRepository.delete(userEntity);
+        UserEntity user = userRepository.findById(id)
+                .orElseThrow(() -> new UserNotFoundException("User not found"));
+
+        // 1. Eliminamos el token de refresco vinculado para liberar la foreign key
+        refreshTokenService.deleteByUserEntity(user);
+
+        // 2.   eliminamos el usuario sin errores de restricciones
+        userRepository.delete(user);
     }
 
     @Override

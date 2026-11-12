@@ -80,6 +80,8 @@ public class UserEntity {
     @com.fasterxml.jackson.annotation.JsonIgnore
     private EmployeeEntity employeeEntity;
 
+
+
     // Métodos requeridos por la interfaz UserDetails de Spring Security
     public boolean isEnabled() {
         return enabled != null ? enabled : true;
