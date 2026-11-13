@@ -50,6 +50,8 @@ public interface BookingService {
 
     BookingDTOResponse assignUserToBooking(Long bookingId, Long userId);
 
+    BookingCancellationDTOResponse interruptStay(BookingCancellationDTORequest request);
+
     // --- MÉTODOS PARA PAGOS / SEÑAS ---
     List<PaymentDTOResponse> getPaymentsByBookingId(Long bookingId);
 

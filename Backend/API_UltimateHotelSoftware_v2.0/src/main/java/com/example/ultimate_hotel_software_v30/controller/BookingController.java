@@ -196,4 +196,13 @@ public class BookingController {
         return ResponseEntity.ok(response);
     }
 
+    /*--------- 16. Interrumpir una estadía (CHECKED_IN) ---------------*/
+    @PostMapping("/interrupt")
+    @PreAuthorize("hasAnyRole('ADMIN', 'RECEPCIONIST')")
+    @Operation(summary = "Interrumpir una estadía activa", description = "Valida que la cuenta esté pagada, interrumpe la estadía, la desactiva y genera el registro físico.")
+    public ResponseEntity<BookingCancellationDTOResponse> interruptStay(@Valid @RequestBody BookingCancellationDTORequest request) {
+        BookingCancellationDTOResponse interruption = bookingService.interruptStay(request);
+        return new ResponseEntity<>(interruption, HttpStatus.CREATED);
+    }
+
 }

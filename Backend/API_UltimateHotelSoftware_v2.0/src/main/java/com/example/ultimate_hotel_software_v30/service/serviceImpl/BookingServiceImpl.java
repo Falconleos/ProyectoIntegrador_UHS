@@ -284,6 +284,62 @@ public class BookingServiceImpl implements BookingService {
         }
     }
 
+    // 3.3. Interrumpir una estadía (CHECKED_IN)
+    @Override
+    @Transactional
+    public BookingCancellationDTOResponse interruptStay(BookingCancellationDTORequest request) {
+        BookingEntity booking = findEntityById(request.getBookingId());
+
+        if (booking.getState() != BookingState.CHECKED_IN) {
+            throw new BookingStateConflictException("Only bookings in CHECKED_IN state can have their stay interrupted.");
+        }
+
+        AccountEntity account = accountRepository.findByBookingEntity_Id(booking.getId()).orElse(null);
+
+        // Validar que la cuenta esté totalmente pagada
+        if (account == null || !Boolean.TRUE.equals(account.getIsPaid())) {
+            throw new BookingStateConflictException("Cannot interrupt stay: The associated account is not fully paid.");
+        }
+
+        boolean existsCancellation = bookingCancellationRepository.existsByBookingId(booking.getId());
+        if (existsCancellation) {
+            throw new BookingStateConflictException("Esta reserva ya cuenta con un registro físico de interrupción/cancelación en el sistema.");
+        }
+
+        // Simplemente cerramos la cuenta sin ofrecer nota de crédito
+        if (account != null) {
+            account.setState(com.example.ultimate_hotel_software_v30.enums.AccountState.CANCELLED);
+            accountRepository.save(account);
+        }
+
+        // Actualizar estado de la reserva a INTERRUPTED y active = false
+        booking.setState(BookingState.INTERRUPTED);
+        booking.setActive(false);
+        bookingRepository.save(booking);
+
+        UserEntity currentUser = null;
+        try {
+            Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+            if (principal instanceof UserDetails) {
+                String currentUsername = ((UserDetails) principal).getUsername();
+                if (!currentUsername.isEmpty()) {
+                    currentUser = userService.findEntityByUsername(currentUsername);
+                }
+            }
+        } catch (Exception e) {
+            // Ignorar si no hay usuario autenticado
+        }
+
+        BookingCancellationEntity interruptionRecord = BookingCancellationEntity.builder()
+                .userEntity(currentUser)
+                .booking(booking)
+                .reason(request.getReason())
+                .build();
+
+        BookingCancellationEntity savedInterruption = bookingCancellationService.create(interruptionRecord);
+        return bookingCancellationMapper.toBookingCancellationDTOResponse(savedInterruption);
+    }
+
     @Override
     @Transactional
     public void update(BookingEntity booking) {
