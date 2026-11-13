@@ -29,7 +29,7 @@ public class AccountController {
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("hasAnyAuthority('ADMIN', 'ROLE_ADMIN', 'RECEPCIONIST', 'ROLE_RECEPCIONIST')")
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'ROLE_ADMIN', 'RECEPCIONIST', 'ROLE_RECEPCIONIST', 'GUEST', 'ROLE_GUEST')")
     public ResponseEntity<Object> getAccountById(@PathVariable Long id) {
         try {
             AccountDTOResponse account = accountService.getAccountById(id);
@@ -40,7 +40,7 @@ public class AccountController {
     }
 
     @GetMapping("/booking/{bookingId}")
-    @PreAuthorize("hasAnyAuthority('ADMIN', 'ROLE_ADMIN', 'RECEPCIONIST', 'ROLE_RECEPCIONIST')")
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'ROLE_ADMIN', 'RECEPCIONIST', 'ROLE_RECEPCIONIST', 'GUEST', 'ROLE_GUEST')")
     public ResponseEntity<Object> getAccountByBookingId(@PathVariable Long bookingId) {
         try {
             AccountDTOResponse account = accountService.getAccountByBookingId(bookingId);
@@ -79,7 +79,7 @@ public class AccountController {
     }
 
     @GetMapping("/bookings/{bookingId}/payments")
-    @PreAuthorize("hasAnyAuthority('ADMIN', 'ROLE_ADMIN', 'RECEPCIONIST', 'ROLE_RECEPCIONIST')")
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'ROLE_ADMIN', 'RECEPCIONIST', 'ROLE_RECEPCIONIST', 'GUEST', 'ROLE_GUEST')")
     public ResponseEntity<Object> getPaymentsByBookingId(@PathVariable Long bookingId) {
         try {
             List<PaymentDTOResponse> payments = accountService.getPaymentsByBookingId(bookingId);
@@ -88,8 +88,4 @@ public class AccountController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         }
     }
-
-
-
-
 }

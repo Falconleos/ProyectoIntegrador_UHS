@@ -179,12 +179,12 @@ public class BookingController {
         return new ResponseEntity<>(newPayment, HttpStatus.CREATED);
     }
 
-    /*--------- 14. Listar reservas por estado específico (ADMIN o RECEPCIONIST) ---------------*/
+    /*--------- 14 Listar reservas por estado (ADMIN, RECEPCIONIST o GUEST filtrado) ---------------*/
     @GetMapping("/state/{state}")
-    @PreAuthorize("hasAnyRole('ADMIN', 'RECEPCIONIST')")
-    @Operation(summary = "Listar reservas por estado de reserva", description = "Filtra las reservas según su BookingState (PENDING, CONFIRMED, CHECKED_IN, etc.)")
+    @PreAuthorize("hasAnyRole('ADMIN', 'RECEPCIONIST', 'GUEST')")
+    @Operation(summary = "Listar reservas por estado", description = "Admin/Recepcionista ve todas las del estado; Guest ve solo las suyas en ese estado.")
     public ResponseEntity<List<BookingDTOResponse>> getBookingsByState(@PathVariable BookingState state) {
-        List<BookingDTOResponse> bookings = bookingService.getBookingsByState(state);
+        List<BookingDTOResponse> bookings = bookingService.getBookingsByStateForCurrentUser(state);
         return ResponseEntity.ok(bookings);
     }
 

@@ -7,7 +7,6 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -21,4 +20,8 @@ public interface BookingRepository extends JpaRepository<BookingEntity,Long> {
 
     @Query("SELECT b FROM BookingEntity b WHERE b.userEntity.username = :username OR b.userBookingEntity.username = :username")
     List<BookingEntity> findByUsername(@Param("username") String username);
+
+    // --- NUEVO: Buscar por estado filtrando además por el usuario actual ---
+    @Query("SELECT b FROM BookingEntity b WHERE b.state = :state AND (b.userEntity.username = :username OR b.userBookingEntity.username = :username)")
+    List<BookingEntity> findByStateAndUsername(@Param("state") BookingState state, @Param("username") String username);
 }

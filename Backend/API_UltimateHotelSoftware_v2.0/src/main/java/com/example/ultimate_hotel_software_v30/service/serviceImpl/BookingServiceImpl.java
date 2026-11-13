@@ -658,6 +658,34 @@ public class BookingServiceImpl implements BookingService {
         return bookingMapper.toBookingDTOResponse(savedBooking);
     }
 
+    @Override
+    @Transactional(readOnly = true)
+    public List<BookingDTOResponse> getBookingsByStateForCurrentUser(BookingState state) {
+        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        String currentUsername = "";
+        if (principal instanceof UserDetails) {
+            currentUsername = ((UserDetails) principal).getUsername();
+        }
 
+        // Validar si el usuario actual tiene permisos de administración o recepción
+        boolean isAdminOrReceptionist = SecurityContextHolder.getContext().getAuthentication().getAuthorities().stream()
+                .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN") ||
+                        a.getAuthority().equals("ROLE_RECEPCIONIST") ||
+                        a.getAuthority().equals("ADMIN") ||
+                        a.getAuthority().equals("RECEPCIONIST"));
+
+        List<BookingEntity> bookings;
+        if (isAdminOrReceptionist) {
+            // Admin y Recepción ven todas las reservas en este estado
+            bookings = bookingRepository.findByState(state);
+        } else {
+            // Los huéspedes (GUEST) solo ven las suyas asociadas en este estado (Usando el nuevo método del repositorio)
+            bookings = bookingRepository.findByStateAndUsername(state, currentUsername);
+        }
+
+        return bookings.stream()
+                .map(bookingMapper::toBookingDTOResponse)
+                .toList();
+    }
 
 }

@@ -33,12 +33,20 @@ public class RoomAttentionServiceImpl implements RoomAttentionService {
     private final RoomAttentionMapper roomAttentionMapper;
 
     @Override
+    @Transactional(readOnly = true)
+    public List<RoomAttentionDTOResponse> getAllAttentions() {
+        return roomAttentionRepository.findAll().stream()
+                .map(roomAttentionMapper::toRoomAttentionDTOResponse)
+                .collect(Collectors.toList());
+    }
+
+    @Override
     @Transactional
     public RoomAttentionDTOResponse addAttention(RoomAttentionDTORequest request) {
         String currentUsername = SecurityContextHolder.getContext().getAuthentication().getName();
 
-        UserEntity employee = userRepository.findByUsername(currentUsername)
-                .orElseThrow(() -> new RuntimeException("Authenticated employee not found"));
+        UserEntity currentUser = userRepository.findByUsername(currentUsername)
+                .orElseThrow(() -> new RuntimeException("Authenticated user not found"));
 
         BookingEntity bookingEntity = bookingRepository.findById(request.getBookingId())
                 .orElseThrow(() -> new RuntimeException("Booking not found"));
@@ -61,7 +69,7 @@ public class RoomAttentionServiceImpl implements RoomAttentionService {
                 .item(item)
                 .quantity(request.getQuantity())
                 .unitPrice(item.getUnitPrice())
-                .userEntity(employee)
+                .userEntity(currentUser)
                 .build();
 
         RoomAttentionEntity saved = roomAttentionRepository.save(attention);

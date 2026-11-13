@@ -20,22 +20,29 @@ public class RoomAttentionController {
 
     private final RoomAttentionService roomAttentionService;
 
-    // Tanto Administradores como Recepcionistas pueden ver los consumos de una reserva (Booking)
-    @GetMapping("/booking/{bookingId}")
+    // --- NUEVO: Obtiene TODAS las atenciones del sistema (Para la vista global de Servicio al Cuarto) ---
+    @GetMapping
     @PreAuthorize("hasAnyAuthority('ADMIN', 'ROLE_ADMIN', 'RECEPCIONIST', 'ROLE_RECEPCIONIST')")
+    public ResponseEntity<List<RoomAttentionDTOResponse>> getAllAttentions() {
+        return ResponseEntity.ok(roomAttentionService.getAllAttentions());
+    }
+
+    // Permitimos a ADMIN, RECEPCIONIST y GUEST consultar los consumos de una reserva específica
+    @GetMapping("/booking/{bookingId}")
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'ROLE_ADMIN', 'RECEPCIONIST', 'ROLE_RECEPCIONIST', 'GUEST', 'ROLE_GUEST')")
     public ResponseEntity<List<RoomAttentionDTOResponse>> getAttentionsByBookingId(@PathVariable Long bookingId) {
         return ResponseEntity.ok(roomAttentionService.getAttentionsByBookingId(bookingId));
     }
 
-    // Tanto Administradores como Recepcionistas pueden registrar un consumo o servicio
+    // Permitir a Administradores, Recepcionistas y Huéspedes registrar un consumo o servicio
     @PostMapping
-    @PreAuthorize("hasAnyAuthority('ADMIN', 'ROLE_ADMIN', 'RECEPCIONIST', 'ROLE_RECEPCIONIST')")
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'ROLE_ADMIN', 'RECEPCIONIST', 'ROLE_RECEPCIONIST', 'GUEST', 'ROLE_GUEST')")
     public ResponseEntity<RoomAttentionDTOResponse> addAttention(@Valid @RequestBody RoomAttentionDTORequest request) {
         RoomAttentionDTOResponse response = roomAttentionService.addAttention(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
-    // Tanto Administradores como Recepcionistas pueden eliminar cargos cargados por error
+    // Solo Administradores y Recepcionistas pueden eliminar cargos
     @DeleteMapping("/{id}")
     @PreAuthorize("hasAnyAuthority('ADMIN', 'ROLE_ADMIN', 'RECEPCIONIST', 'ROLE_RECEPCIONIST')")
     public ResponseEntity<Void> removeAttention(@PathVariable Long id) {
@@ -44,6 +51,7 @@ public class RoomAttentionController {
     }
 
     @PatchMapping("/{id}/deliver")
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'ROLE_ADMIN', 'RECEPCIONIST', 'ROLE_RECEPCIONIST')")
     @Operation(summary = "Marcar una atención o consumo como entregado")
     public ResponseEntity<RoomAttentionDTOResponse> markAsDelivered(@PathVariable Long id) {
         return ResponseEntity.ok(roomAttentionService.markAsDelivered(id));

@@ -26,14 +26,14 @@ public class ItemController {
     private final ItemService itemService;
 
     @GetMapping
-    @PreAuthorize("hasAnyAuthority('ADMIN', 'ROLE_ADMIN', 'RECEPCIONIST', 'ROLE_RECEPCIONIST')")
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'ROLE_ADMIN', 'RECEPCIONIST', 'ROLE_RECEPCIONIST', 'GUEST', 'ROLE_GUEST')")
     @Operation(summary = "Listar todos los ítems")
     public ResponseEntity<List<ItemDTOResponse>> getAllItems() {
         return ResponseEntity.ok(itemService.getAllItems());
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("hasAnyAuthority('ADMIN', 'ROLE_ADMIN', 'RECEPCIONIST', 'ROLE_RECEPCIONIST')")
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'ROLE_ADMIN', 'RECEPCIONIST', 'ROLE_RECEPCIONIST', 'GUEST', 'ROLE_GUEST')")
     @Operation(summary = "Obtener un ítem por su ID")
     public ResponseEntity<ItemDTOResponse> getItemById(@PathVariable Long id) {
         return ResponseEntity.ok(itemService.findById(id));
@@ -69,7 +69,7 @@ public class ItemController {
     }
 
     @GetMapping("/{id}/image")
-    @PreAuthorize("hasAnyAuthority('ADMIN', 'ROLE_ADMIN', 'RECEPCIONIST', 'ROLE_RECEPCIONIST')")
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'ROLE_ADMIN', 'RECEPCIONIST', 'ROLE_RECEPCIONIST', 'GUEST', 'ROLE_GUEST')")
     @Operation(summary = "Obtener la imagen de un ítem por ID")
     public ResponseEntity<byte[]> getItemImage(@PathVariable Long id) {
         byte[] image = itemService.getItemImage(id);

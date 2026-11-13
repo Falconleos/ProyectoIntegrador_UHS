@@ -6,6 +6,9 @@ import com.example.ultimate_hotel_software_v30.dto.response.RoomAttentionDTOResp
 import java.util.List;
 
 public interface RoomAttentionService {
+    // --- NUEVO: Obtiene todas las atenciones a nivel global ---
+    List<RoomAttentionDTOResponse> getAllAttentions();
+
     RoomAttentionDTOResponse addAttention(RoomAttentionDTORequest request);
     void removeAttention(Long id);
     List<RoomAttentionDTOResponse> getAttentionsByBookingId(Long bookingId);

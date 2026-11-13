@@ -21,7 +21,7 @@ public interface BookingService {
 
     List<BookingDTOResponse> getBookings(Boolean active);
 
-    // --- NUEVO: Obtener las reservas del usuario autenticado ---
+    // --- Obtener las reservas del usuario autenticado ---
     List<BookingDTOResponse> getMyBookings();
 
     BookingDTOResponse createBooking(BookingDTORequest request);
@@ -46,6 +46,9 @@ public interface BookingService {
 
     List<BookingDTOResponse> getBookingsByState(BookingState state);
 
+    // --- NUEVO: Filtrar por estado considerando el rol del usuario actual (Admin/Recepcionist vs Guest) ---
+    List<BookingDTOResponse> getBookingsByStateForCurrentUser(BookingState state);
+
     BookingDTOResponse checkInBooking(Long bookingId, String dni);
 
     BookingDTOResponse assignUserToBooking(Long bookingId, Long userId);
@@ -58,5 +61,4 @@ public interface BookingService {
     PaymentDTOResponse addPaymentToBooking(PaymentDTORequest request);
 
     BookingDTOResponse checkInByQr(String qrBooking);
-
 }
