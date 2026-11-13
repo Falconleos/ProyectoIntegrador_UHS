@@ -120,6 +120,34 @@ export class CreditNoteListComponent implements OnInit {
     this.creditNotes.set(filtered);
   }
 
+  // --- Método para cambiar el estado de pago (paid) ---
+  togglePaidStatus(id: number): void {
+    this.creditNoteService.togglePaidStatus(id).subscribe({
+      next: (updatedNote) => {
+        console.log('Estado de pago actualizado para la nota:', updatedNote);
+
+        // Actualizamos en la caché principal manteniendo los datos de la cuenta enriquecidos
+        const updateList = (list: any[]) =>
+          list.map(note => {
+            if (note.id === id) {
+              return {
+                ...note,
+                paid: updatedNote.paid
+              };
+            }
+            return note;
+          });
+
+        this.allCreditNotesCache.update(updateList);
+        this.creditNotes.update(updateList);
+      },
+      error: (err: HttpErrorResponse) => {
+        console.error('Error al actualizar el estado de pago:', err);
+        this.errorMessage.set('No se pudo actualizar el estado de pago de la nota de crédito.');
+      }
+    });
+  }
+
   viewDetail(id: number): void {
     console.log('Ver detalle de nota de crédito ID:', id);
     const note = this.creditNotes().find(n => n.id === id);

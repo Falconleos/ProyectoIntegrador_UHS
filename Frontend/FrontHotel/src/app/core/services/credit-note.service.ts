@@ -7,12 +7,17 @@ import { CreditNoteDtoResponse } from '../../models/CreditNote-model';
   providedIn: 'root'
 })
 export class CreditNoteService {
-  // En tu credit-note.service.ts
-private apiUrl = 'http://localhost:8080/private/credit-notes'; // Asegúrate de que tenga /private/
+
+  private apiUrl = 'http://localhost:8080/private/credit-notes';
 
   constructor(private http: HttpClient) {}
 
   getAllCreditNotes(): Observable<CreditNoteDtoResponse[]> {
     return this.http.get<CreditNoteDtoResponse[]>(this.apiUrl, { withCredentials: true });
+  }
+
+  // Método para alternar el estado paid de la nota de crédito
+  togglePaidStatus(id: number): Observable<CreditNoteDtoResponse> {
+    return this.http.patch<CreditNoteDtoResponse>(`${this.apiUrl}/${id}/toggle-paid`, {}, { withCredentials: true });
   }
 }

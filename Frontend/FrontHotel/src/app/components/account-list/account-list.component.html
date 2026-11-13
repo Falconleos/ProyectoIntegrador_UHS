@@ -58,14 +58,32 @@
               <td class="fw-bold text-nowrap" style="color: #34d399;">${{ account.paidAmount | number:'1.2-2' }}</td>
               <td class="fw-bold text-nowrap" style="color: #fca5a5;">${{ account.remainingBalance | number:'1.2-2' }}</td>
               <td>
-                @if (account.isPaid) {
-                  <span class="badge" style="background: rgba(52, 211, 153, 0.15); color: #34d399; border: 1px solid rgba(52, 211, 153, 0.3);">
-                    <i class="bi bi-check-circle me-1"></i> Pagado
-                  </span>
-                } @else {
-                  <span class="badge" style="background: rgba(251, 191, 36, 0.15); color: #fbbf24; border: 1px solid rgba(251, 191, 36, 0.3);">
-                    <i class="bi bi-clock me-1"></i> Pendiente
-                  </span>
+                @switch (account.state) {
+                  @case ('OPEN') {
+                    <span class="badge" style="background: rgba(251, 191, 36, 0.15); color: #fbbf24; border: 1px solid rgba(251, 191, 36, 0.3);">
+                      <i class="bi bi-clock me-1"></i> Abierta
+                    </span>
+                  }
+                  @case ('PAID') {
+                    <span class="badge" style="background: rgba(52, 211, 153, 0.15); color: #34d399; border: 1px solid rgba(52, 211, 153, 0.3);">
+                      <i class="bi bi-check-circle me-1"></i> Pagada
+                    </span>
+                  }
+                  @case ('CANCELLED') {
+                    <span class="badge" style="background: rgba(239, 68, 68, 0.15); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.3);">
+                      <i class="bi bi-x-circle me-1"></i> Cancelada
+                    </span>
+                  }
+                  @case ('REFUNDED') {
+                    <span class="badge" style="background: rgba(56, 189, 248, 0.15); color: #38bdf8; border: 1px solid rgba(56, 189, 248, 0.3);">
+                      <i class="bi bi-arrow-counterclockwise me-1"></i> Reembolsada
+                    </span>
+                  }
+                  @default {
+                    <span class="badge bg-secondary">
+                      {{ account.state || 'N/D' }}
+                    </span>
+                  }
                 }
               </td>
               <td style="text-align: right; padding-right: 1.5rem;">

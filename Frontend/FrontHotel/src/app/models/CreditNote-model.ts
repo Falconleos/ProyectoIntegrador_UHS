@@ -1,9 +1,7 @@
-
 export interface CreditNoteDtoRequest {
   accountId: number;
   amount: number;
 }
-
 
 export interface CreditNoteDtoResponse {
   id: number;
@@ -11,4 +9,5 @@ export interface CreditNoteDtoResponse {
   amount: number;
   reason: string;
   issuedAt: string;
+  paid: boolean;
 }

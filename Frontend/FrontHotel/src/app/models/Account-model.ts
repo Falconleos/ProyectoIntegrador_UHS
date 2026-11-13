@@ -1,4 +1,6 @@
-import {PaymentDTOResponse} from './Payment-model'
+import { PaymentDTOResponse } from './Payment-model';
+
+export type AccountState = 'OPEN' | 'PAID' | 'CANCELLED' | 'REFUNDED';
 
 export interface AccountDTOResponse {
   id: number;
@@ -10,6 +12,7 @@ export interface AccountDTOResponse {
   remainingBalance?: number;       // Calculado o mapeado en la vista/backend
   isPaid: boolean;
   adjustmentPercentage: number;
+  state: AccountState;             // Añadido para reflejar el estado financiero (OPEN, PAID, CANCELLED, REFUNDED)
   payments: PaymentDTOResponse[];
   user?: {
     name: string;

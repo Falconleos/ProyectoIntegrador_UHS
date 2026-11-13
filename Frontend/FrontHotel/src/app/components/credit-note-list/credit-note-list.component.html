@@ -32,6 +32,7 @@
               <th>Cliente</th>
               <th>DNI</th>
               <th>Monto</th>
+              <th>Estado (Paid)</th>
               <th>Fecha de Emisión</th>
               <th>Motivo</th>
               <th>Acciones</th>
@@ -47,6 +48,14 @@
                 </td>
                 <td>{{ note.account?.user?.dni || 'N/D' }}</td>
                 <td class="fw-bold text-success">${{ note.amount }}</td>
+                <td>
+                  <button 
+                    class="btn btn-sm {{ note.paid ? 'btn-success' : 'btn-outline-secondary' }}"
+                    (click)="togglePaidStatus(note.id)"
+                    title="Hacer clic para alternar estado de pago">
+                    {{ note.paid ? 'Pagado' : 'Pendiente' }}
+                  </button>
+                </td>
                 <td>{{ note.issuedAt || note.issueDate }}</td>
                 <td class="text-truncate" style="max-width: 200px;" title="{{ note.reason }}">{{ note.reason }}</td>
                 <td>
