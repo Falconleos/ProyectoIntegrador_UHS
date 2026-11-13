@@ -14,4 +14,9 @@ public class CreditNoteDTOResponse {
     private String reason;
     private LocalDateTime issuedAt;
     private Boolean paid;
+
+    // Nuevos campos para mostrar el titular real de la reserva
+    private String clientName;
+    private String clientLastName;
+    private String username;
 }

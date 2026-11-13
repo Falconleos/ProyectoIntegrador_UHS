@@ -2,7 +2,9 @@ package com.example.ultimate_hotel_software_v30.service.serviceImpl;
 
 import com.example.ultimate_hotel_software_v30.dto.response.CreditNoteDTOResponse;
 import com.example.ultimate_hotel_software_v30.model.AccountEntity;
+import com.example.ultimate_hotel_software_v30.model.BookingEntity;
 import com.example.ultimate_hotel_software_v30.model.CreditNoteEntity;
+import com.example.ultimate_hotel_software_v30.model.UserEntity;
 import com.example.ultimate_hotel_software_v30.repository.CreditNoteRepository;
 import com.example.ultimate_hotel_software_v30.service.CreditNoteService;
 import lombok.RequiredArgsConstructor;
@@ -85,6 +87,25 @@ public class CreditNoteServiceImpl implements CreditNoteService {
     }
 
     private CreditNoteDTOResponse mapToResponse(CreditNoteEntity entity) {
+        BookingEntity booking = (entity.getAccount() != null) ? entity.getAccount().getBookingEntity() : null;
+
+        String clientName = null;
+        String clientLastName = null;
+        String clientUsername = null;
+
+        if (booking != null) {
+            UserEntity associatedUser = booking.getUserEntity();
+
+            if (associatedUser != null) {
+                clientName = associatedUser.getName();
+                clientLastName = associatedUser.getSurname();
+                clientUsername = associatedUser.getUsername();
+            } else {
+                clientName = booking.getGuestFirstName();
+                clientLastName = booking.getGuestLastName();
+            }
+        }
+
         return CreditNoteDTOResponse.builder()
                 .id(entity.getId())
                 .accountId(entity.getAccount() != null ? entity.getAccount().getId() : null)
@@ -92,6 +113,9 @@ public class CreditNoteServiceImpl implements CreditNoteService {
                 .reason(entity.getReason())
                 .issuedAt(entity.getIssuedAt())
                 .paid(entity.getPaid())
+                .clientName(clientName)
+                .clientLastName(clientLastName)
+                .username(clientUsername)
                 .build();
     }
 }

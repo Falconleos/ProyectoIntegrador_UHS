@@ -428,8 +428,27 @@ public class BookingServiceImpl implements BookingService {
             throw new DisabledUserException("Cannot assign a disabled user to a booking.");
         }
 
+        // 1. Asignamos el usuario titular a la reserva
         booking.setUserEntity(user);
         BookingEntity savedBooking = bookingRepository.save(booking);
+
+        // 2. Verificamos si ya posee una cuenta financiera asociada
+        boolean accountExists = accountRepository.findByBookingEntity_Id(savedBooking.getId()).isPresent();
+
+        // 3. Si no tiene cuenta y la reserva tiene un precio total, la creamos automáticamente
+        if (!accountExists && savedBooking.getTotalPrice() != null) {
+            AccountEntity account = AccountEntity.builder()
+                    .bookingEntity(savedBooking)
+                    .baseAmount(savedBooking.getTotalPrice())
+                    .servicesTotal(0.0)
+                    .paidAmount(0.0)
+                    .isPaid(false)
+                    .adjustmentPercentage(0)
+                    .build();
+
+            accountRepository.save(account);
+        }
+
         return bookingMapper.toBookingDTOResponse(savedBooking);
     }
 

@@ -2,6 +2,7 @@ package com.example.ultimate_hotel_software_v30.service.serviceImpl;
 
 import com.example.ultimate_hotel_software_v30.dto.request.PaymentDTORequest;
 import com.example.ultimate_hotel_software_v30.dto.response.PaymentDTOResponse;
+import com.example.ultimate_hotel_software_v30.enums.AccountState;
 import com.example.ultimate_hotel_software_v30.mapper.PaymentMapper;
 import com.example.ultimate_hotel_software_v30.model.AccountEntity;
 import com.example.ultimate_hotel_software_v30.model.PaymentEntity;
@@ -12,6 +13,7 @@ import com.example.ultimate_hotel_software_v30.repository.UserRepository;
 import com.example.ultimate_hotel_software_v30.service.PaymentService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.authentication.AccountStatusException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -32,6 +34,12 @@ public class PaymentServiceImpl implements PaymentService {
     public PaymentDTOResponse addPaymentToAccount(PaymentDTORequest request, String currentUsername) {
         AccountEntity account = accountRepository.findById(request.getAccountId())
                 .orElseThrow(() -> new EntityNotFoundException("Cuenta no encontrada con ID: " + request.getAccountId()));
+
+        // --- VALIDACIÓN DE ESTADO DE CUENTA ---
+        if (account.getState() != AccountState.OPEN) {
+            throw new AccountStatusException("No se pueden registrar pagos en una cuenta que no se encuentra abierta (Estado actual: " + account.getState() + ")") {
+            };
+        }
 
         UserEntity user = userRepository.findByUsername(currentUsername)
                 .orElseThrow(() -> new EntityNotFoundException("Usuario no encontrado: " + currentUsername));

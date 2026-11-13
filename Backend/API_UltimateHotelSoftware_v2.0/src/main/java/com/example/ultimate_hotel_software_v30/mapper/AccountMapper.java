@@ -12,10 +12,10 @@ public interface AccountMapper {
     @Mapping(target = "checkInDate", source = "bookingEntity.checkIn")
     @Mapping(target = "checkOutDate", source = "bookingEntity.checkOut")
     @Mapping(target = "roomNumber", source = "bookingEntity.roomEntity.number")
-    @Mapping(target = "user.name", source = "bookingEntity.guestFirstName")
-    @Mapping(target = "user.surname", source = "bookingEntity.guestLastName")
-    @Mapping(target = "user.dni", source = "bookingEntity.userEntity.dni")
-    @Mapping(target = "state", expression = "java(entity.getState() != null ? entity.getState().name() : null)")
-    AccountDTOResponse toAccountDTOResponse(AccountEntity entity);
+    @Mapping(target = "user.name", expression = "java(accountEntity.getBookingEntity() != null && accountEntity.getBookingEntity().getUserEntity() != null ? accountEntity.getBookingEntity().getUserEntity().getName() : (accountEntity.getBookingEntity() != null ? accountEntity.getBookingEntity().getGuestFirstName() : null))")
+    @Mapping(target = "user.surname", expression = "java(accountEntity.getBookingEntity() != null && accountEntity.getBookingEntity().getUserEntity() != null ? accountEntity.getBookingEntity().getUserEntity().getSurname() : (accountEntity.getBookingEntity() != null ? accountEntity.getBookingEntity().getGuestLastName() : null))")
+    @Mapping(target = "user.dni", expression = "java(accountEntity.getBookingEntity() != null && accountEntity.getBookingEntity().getUserEntity() != null ? accountEntity.getBookingEntity().getUserEntity().getDni() : null)")
+    @Mapping(target = "state", expression = "java(accountEntity.getState() != null ? accountEntity.getState().name() : null)")
+    AccountDTOResponse toAccountDTOResponse(AccountEntity accountEntity);
 
 }
