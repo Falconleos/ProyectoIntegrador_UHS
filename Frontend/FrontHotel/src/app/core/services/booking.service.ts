@@ -45,6 +45,10 @@ export class BookingService {
     return this.http.get<BookingCancellationDtoResponse[]>(this.cancellationUrl, { withCredentials: true });
   }
 
+  assignUserToBooking(bookingId: number, userId: number): Observable<BookingDtoResponse> {
+    return this.http.patch<BookingDtoResponse>(`${this.apiUrl}/${bookingId}/assign-user/${userId}`, {}, { withCredentials: true });
+  }
+
   // --- MÉTODOS PARA SEÑAS DE RESERVAS ---
 
   addPaymentToBooking(request: PaymentDTORequest): Observable<PaymentDTOResponse> {

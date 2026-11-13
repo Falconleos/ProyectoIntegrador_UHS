@@ -34,17 +34,23 @@ export interface BookingDtoResponse {
   
   name?: string;
   surname?: string;
-  username?: string;
+  username?: string; 
 
   qrBooking?: string;
   observation?: string;
 
-  userBookingUsername?: string;
+  userBookingUsername?: string;   // Empleado que registró
   userCheckInUsername?: string;
 
   roomNumber: number; 
   totalPrice: number;
-  createdAt: string;       
+  createdAt: string;        
+}
+
+export interface BookingWithAccount extends BookingDtoResponse {
+  hasAccount?: boolean;
+  accountId?: number;
+  selectedUserId?: number | null;
 }
 
 export interface BookingCancellationDtoRequest {

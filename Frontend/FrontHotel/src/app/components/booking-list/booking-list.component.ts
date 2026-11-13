@@ -7,11 +7,13 @@ import { BookingDtoResponse } from '../../models/Booking-model';
 import { PaymentDTOResponse } from '../../models/Payment-model'; 
 import { AuthService } from '../../core/services/auth.service';
 import { AccountService } from '../../core/services/account.service';
+import { UserService } from '../../core/services/user.service';
 import * as QRCode from 'qrcode';
 
 export interface BookingWithAccount extends BookingDtoResponse {
   hasAccount?: boolean;
   accountId?: number;
+  selectedUserId?: number | null; // Para almacenar temporalmente el ID del select de titular
 }
 
 @Component({
@@ -25,12 +27,12 @@ export interface BookingWithAccount extends BookingDtoResponse {
 export class BookingListComponent implements OnInit {
   // --- Estados con Signals ---
   bookings = signal<BookingWithAccount[]>([]);
+  users = signal<any[]>([]); // Lista de usuarios para el select del titular
   loading = signal<boolean>(true);
   errorMessage = signal<string>('');
   canModify = signal<boolean>(false);
-  isGuest = signal<boolean>(false); // Bandera para identificar si es huésped
+  isGuest = signal<boolean>(false);
 
-  // Bandera para rastrear qué IDs están en proceso de cancelación y evitar doble envío
   cancellingIds = signal<number[]>([]);
 
   selectedBookingForPayment = signal<BookingDtoResponse | null>(null);
@@ -45,12 +47,48 @@ export class BookingListComponent implements OnInit {
     private bookingService: BookingService,
     private authService: AuthService,
     private accountService: AccountService,
+    private userService: UserService,
     private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
     this.checkUserRole();
     this.loadBookings();
+    this.loadUsers();
+  }
+
+  loadUsers(): void {
+    if (this.canModify()) {
+      this.userService.getAll().subscribe({
+        next: (data) => {
+          this.users.set(Array.isArray(data) ? data : []);
+          this.cdr.markForCheck();
+        },
+        error: (err) => {
+          console.error('Error al cargar la lista de usuarios:', err);
+        }
+      });
+    }
+  }
+
+  // --- Asignar usuario titular seleccionado a la reserva ---
+  assignUser(booking: BookingWithAccount): void {
+    const userId = booking.selectedUserId;
+    if (!userId) {
+      alert('Por favor, selecciona un usuario válido.');
+      return;
+    }
+
+    this.bookingService.assignUserToBooking(booking.id, userId).subscribe({
+      next: () => {
+        alert(`Usuario titular asignado exitosamente a la reserva #${booking.id}`);
+        this.loadBookings();
+      },
+      error: (err) => {
+        console.error('Error al asignar usuario a la reserva:', err);
+        alert('No se pudo asignar el usuario a la reserva.');
+      }
+    });
   }
 
   checkUserRole(): void {
@@ -93,14 +131,13 @@ export class BookingListComponent implements OnInit {
     this.loading.set(true);
     this.errorMessage.set('');
     
-    // Si es admin/recepcionista ejecutamos el proceso de no-shows, si es guest vamos directo a filtrar sus reservas
     if (!this.isGuest()) {
       this.bookingService.processNoShows().subscribe({
         next: () => {
           this.fetchAndFilterBookings();
         },
         error: (err) => {
-          console.warn('No se pudo ejecutar el procesamiento automático de No-Shows, continuando carga...', err);
+          console.warn('No se pudo ejecutar el procesamiento automático de No-Shows...', err);
           this.fetchAndFilterBookings();
         }
       });
@@ -110,7 +147,6 @@ export class BookingListComponent implements OnInit {
   }
 
   private fetchAndFilterBookings(): void {
-    // Si es GUEST, consultamos las reservas del usuario autenticado; si es admin/recepcionista, todas.
     const requestObservable = this.isGuest() && this.bookingService.getMyBookings 
       ? this.bookingService.getMyBookings() 
       : this.bookingService.getAll();
@@ -118,8 +154,6 @@ export class BookingListComponent implements OnInit {
     requestObservable.subscribe({
       next: (data) => {
         const allBookings = Array.isArray(data) ? [...data] : [];
-        
-        // Si es guest, ya vienen filtradas por el backend, de lo contrario aplicamos los filtros de estados activos
         const filtered: BookingWithAccount[] = this.isGuest() 
           ? allBookings 
           : allBookings.filter((b) => b.state === 'PENDING' || b.state === 'CONFIRMED' || b.state === 'NO_SHOW');
@@ -246,7 +280,6 @@ export class BookingListComponent implements OnInit {
 
   loadBookingPayments(bookingId: number): void {
     this.loadingPayments.set(true);
-    
     this.accountService.getPaymentsByBookingId(bookingId).subscribe({
       next: (payments) => {
         this.bookingPayments.set(Array.isArray(payments) ? payments : []);

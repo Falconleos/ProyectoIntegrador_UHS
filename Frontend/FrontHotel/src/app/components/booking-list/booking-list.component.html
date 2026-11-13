@@ -50,7 +50,39 @@
           @for (booking of bookings(); track booking.id) {
             <tr>
               <td class="ps-4"><strong>#{{ booking.id }}</strong></td>
-              <td>{{ booking.guestFirstName }} {{ booking.guestLastName }}</td>
+              <!-- Columna Titular con lógica de asociación de usuario -->
+              <td>
+                <div>{{ booking.guestFirstName }} {{ booking.guestLastName }}</div>
+                
+                @if (booking.username) {
+                  <span class="badge badge-secondary" style="font-size: 0.7rem; margin-top: 2px;">
+                    <i class="bi bi-person-check me-1"></i>{{ booking.username }}
+                  </span>
+                } @else if (canModify()) {
+                  <div style="display: flex; gap: 5px; align-items: center; margin-top: 4px;">
+                    <select 
+                      class="form-select form-select-sm" 
+                      [(ngModel)]="booking.selectedUserId"
+                      style="font-size: 0.75rem; padding: 3px 6px;"
+                    >
+                      <option [ngValue]="null">Asociar usuario...</option>
+                      @for (u of users(); track u.id) {
+                        <option [ngValue]="u.id">{{ u.username || (u.name + ' ' + u.surname) }}</option>
+                      }
+                    </select>
+                    <button 
+                      type="button" 
+                      class="btn-primary" 
+                      style="padding: 3px 8px; font-size: 0.75rem;"
+                      (click)="assignUser(booking)"
+                      [disabled]="!booking.selectedUserId"
+                      title="Asignar usuario titular"
+                    >
+                      <i class="bi bi-check"></i>
+                    </button>
+                  </div>
+                }
+              </td>
               <td class="subtitle">{{ booking.guestPhone || '-' }}</td>
               <td>
                 @if (booking.roomNumber) {
@@ -63,6 +95,7 @@
               <td class="subtitle">{{ booking.checkOut }}</td>
               <td style="text-align: center;">{{ booking.guestCount }}</td>
               <td style="text-align: right;"><strong>${{ booking.totalPrice | number:'1.2-2' }}</strong></td>
+              <!-- Columna Registrada por (Intacta con el usuario empleado) -->
               <td>
                 @if (booking.userBookingUsername) {
                   <span class="badge badge-secondary">

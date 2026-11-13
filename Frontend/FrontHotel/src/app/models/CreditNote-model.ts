@@ -10,4 +10,7 @@ export interface CreditNoteDtoResponse {
   reason: string;
   issuedAt: string;
   paid: boolean;
+  clientName?: string;
+  clientLastName?: string;
+  username?: string;
 }

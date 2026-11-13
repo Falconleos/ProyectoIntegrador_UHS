@@ -1,28 +1,4 @@
-<div class="container-fluid paddingExtra">
-  <!-- Sección de Encabezado -->
-  <div class="header-section mb-4">
-    <h2 class="fw-bold text-main mb-1">Listado de Notas de Crédito</h2>
-    <p class="text-secondary">Consulte el registro de todas las notas de crédito emitidas en el sistema.</p>
-  </div>
-
-  <!-- Alertas de Carga / Error -->
-  @if (loading()) {
-    <div class="alert alert-info">Cargando información...</div>
-  }
-
-  @if (errorMessage()) {
-    <div class="alert alert-danger">{{ errorMessage() }}</div>
-  }
-
-  <!-- SECCIÓN: Tabla limpia de Notas de Crédito -->
-  <section>
-    @if (creditNotes().length === 0 && !loading()) {
-      <div class="text-secondary">
-        No hay notas de crédito registradas en el sistema.
-      </div>
-    }
-
-    @if (creditNotes().length > 0) {
+@if (creditNotes().length > 0) {
       <div class="table-responsive shadow-sm rounded">
         <table class="table align-middle mb-0">
           <thead>
@@ -30,7 +6,7 @@
               <th>ID</th>
               <th>Cuenta</th>
               <th>Cliente</th>
-              <th>DNI</th>
+              <th>Username</th>
               <th>Monto</th>
               <th>Estado (Paid)</th>
               <th>Fecha de Emisión</th>
@@ -44,9 +20,15 @@
                 <td>#{{ note.id }}</td>
                 <td>Cuenta #{{ note.accountId }}</td>
                 <td class="fw-semibold">
-                  {{ note.account?.user?.name || 'N/D' }} {{ note.account?.user?.surname || '' }}
+                  {{ note.clientName || 'N/D' }} {{ note.clientLastName || '' }}
                 </td>
-                <td>{{ note.account?.user?.dni || 'N/D' }}</td>
+                <td>
+                  @if (note.username) {
+                    <span class="badge badge-secondary">{{ note.username }}</span>
+                  } @else {
+                    <span class="text-secondary">Sin usuario</span>
+                  }
+                </td>
                 <td class="fw-bold text-success">${{ note.amount }}</td>
                 <td>
                   <button 
@@ -56,7 +38,7 @@
                     {{ note.paid ? 'Pagado' : 'Pendiente' }}
                   </button>
                 </td>
-                <td>{{ note.issuedAt || note.issueDate }}</td>
+                <td>{{ note.issuedAt }}</td>
                 <td class="text-truncate" style="max-width: 200px;" title="{{ note.reason }}">{{ note.reason }}</td>
                 <td>
                   <button class="btn btn-dark-solid btn-sm" (click)="viewDetail(note.id)">Detalle</button>
@@ -67,76 +49,3 @@
         </table>
       </div>
     }
-  </section>
-
-  <!-- MODAL DE DETALLE DE CANCELACIÓN (Glassmorphism Ordenado) -->
-  @if (showModal()) {
-    <div class="modal-backdrop-custom" (click)="closeModal()">
-      <div class="modal-card-custom p-4" (click)="$event.stopPropagation()">
-        <div class="d-flex justify-content-between align-items-center mb-4 border-bottom border-secondary pb-3">
-          <h5 class="fw-bold m-0 text-main">Detalle de Cancelación de Reserva</h5>
-        </div>
-
-        <!-- Estado de carga del detalle -->
-        @if (loadingDetail()) {
-          <div class="alert alert-info py-2 my-2">Buscando datos de la cancelación...</div>
-        }
-        
-        <!-- Mensaje de error si falla o no existe -->
-        @if (detailError()) {
-          <div class="alert alert-danger py-2 my-2">{{ detailError() }}</div>
-        }
-
-        <!-- Datos de la cancelación vinculada -->
-        @if (cancellationDetail(); as detail) {
-          @if (!loadingDetail()) {
-            <div class="detail-content mt-2">
-              <div class="row g-3">
-                <div class="col-6">
-                  <div class="detail-item-box">
-                    <span class="text-secondary d-small-label">ID de Cancelación</span>
-                    <strong class="text-main fs-6">#{{ detail.id }}</strong>
-                  </div>
-                </div>
-                <div class="col-6">
-                  <div class="detail-item-box">
-                    <span class="text-secondary d-small-label">Reserva Vinculada</span>
-                    <strong class="text-main fs-6">#{{ detail.bookingId }}</strong>
-                  </div>
-                </div>
-                <div class="col-12">
-                  <div class="detail-item-box">
-                    <span class="text-secondary d-small-label">Cliente (Registrado)</span>
-                    <strong class="text-main fs-6">{{ detail.nombreApellido || 'N/D' }}</strong>
-                  </div>
-                </div>
-                <div class="col-6">
-                  <div class="detail-item-box">
-                    <span class="text-secondary d-small-label">Empleado Responsable</span>
-                    <strong class="text-main fs-6">{{ detail.employeeUsername || 'N/D' }}</strong>
-                  </div>
-                </div>
-                <div class="col-6">
-                  <div class="detail-item-box">
-                    <span class="text-secondary d-small-label">Fecha de Cancelación</span>
-                    <strong class="text-main fs-6">{{ detail.cancellationDate || 'N/D' }}</strong>
-                  </div>
-                </div>
-                <div class="col-12">
-                  <div class="detail-item-box">
-                    <span class="text-secondary d-small-label mb-1">Motivo de Cancelación</span>
-                    <p class="text-main reason-box m-0">{{ detail.reason || 'Sin motivo especificado' }}</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          }
-        }
-
-        <div class="d-flex justify-content-end mt-4 pt-3 border-top border-secondary">
-          <button class="btn btn-dark-solid px-4 py-2" (click)="closeModal()">Cerrar</button>
-        </div>
-      </div>
-    </div>
-  }
-</div>

@@ -3,11 +3,9 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpErrorResponse } from '@angular/common/http';
 import { CreditNoteService } from '../../core/services/credit-note.service';
-import { AccountService } from '../../core/services/account.service';
+import { CreditNoteDtoResponse } from '../../models/CreditNote-model'; // Asegúrate de importar tu interfaz correcta
 
 import { BookingCancellationDtoResponse } from '../../models/Booking-model';
-import { forkJoin, of } from 'rxjs';
-import { catchError, map } from 'rxjs/operators';
 import { BookingService } from '../../core/services/booking.service';
 
 @Component({
@@ -20,8 +18,8 @@ import { BookingService } from '../../core/services/booking.service';
 })
 export class CreditNoteListComponent implements OnInit {
   // --- Estados con Signals ---
-  creditNotes = signal<any[]>([]);
-  allCreditNotesCache = signal<any[]>([]); // Caché para preservar la lista completa al realizar búsquedas
+  creditNotes = signal<CreditNoteDtoResponse[]>([]);
+  allCreditNotesCache = signal<CreditNoteDtoResponse[]>([]); // Caché para búsquedas
   loading = signal<boolean>(false);
   errorMessage = signal<string>('');
   searchCode = signal<string>('');
@@ -31,11 +29,10 @@ export class CreditNoteListComponent implements OnInit {
   loadingDetail = signal<boolean>(false);
   cancellationDetail = signal<BookingCancellationDtoResponse | null>(null);
   detailError = signal<string>('');
-  selectedCreditNote = signal<any>(null);
+  selectedCreditNote = signal<CreditNoteDtoResponse | null>(null);
 
   constructor(
     private creditNoteService: CreditNoteService,
-    private accountService: AccountService,
     private bookingService: BookingService
   ) {}
 
@@ -49,48 +46,11 @@ export class CreditNoteListComponent implements OnInit {
     
     this.creditNoteService.getAllCreditNotes().subscribe({
       next: (notes) => {
-        console.log("Notas de crédito crudas del backend:", notes);
-        
-        if (!notes || notes.length === 0) {
-          this.creditNotes.set([]);
-          this.allCreditNotesCache.set([]);
-          this.loading.set(false);
-          return;
-        }
-
-        const accountRequests = notes.map(note => {
-          const accountId = note.accountId;
-          if (!accountId) return of(note);
-
-          return this.accountService.getAccountById(accountId).pipe(
-            map(account => {
-              console.log(`Datos obtenidos para la cuenta ${accountId}:`, account);
-              return {
-                ...note,
-                account: account 
-              };
-            }),
-            catchError((err: HttpErrorResponse) => {
-              console.error(`Error al buscar la cuenta ${accountId}:`, err);
-              return of(note);
-            })
-          );
-        });
-
-        forkJoin(accountRequests).subscribe({
-          next: (enrichedNotes) => {
-            console.log("Notas de crédito enriquecidas finales:", enrichedNotes);
-            this.creditNotes.set(enrichedNotes);
-            this.allCreditNotesCache.set(enrichedNotes);
-            this.loading.set(false);
-          },
-          error: (err: HttpErrorResponse) => {
-            console.error('Error general en forkJoin:', err);
-            this.creditNotes.set(notes);
-            this.allCreditNotesCache.set(notes);
-            this.loading.set(false);
-          }
-        });
+        console.log("Notas de crédito cargadas del backend:", notes);
+        const data = Array.isArray(notes) ? notes : [];
+        this.creditNotes.set(data);
+        this.allCreditNotesCache.set(data);
+        this.loading.set(false);
       },
       error: (err: HttpErrorResponse) => {
         console.error('Error al cargar las notas de crédito:', err);
@@ -112,9 +72,9 @@ export class CreditNoteListComponent implements OnInit {
     const filtered = cache.filter(note => 
       String(note.id).includes(query) || 
       String(note.accountId).includes(query) ||
-      String(note.account?.name || '').toLowerCase().includes(query) ||
-      String(note.account?.surname || '').toLowerCase().includes(query) ||
-      String(note.account?.dni || '').includes(query)
+      String(note.clientName || '').toLowerCase().includes(query) ||
+      String(note.clientLastName || '').toLowerCase().includes(query) ||
+      String(note.username || '').toLowerCase().includes(query)
     );
 
     this.creditNotes.set(filtered);
@@ -126,8 +86,7 @@ export class CreditNoteListComponent implements OnInit {
       next: (updatedNote) => {
         console.log('Estado de pago actualizado para la nota:', updatedNote);
 
-        // Actualizamos en la caché principal manteniendo los datos de la cuenta enriquecidos
-        const updateList = (list: any[]) =>
+        const updateList = (list: CreditNoteDtoResponse[]) =>
           list.map(note => {
             if (note.id === id) {
               return {
@@ -159,20 +118,24 @@ export class CreditNoteListComponent implements OnInit {
     this.cancellationDetail.set(null);
     this.detailError.set('');
 
-    const targetBookingId = note.account?.bookingId;
-    if (!targetBookingId) {
+    // Si tu nota de crédito trae vinculado el bookingId en el DTO o en la cuenta, lo utilizas aquí.
+    // Si usas el accountId para buscar la reserva, asegúrate de tener el método o id disponible.
+    const targetAccountId = note.accountId;
+    if (!targetAccountId) {
       this.loadingDetail.set(false);
-      this.detailError.set('La cuenta asociada no contiene un identificador de reserva (bookingId).');
+      this.detailError.set('La nota de crédito no contiene un identificador de cuenta asociado.');
       return;
     }
 
+    // Opcional: si necesitas buscar por cuenta o si manejas la relación en el historial
     this.bookingService.getCancellationHistory().subscribe({
       next: (history: BookingCancellationDtoResponse[]) => {
-        const found = history.find(c => c.bookingId === targetBookingId);
+        // Buscamos en el historial (puedes ajustar el criterio si manejas accountId o bookingId)
+        const found = history.find(c => c.bookingId === targetAccountId); // Ajustar si es bookingId
         if (found) {
           this.cancellationDetail.set(found);
         } else {
-          this.detailError.set(`No se encontró un registro de cancelación vinculado a la reserva #${targetBookingId}.`);
+          this.detailError.set(`No se encontró un registro de cancelación vinculado.`);
         }
         this.loadingDetail.set(false);
       },
