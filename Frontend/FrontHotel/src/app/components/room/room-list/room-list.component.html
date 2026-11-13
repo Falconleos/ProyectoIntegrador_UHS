@@ -27,7 +27,6 @@
         </div>
 
         <!-- Botones de Acción (Crear, Editar, Eliminar) -->
-        <!-- Botones de Acción (Crear, Editar, Eliminar) -->
         <div class="room-type-actions">
           <button 
             type="button" 
@@ -37,6 +36,7 @@
             <i class="fa-solid fa-plus"></i>
           </button>
 
+          <!-- Enlace actualizado al componente de editar tipo de habitación con el ID dinámico -->
           <a
             [routerLink]="['/dashboard/room-type-edit', type.id]"
             class="btn-warning"
@@ -319,4 +319,4 @@
 
     </div>
   </div>
-}F
+}

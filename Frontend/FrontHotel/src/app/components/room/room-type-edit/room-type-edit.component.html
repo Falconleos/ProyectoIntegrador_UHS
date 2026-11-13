@@ -1,0 +1,83 @@
+<section class="edit-container">
+  <header class="edit-header">
+    <h2>Editar Tipo de Habitación</h2>
+    <a routerLink="/room-types" class="btn-back">Volver al listado</a>
+  </header>
+
+  @if (isLoading()) {
+    <div class="state-message">Cargando datos del tipo de habitación...</div>
+  } @else {
+    @if (errorMessage()) {
+      <div class="alert-error">{{ errorMessage() }}</div>
+    }
+
+    <form [formGroup]="editForm" (ngSubmit)="onSubmit()" class="edit-form">
+      <!-- Nombre -->
+      <div class="form-group">
+        <label for="name">Nombre *</label>
+        <input
+          id="name"
+          type="text"
+          formControlName="name"
+          placeholder="Ej: Suite Ejecutiva"
+        />
+        @if (editForm.controls.name.invalid && editForm.controls.name.touched) {
+          <small class="error-text">El nombre es obligatorio (mínimo 2 caracteres).</small>
+        }
+      </div>
+
+      <!-- Capacidad y Precio por noche -->
+      <div class="form-row">
+        <div class="form-group">
+          <label for="capacity">Capacidad (personas) *</label>
+          <input
+            id="capacity"
+            type="number"
+            min="1"
+            formControlName="capacity"
+          />
+          @if (editForm.controls.capacity.invalid && editForm.controls.capacity.touched) {
+            <small class="error-text">La capacidad debe ser al menos 1 persona.</small>
+          }
+        </div>
+
+        <div class="form-group">
+          <label for="pricePerNight">Precio por noche *</label>
+          <input
+            id="pricePerNight"
+            type="number"
+            step="0.01"
+            min="0.01"
+            formControlName="pricePerNight"
+          />
+          @if (editForm.controls.pricePerNight.invalid && editForm.controls.pricePerNight.touched) {
+            <small class="error-text">Ingresa un precio válido mayor a 0.</small>
+          }
+        </div>
+      </div>
+
+      <!-- Descripción -->
+      <div class="form-group">
+        <label for="description">Descripción</label>
+        <textarea
+          id="description"
+          rows="4"
+          formControlName="description"
+          placeholder="Detalles, comodidades o características del tipo de habitación..."
+        ></textarea>
+      </div>
+
+      <!-- Acciones -->
+      <div class="form-actions">
+        <a routerLink="/dashboard/room-list" class="btn-cancel">Cancelar</a>
+        <button
+          type="submit"
+          class="btn-submit"
+          [disabled]="editForm.invalid || isSubmitting()"
+        >
+          {{ isSubmitting() ? 'Guardando...' : 'Guardar Cambios' }}
+        </button>
+      </div>
+    </form>
+  }
+</section>

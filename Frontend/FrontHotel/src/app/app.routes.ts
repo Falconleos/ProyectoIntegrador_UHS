@@ -123,6 +123,10 @@ export const routes: Routes = [
             {
                 path:'bookings/:id/agregar-servicio', 
                 loadComponent:()=>import('./components/room-attention/room-attention-form/room-attention-form.component').then(m=>m.RoomAttentionFormComponent)
+            },
+            {
+                path:'room-type-edit/:id',
+                loadComponent:()=>import('./components/room/room-type-edit/room-type-edit.component').then(m=>m.RoomTypeEditComponent)
             }
             
         ]

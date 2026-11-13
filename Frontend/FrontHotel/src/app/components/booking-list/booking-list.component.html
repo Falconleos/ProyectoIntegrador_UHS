@@ -120,7 +120,7 @@
                     type="button"
                     class="btn-danger"
                     (click)="cancelBooking(booking.id)"
-                    [disabled]="!canModify() || booking.state === 'CHECKED_IN' || booking.state === 'CANCELLED' || isCancelling(booking.id) || !booking.hasAccount"
+                    [disabled]="!canModify() || booking.state === 'CHECKED_IN' || booking.state === 'CANCELLED' || isCancelling(booking.id)"
                     title="Cancelar"
                   >
                     <i class="bi bi-x-lg"></i>
