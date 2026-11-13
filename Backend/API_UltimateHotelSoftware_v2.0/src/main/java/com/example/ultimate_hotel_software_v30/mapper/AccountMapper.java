@@ -15,6 +15,7 @@ public interface AccountMapper {
     @Mapping(target = "user.name", source = "bookingEntity.guestFirstName")
     @Mapping(target = "user.surname", source = "bookingEntity.guestLastName")
     @Mapping(target = "user.dni", source = "bookingEntity.userEntity.dni")
+    @Mapping(target = "state", expression = "java(entity.getState() != null ? entity.getState().name() : null)")
     AccountDTOResponse toAccountDTOResponse(AccountEntity entity);
 
 }

@@ -221,7 +221,10 @@ public class BookingServiceImpl implements BookingService {
         if (hasUserEntity && hasPayments && wantsCreditNote) {
             System.out.println("[BACKEND DEBUG] Generando nota de crédito...");
             creditNoteService.createCreditNote(account, request.getReason());
-            account.setState(com.example.ultimate_hotel_software_v30.enums.AccountState.REFUNDED);
+            if (account != null) {
+                System.out.println("[BACKEND DEBUG] Cambiando estado de cuenta a REFUNDED...");
+                account.setState(com.example.ultimate_hotel_software_v30.enums.AccountState.REFUNDED);
+            }
         } else {
             if (account != null) {
                 System.out.println("[BACKEND DEBUG] Cambiando estado de cuenta a CANCELLED...");
@@ -231,7 +234,7 @@ public class BookingServiceImpl implements BookingService {
 
         if (account != null) {
             accountRepository.save(account);
-            System.out.println("[BACKEND DEBUG] Cuenta financiera guardada exitosamente.");
+            System.out.println("[BACKEND DEBUG] Cuenta financiera guardada exitosamente con estado: " + account.getState());
         }
 
         booking.setState(BookingState.CANCELLED);

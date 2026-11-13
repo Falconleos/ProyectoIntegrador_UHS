@@ -17,4 +17,6 @@ public interface CreditNoteService {
     List<CreditNoteDTOResponse> getCreditNotesByBookingId(Long bookingId);
 
     List<CreditNoteDTOResponse> getCreditNotesByUserId(Long userId);
+
+    CreditNoteDTOResponse togglePaidStatus(Long id);
 }

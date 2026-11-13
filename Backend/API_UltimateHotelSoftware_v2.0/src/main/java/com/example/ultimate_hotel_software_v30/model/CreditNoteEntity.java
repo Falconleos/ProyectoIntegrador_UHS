@@ -30,8 +30,15 @@ public class CreditNoteEntity {
     @Column(nullable = false)
     private LocalDateTime issuedAt;
 
+    @Column(nullable = false)
+    @Builder.Default
+    private Boolean paid = false; // Indica si la nota de crédito está pagada/saldada
+
     @PrePersist
     protected void onCreate() {
         issuedAt = LocalDateTime.now();
+        if (paid == null) {
+            paid = false;
+        }
     }
 }

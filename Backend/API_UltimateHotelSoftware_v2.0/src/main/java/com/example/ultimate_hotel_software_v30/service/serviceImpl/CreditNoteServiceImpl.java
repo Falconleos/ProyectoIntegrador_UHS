@@ -71,6 +71,19 @@ public class CreditNoteServiceImpl implements CreditNoteService {
                 .collect(Collectors.toList());
     }
 
+    @Override
+    @Transactional
+    public CreditNoteDTOResponse togglePaidStatus(Long id) {
+        CreditNoteEntity creditNote = creditNoteRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Nota de crédito no encontrada con ID: " + id));
+
+        // Invierte el estado actual (true a false o false a true)
+        creditNote.setPaid(!Boolean.TRUE.equals(creditNote.getPaid()));
+
+        CreditNoteEntity updatedNote = creditNoteRepository.save(creditNote);
+        return mapToResponse(updatedNote);
+    }
+
     private CreditNoteDTOResponse mapToResponse(CreditNoteEntity entity) {
         return CreditNoteDTOResponse.builder()
                 .id(entity.getId())
@@ -78,6 +91,7 @@ public class CreditNoteServiceImpl implements CreditNoteService {
                 .amount(entity.getAmount())
                 .reason(entity.getReason())
                 .issuedAt(entity.getIssuedAt())
+                .paid(entity.getPaid())
                 .build();
     }
 }

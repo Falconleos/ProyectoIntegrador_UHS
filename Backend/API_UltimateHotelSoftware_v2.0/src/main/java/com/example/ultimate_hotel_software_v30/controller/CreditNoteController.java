@@ -71,4 +71,14 @@ public class CreditNoteController {
     public ResponseEntity<List<CreditNoteDTOResponse>> getCreditNotesByUser(@PathVariable Long userId) {
         return ResponseEntity.ok(creditNoteService.getCreditNotesByUserId(userId));
     }
+
+    @PatchMapping("/{id}/toggle-paid")
+    @PreAuthorize("hasAnyRole('ADMIN', 'RECEPCIONIST')")
+    @Operation(
+            summary = "Alternar estado de pago de la nota de crédito",
+            description = "Cambia el estado de pago (paid) de una nota de crédito de true a false o viceversa."
+    )
+    public ResponseEntity<CreditNoteDTOResponse> togglePaidStatus(@PathVariable Long id) {
+        return ResponseEntity.ok(creditNoteService.togglePaidStatus(id));
+    }
 }

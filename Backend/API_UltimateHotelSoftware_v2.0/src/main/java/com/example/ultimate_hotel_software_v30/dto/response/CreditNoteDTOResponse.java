@@ -13,4 +13,5 @@ public class CreditNoteDTOResponse {
     private Double amount;
     private String reason;
     private LocalDateTime issuedAt;
+    private Boolean paid;
 }

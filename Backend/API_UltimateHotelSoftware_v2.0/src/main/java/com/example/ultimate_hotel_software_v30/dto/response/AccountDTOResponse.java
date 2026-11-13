@@ -37,6 +37,9 @@ public class AccountDTOResponse {
     @Schema(description = "Porcentaje de recargo (positivo) o descuento (negativo) aplicado a la cuenta", example = "0")
     private Integer adjustmentPercentage;
 
+    @Schema(description = "Estado actual de la cuenta (OPEN, PAID, CANCELLED, REFUNDED)", example = "OPEN")
+    private String state; // O puedes usar tu AccountState enum si lo compartes en los DTOs
+
     @Schema(description = "Datos del huésped principal")
     private UserDetailsDTO user;
 
