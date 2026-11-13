@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { CheckInDtoResponse } from '../../models/CheckIn-model';
-import { BookingDtoResponse } from '../../models/Booking-model';
+import { BookingCancellationDtoRequest, BookingCancellationDtoResponse, BookingDtoResponse } from '../../models/Booking-model';
 
 @Injectable({
   providedIn: 'root'
@@ -69,8 +69,8 @@ export class CheckInService {
     return this.http.patch<BookingDtoResponse>(`${this.bookingsUrl}/${bookingId}/assign-user/${userId}`, {}, { headers: this.getAuthHeaders() });
   }
 
-  interruptStay(id: number, reason: string): Observable<any> {
-    return this.http.put(`${this.apiUrl}/${id}/interrupt`, { reason }, { headers: this.getAuthHeaders() });
+  interruptStay(request: BookingCancellationDtoRequest): Observable<BookingCancellationDtoResponse> {
+    return this.http.post<BookingCancellationDtoResponse>(`${this.bookingsUrl}/interrupt`, request, { headers: this.getAuthHeaders() });
   }
 
   // --- NUEVO MÉTODO PARA CHECK-IN POR QR ---

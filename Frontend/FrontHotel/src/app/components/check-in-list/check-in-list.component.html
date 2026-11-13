@@ -60,8 +60,8 @@
               <span class="badge badge-primary">Hab. {{ booking.roomNumber }}</span>
             </div>
             
-            <h5 class="card-title" title="{{ booking.guestFirstName }} {{ booking.guestLastName }}">
-              {{ booking.guestFirstName }} {{ booking.guestLastName }}
+            <h5 class="card-title" title="{{ getGuestDisplayName(booking) }}">
+              {{ getGuestDisplayName(booking) }}
             </h5>
 
             <div class="card-info">
@@ -116,7 +116,7 @@
             @for (b of checkedInBookings(); track b.id) {
               <tr>
                 <td class="ps-4"><strong>#{{ b.id }}</strong></td>
-                <td>{{ b.guestFirstName }} {{ b.guestLastName }}</td>
+                <td>{{ getGuestDisplayName(b) }}</td>
                 <td><span class="badge badge-secondary">Hab. #{{ b.roomNumber }}</span></td>
                 <td class="subtitle">{{ b.checkIn }} al {{ b.checkOut }}</td>
                 <td style="text-align: right; padding-right: 1.5rem;">

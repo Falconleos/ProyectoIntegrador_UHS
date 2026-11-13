@@ -6,6 +6,7 @@ import { CheckInService } from '../../core/services/check-in.service';
 import { BookingDtoResponse } from '../../models/Booking-model';
 import { AuthService } from '../../core/services/auth.service';
 import { UserService } from '../../core/services/user.service';
+import { AccountService } from '../../core/services/account.service'; // <-- Importado para verificar cuentas y pagos
 import * as QRCode from 'qrcode';
 // @ts-ignore
 import jsQR from 'jsqr';
@@ -55,6 +56,7 @@ export class CheckInListComponent implements OnInit {
     private checkInService: CheckInService,
     private authService: AuthService,
     private userService: UserService,
+    private accountService: AccountService, // <-- Inyectado aquí
     private router: Router
   ) {}
 
@@ -62,6 +64,14 @@ export class CheckInListComponent implements OnInit {
     this.checkUserRole();
     this.loadData();
     this.loadUsers();
+  }
+
+  // --- NUEVA FUNCIÓN AUXILIAR PARA MOSTRAR EL NOMBRE CORRECTO ---
+  getGuestDisplayName(booking: BookingDtoResponse): string {
+    if (booking.name || booking.surname) {
+      return `${booking.name || ''} ${booking.surname || ''}`.trim();
+    }
+    return `${booking.guestFirstName || ''} ${booking.guestLastName || ''}`.trim();
   }
 
   checkUserRole(): void {
@@ -186,8 +196,6 @@ export class CheckInListComponent implements OnInit {
     );
 
     if (found) {
-      // En vez de abrir un modal QR estático, disparamos directamente el flujo normal de Check-In
-      // que valida el usuario asociado y abre el modal correspondiente si le falta.
       this.goToCreateCheckIn(found);
     } else {
       this.qrError.set('No se encontró ninguna reserva activa para hoy con el código QR decodificado.');
@@ -338,17 +346,42 @@ export class CheckInListComponent implements OnInit {
     this.newUser.update(u => ({ ...u, [field]: value }));
   }
 
+  // --- INTERRUPCIÓN DE ESTADÍA SIMPLIFICADA (SIN NOTA DE CRÉDITO) ---
   interruptStay(id: number): void {
     const reason = prompt('Motivo de interrupción de estadía:');
-    if (reason && reason.trim() !== '') {
-      this.checkInService.interruptStay(id, reason).subscribe({
-        next: () => {
-          alert('Estadía interrumpida.');
-          this.loadData();
-        },
-        error: (err: any) => alert(err.error?.message || 'Error al interrumpir.')
-      });
+    if (!reason || !reason.trim()) {
+      return;
     }
+
+    // 1. Consultamos la cuenta financiera asociada para validar si está pagada
+    this.accountService.getAccountByBookingId(id).subscribe({
+      next: (account: any) => {
+        if (!account || !account.isPaid) {
+          alert('Advertencia: No se puede interrumpir la estadía porque la cuenta asociada no está totalmente pagada.');
+          return;
+        }
+
+        const requestPayload = {
+          bookingId: id,
+          reason: reason.trim(),
+          issueCreditNote: false // Ya no aplica para interrupciones
+        };
+
+        // 2. Ejecutamos la interrupción de forma directa
+        this.checkInService.interruptStay(requestPayload).subscribe({
+          next: () => {
+            alert('Estadía interrumpida con éxito.');
+            this.loadData();
+          },
+          error: (err: any) => {
+            alert(err.error?.message || 'Error al intentar interrumpir la estadía.');
+          }
+        });
+      },
+      error: () => {
+        alert('No se pudo verificar la cuenta financiera asociada a la reserva.');
+      }
+    });
   }
 
   viewAccountPlaceholder(id: number): void { 
@@ -356,11 +389,6 @@ export class CheckInListComponent implements OnInit {
   }
 
   servicesPlaceholder(id: number): void { 
-    console.log('ID de reserva recibido:', id);
-    if (!id) {
-      console.log('¡El ID es nulo o indefinido!');
-      return;
-    }
     this.router.navigate([`/dashboard/bookings/${id}/servicios`]);
   }
 }
