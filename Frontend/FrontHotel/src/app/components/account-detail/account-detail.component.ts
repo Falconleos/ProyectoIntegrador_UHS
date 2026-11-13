@@ -22,6 +22,9 @@ export class AccountDetailComponent implements OnInit {
   checkInState = signal<string>('');
   loading = signal<boolean>(true);
   errorMessage = signal<string>('');
+  
+  // Control de permisos para edición (Admin / Recepción vs Guest)
+  canModify = signal<boolean>(false);
 
   // Formulario de pago
   paymentAmount = signal<number>(0);
@@ -41,10 +44,24 @@ export class AccountDetailComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
+    this.checkUserRole();
     const idParam = this.route.snapshot.paramMap.get('id');
     if (idParam) {
       this.checkInId = +idParam;
       this.loadData();
+    }
+  }
+
+  checkUserRole(): void {
+    const storedRoles = localStorage.getItem('role') || '';
+    try {
+      const roles = JSON.parse(storedRoles);
+      const hasAccess = Array.isArray(roles) 
+        ? roles.some((r: any) => ['ADMIN', 'ROLE_ADMIN', 'RECEPCIONIST', 'ROLE_RECEPCIONIST'].includes(typeof r === 'string' ? r : r.authority))
+        : ['ADMIN', 'ROLE_ADMIN', 'RECEPCIONIST', 'ROLE_RECEPCIONIST'].includes(storedRoles);
+      this.canModify.set(hasAccess);
+    } catch (e) {
+      this.canModify.set(storedRoles.includes('ADMIN') || storedRoles.includes('RECEPCIONIST'));
     }
   }
 
@@ -117,7 +134,7 @@ export class AccountDetailComponent implements OnInit {
 
   applyAdjustments(): void {
     const acc = this.account();
-    if (!acc || acc.isPaid) return;
+    if (!acc || acc.isPaid || !this.canModify()) return;
 
     this.accountService.updateAdjustmentPercentage(this.checkInId, this.adjustmentPercentage()).subscribe({
       next: (updatedAccount: AccountDTOResponse) => {
@@ -148,7 +165,7 @@ export class AccountDetailComponent implements OnInit {
 
   submitPayment(): void {
     const acc = this.account();
-    if (!acc || this.paymentAmount() <= 0 || acc.isPaid) return;
+    if (!acc || this.paymentAmount() <= 0 || acc.isPaid || !this.canModify()) return;
 
     const paymentPayload = {
       accountId: acc.id,

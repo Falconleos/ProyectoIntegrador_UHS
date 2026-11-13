@@ -7,21 +7,22 @@ export interface ItemDtoResponse {
 }
 
 export interface RoomAttentionDtoRequest {
-  bookingId: number; // Actualizado de checkInId a bookingId
+  bookingId: number;
   itemId: number;
   quantity: number;
 }
 
 export interface RoomAttentionDtoResponse {
   id: number;
-  bookingId: number; // Actualizado de checkInId a bookingId
+  bookingId: number;
   itemId: number;
-  itemDTOResponse: ItemDtoResponse; // Agregado el objeto de respuesta del ítem
+  itemDTOResponse: ItemDtoResponse;
   isService: boolean;
   quantity: number;
   unitPrice: number;
   subtotal: number;
   createdAt: string;
   employeeUsername: string;
+  roomNumber?: string; // Opcional por si el back no lo trae
   delivered: boolean;
 }

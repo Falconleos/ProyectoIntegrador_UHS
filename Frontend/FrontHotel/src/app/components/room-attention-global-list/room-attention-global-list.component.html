@@ -1,0 +1,126 @@
+<div class="container">
+  <!-- Encabezado -->
+  <div class="header-section">
+    <h2>
+      <i class="bi bi-bell-concierge me-2"></i> Servicio al Cuarto (Gestión Global)
+    </h2>
+  </div>
+
+  <hr class="divider" />
+
+  <!-- Mensaje de Error -->
+  @if (errorMessage()) {
+    <div class="alert alert-danger">
+      <i class="bi bi-exclamation-triangle me-2"></i> {{ errorMessage() }}
+    </div>
+  }
+
+  <!-- Estado de Carga -->
+  @if (loading()) {
+    <div class="alert alert-info">
+      <i class="bi bi-arrow-repeat spin me-2"></i> Cargando solicitudes de servicio al cuarto...
+    </div>
+  } @else {
+    @if (attentions().length === 0) {
+      <div class="alert alert-info">
+        <i class="bi bi-info-circle me-2"></i> No hay solicitudes de servicio al cuarto registradas en el sistema.
+      </div>
+    } @else {
+      <!-- Contenedor con Estilo Glass para la Tabla -->
+      <div class="glass-table-container">
+        <div class="table-responsive">
+          <table class="table-glass">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Habitación / Reserva</th>
+                <th>Descripción</th>
+                <th>Cant.</th>
+                <th>Subtotal</th>
+                <th>Registrado por</th>
+                <th>Fecha / Hora</th>
+                <th>Estado</th>
+                <th class="text-end">Acciones</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (item of attentions(); track item.id) {
+                <tr [ngClass]="{'row-pending': !item.delivered, 'row-delivered': item.delivered}">
+                  <td><strong class="text-subtitle">#{{ item.id }}</strong></td>
+                  <td>
+                    <div class="d-flex flex-column gap-1">
+                      <!-- Muestra la habitación si el back la envía de alguna forma, sino cae en 'N/A' o número de reserva -->
+                      <span class="badge" style="background: rgba(129, 140, 248, 0.2); color: #818cf8; font-weight: 600;">
+                        <i class="bi bi-door-open me-1"></i> Hab. {{ item.roomNumber || $any(item).bookingEntity?.room?.number || $any(item).room || 'N/A' }}
+                      </span>
+                      <span class="text-subtitle" style="font-size: 0.75rem;">Reserva #{{ item.bookingId }}</span>
+                    </div>
+                  </td>
+                  <td>
+                    <div class="text-main fw-medium">
+                      {{ item.itemDTOResponse.description || 'Consumo #' + item.id }}
+                    </div>
+                  </td>
+                  <td>
+                    <span class="text-main">{{ item.quantity }}</span>
+                  </td>
+                  <td>
+                    <span class="text-main fw-bold text-success">${{ item.subtotal | number:'1.2-2' }}</span>
+                  </td>
+                  <td>
+                    <span class="badge badge-secondary" style="font-size: 0.8rem;">
+                      <i class="bi bi-person-fill me-1"></i> {{ item.employeeUsername || 'Sistema' }}
+                    </span>
+                  </td>
+                  <td>
+                    <span class="text-subtitle" style="font-size: 0.85rem;">{{ item.createdAt || 'N/A' }}</span>
+                  </td>
+                  <td>
+                    @if (item.delivered) {
+                      <span class="badge badge-success-glass">
+                        <i class="bi bi-check-circle me-1"></i> Entregado
+                      </span>
+                    } @else {
+                      <span class="badge badge-warning-glass" style="background: rgba(251, 191, 36, 0.2); color: #fbbf24;">
+                        <i class="bi bi-clock me-1"></i> Pendiente
+                      </span>
+                    }
+                  </td>
+                  
+                  <!-- Acciones de Entregar / Eliminar -->
+                  <td class="text-end">
+                    <div class="d-flex justify-content-end gap-2">
+                      @if (!item.delivered) {
+                        <button 
+                          type="button"
+                          class="btn-secondary-action" 
+                          [disabled]="deliveringId() === item.id"
+                          (click)="markAsDelivered(item.id)">
+                          <i class="bi bi-check2-all me-1"></i> Entregar
+                        </button>
+                      }
+                      <button 
+                        type="button"
+                        class="btn-danger-action" 
+                        [disabled]="deletingId() === item.id"
+                        (click)="deleteAttention(item.id)">
+                          <i class="bi bi-trash me-1"></i> Eliminar
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </div>
+    }
+  }
+
+  <!-- Botón Volver -->
+  <div class="mt-4">
+    <a routerLink="/dashboard" class="btn-secondary-action">
+      <i class="bi bi-arrow-left me-1"></i> Volver al Inicio
+    </a>
+  </div>
+</div>

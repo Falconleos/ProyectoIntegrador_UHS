@@ -7,92 +7,97 @@
 
   <hr class="divider" />
 
-  <!-- BARRA DE ADJUNTO DE IMAGEN QR -->
-  <div class="card-box mb-4">
-    <div class="row align-items-center">
-      <div class="col-md-8">
-        <label for="qrFile" class="form-label">📷 Adjuntar Imagen PNG de Código QR para Check-In</label>
-        <div class="input-wrapper">
-          <span class="input-icon"><i class="bi bi-qr-code-scan"></i></span>
-          <input 
-            type="file" 
-            id="qrFile" 
-            class="form-control" 
-            accept="image/png, image/jpeg"
-            (change)="onQrFileSelected($event)">
+  <!-- ========================================================== -->
+  <!-- ZONA EXCLUSIVA DE ADMINISTRACIÓN / RECEPCIÓN (Oculta al Guest) -->
+  <!-- ========================================================== -->
+  @if (canModify()) {
+    <!-- BARRA DE ADJUNTO DE IMAGEN QR -->
+    <div class="card-box mb-4">
+      <div class="row align-items-center">
+        <div class="col-md-8">
+          <label for="qrFile" class="form-label">📷 Adjuntar Imagen PNG de Código QR para Check-In</label>
+          <div class="input-wrapper">
+            <span class="input-icon"><i class="bi bi-qr-code-scan"></i></span>
+            <input 
+              type="file" 
+              id="qrFile" 
+              class="form-control" 
+              accept="image/png, image/jpeg"
+              (change)="onQrFileSelected($event)">
+          </div>
+          <small class="subtitle d-block mt-2">Seleccione o adjunte el archivo PNG del código QR del huésped para iniciar el proceso de Check-In automáticamente.</small>
         </div>
-        <small class="subtitle d-block mt-2">Seleccione o adjunte el archivo PNG del código QR del huésped para iniciar el proceso de Check-In automáticamente.</small>
-      </div>
-      <div class="col-md-4 mt-3 mt-md-0">
-        @if (qrError()) {
-          <div class="alert alert-danger mb-0">{{ qrError() }}</div>
-        }
-        @if (qrSuccess()) {
-          <div class="alert alert-success mb-0">{{ qrSuccess() }}</div>
-        }
+        <div class="col-md-4 mt-3 mt-md-0">
+          @if (qrError()) {
+            <div class="alert alert-danger mb-0">{{ qrError() }}</div>
+          }
+          @if (qrSuccess()) {
+            <div class="alert alert-success mb-0">{{ qrSuccess() }}</div>
+          }
+        </div>
       </div>
     </div>
-  </div>
 
-  <!-- Alertas de Carga / Error -->
-  @if (loading()) {
-    <div class="alert alert-info">Cargando información...</div>
-  }
-  @if (errorMessage()) {
-    <div class="alert alert-danger">{{ errorMessage() }}</div>
-  }
-
-  <!-- SECCIÓN SUPERIOR: Cards de reservas pendientes/confirmadas para hoy -->
-  <section class="mb-5">
-    <h3 class="section-title mb-3">Reservas para Check-in Hoy</h3>
-    
-    @if (pendingBookingsToday().length === 0 && !loading()) {
-      <p class="subtitle">No hay reservas pendientes o confirmadas para realizar check-in hoy.</p>
+    <!-- Alertas de Carga / Error -->
+    @if (loading()) {
+      <div class="alert alert-info">Cargando información...</div>
+    }
+    @if (errorMessage()) {
+      <div class="alert alert-danger">{{ errorMessage() }}</div>
     }
 
-    <div class="cards-grid">
-      @for (booking of pendingBookingsToday(); track booking.id) {
-        <div class="booking-card">
-          <!-- Bloque Superior -->
-          <div>
-            <div class="card-header-row">
-              <span class="badge badge-secondary">Reserva #{{ booking.id }}</span>
-              <span class="badge badge-primary">Hab. {{ booking.roomNumber }}</span>
-            </div>
-            
-            <h5 class="card-title" title="{{ getGuestDisplayName(booking) }}">
-              {{ getGuestDisplayName(booking) }}
-            </h5>
+    <!-- SECCIÓN SUPERIOR: Cards de reservas pendientes/confirmadas para hoy -->
+    <section class="mb-5">
+      <h3 class="section-title mb-3">Reservas para Check-in Hoy</h3>
+      
+      @if (pendingBookingsToday().length === 0 && !loading()) {
+        <p class="subtitle">No hay reservas pendientes o confirmadas para realizar check-in hoy.</p>
+      }
 
-            <div class="card-info">
-              <p class="mb-1"><strong>Tel:</strong> {{ booking.guestPhone || 'No registrado' }}</p>
-              <p class="mb-1"><strong>Fechas:</strong> {{ booking.checkIn }} al {{ booking.checkOut }}</p>
-              <p class="mb-1"><strong>Total:</strong> ${{ booking.totalPrice | number:'1.2-2' }}</p>
-              <p class="mb-0"><small class="subtitle">Creado por: {{ booking.userBookingUsername || 'Sistema' }}</small></p>
-            </div>
-          </div>
-
-          <!-- Bloque Inferior con Miniatura QR -->
-          <div>
-            @if (booking.qrBooking && qrDataUrls()[booking.id]) {
-              <div class="qr-box mb-3 text-center" style="background: rgba(2, 6, 23, 0.4); padding: 10px; border-radius: var(--radius-sm);">
-                <span class="qr-label d-block mb-1" style="font-size: 0.75rem;">Código QR Asociado:</span>
-                <img [src]="qrDataUrls()[booking.id]" alt="QR Reserva #{{ booking.id }}" style="width: 90px; height: 90px; border-radius: 4px; border: 1px solid rgba(255,255,255,0.1);" />
+      <div class="cards-grid">
+        @for (booking of pendingBookingsToday(); track booking.id) {
+          <div class="booking-card">
+            <!-- Bloque Superior -->
+            <div>
+              <div class="card-header-row">
+                <span class="badge badge-secondary">Reserva #{{ booking.id }}</span>
+                <span class="badge badge-primary">Hab. {{ booking.roomNumber }}</span>
               </div>
-            }
+              
+              <h5 class="card-title" title="{{ getGuestDisplayName(booking) }}">
+                {{ getGuestDisplayName(booking) }}
+              </h5>
 
-            @if (canModify()) {
+              <div class="card-info">
+                <p class="mb-1"><strong>Tel:</strong> {{ booking.guestPhone || 'No registrado' }}</p>
+                <p class="mb-1"><strong>Fechas:</strong> {{ booking.checkIn }} al {{ booking.checkOut }}</p>
+                <p class="mb-1"><strong>Total:</strong> ${{ booking.totalPrice | number:'1.2-2' }}</p>
+                <p class="mb-0"><small class="subtitle">Creado por: {{ booking.userBookingUsername || 'Sistema' }}</small></p>
+              </div>
+            </div>
+
+            <!-- Bloque Inferior con Miniatura QR -->
+            <div>
+              @if (booking.qrBooking && qrDataUrls()[booking.id]) {
+                <div class="qr-box mb-3 text-center" style="background: rgba(2, 6, 23, 0.4); padding: 10px; border-radius: var(--radius-sm);">
+                  <span class="qr-label d-block mb-1" style="font-size: 0.75rem;">Código QR Asociado:</span>
+                  <img [src]="qrDataUrls()[booking.id]" alt="QR Reserva #{{ booking.id }}" style="width: 90px; height: 90px; border-radius: 4px; border: 1px solid rgba(255,255,255,0.1);" />
+                </div>
+              }
+
               <button class="btn-primary w-100" (click)="goToCreateCheckIn(booking)">
                 <i class="bi bi-check2-circle me-1"></i> Realizar Check-In
               </button>
-            }
+            </div>
           </div>
-        </div>
-      }
-    </div>
-  </section>
+        }
+      </div>
+    </section>
+  }
 
-  <!-- SECCIÓN INFERIOR: Tabla con las reservas en estado CHECKED_IN -->
+  <!-- ========================================================== -->
+  <!-- SECCIÓN INFERIOR: Estadías Activas (Visible para Admin y Guests) -->
+  <!-- ========================================================== -->
   <section>
     <h3 class="section-title mb-3">Estadías Activas (Checked-In)</h3>
 

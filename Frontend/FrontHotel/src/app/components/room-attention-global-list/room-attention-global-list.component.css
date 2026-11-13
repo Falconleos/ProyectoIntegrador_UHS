@@ -1,0 +1,203 @@
+/* --- Contenedor Principal --- */
+.container {
+  padding: 2rem;
+  max-width: 1400px;
+  margin: 0 auto;
+  color: var(--color-text-main);
+  font-family: var(--font-family);
+}
+
+/* --- Encabezado --- */
+.header-section {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.header-section h2 {
+  font-size: var(--font-size-title-fluid);
+  font-weight: 600;
+  color: var(--color-text-main);
+  display: flex;
+  align-items: center;
+}
+
+/* --- Divisor --- */
+.divider {
+  border: 0;
+  height: 1px;
+  background: rgba(255, 255, 255, 0.08);
+  margin-bottom: 1.5rem;
+}
+
+/* --- Alertas y Estados --- */
+.alert {
+  padding: 1rem 1.25rem;
+  border-radius: var(--radius-md);
+  margin-bottom: 1.5rem;
+  font-size: var(--font-size-sm);
+  display: flex;
+  align-items: center;
+  border: var(--border-glass);
+  backdrop-filter: var(--backdrop-blur);
+}
+
+.alert-danger {
+  background: rgba(239, 68, 68, 0.15);
+  color: #fca5a5;
+  border-color: rgba(239, 68, 68, 0.2);
+}
+
+.alert-info {
+  background: var(--bg-secondary);
+  color: var(--color-text-muted);
+}
+
+/* Animación de carga */
+.spin {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* --- Contenedor Glass para la Tabla --- */
+.glass-table-container {
+  background: var(--bg-secondary);
+  backdrop-filter: var(--backdrop-blur);
+  -webkit-backdrop-filter: var(--backdrop-blur);
+  border: var(--border-glass);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-main);
+  overflow: hidden;
+  margin-bottom: 1.5rem;
+}
+
+.table-responsive {
+  width: 100%;
+  overflow-x: auto;
+}
+
+/* --- Tabla Glass --- */
+.table-glass {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  font-size: var(--font-size-sm);
+}
+
+.table-glass th {
+  background: rgba(15, 23, 42, 0.8);
+  color: var(--color-text-muted);
+  font-weight: 600;
+  padding: 1rem 1.25rem;
+  border-bottom: var(--border-glass);
+  text-transform: uppercase;
+  font-size: var(--font-size-xs);
+  letter-spacing: 0.05em;
+}
+
+.table-glass td {
+  padding: 1rem 1.25rem;
+  border-bottom: var(--border-glass);
+  color: var(--color-text-main);
+  vertical-align: middle;
+}
+
+/* --- Filas Condicionales por Estado --- */
+tr.row-pending {
+  background-color: rgba(251, 191, 36, 0.06); /* Tinte amarillo muy suave para destacar pendientes arriba */
+}
+
+tr.row-delivered {
+  opacity: 0.75; /* Atenúa sutilmente los entregados abajo */
+}
+
+tr.row-pending:hover,
+tr.row-delivered:hover {
+  background-color: var(--bg-btn-secondary-hover);
+}
+
+/* --- Textos Auxiliares y Badges --- */
+.text-subtitle {
+  color: var(--color-text-muted);
+}
+
+.text-main {
+  color: var(--color-text-main);
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.35rem 0.75rem;
+  border-radius: 50px;
+  font-size: var(--font-size-xs);
+  font-weight: 500;
+}
+
+.badge-secondary {
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--color-text-muted);
+  border: var(--border-btn);
+}
+
+.badge-success-glass {
+  background: rgba(34, 197, 94, 0.15);
+  color: #4ade80;
+  border: 1px solid rgba(34, 197, 94, 0.2);
+}
+
+.badge-warning-glass {
+  background: rgba(251, 191, 36, 0.15);
+  color: #fbbf24;
+  border: 1px solid rgba(251, 191, 36, 0.2);
+}
+
+/* --- Botones de Acción --- */
+.btn-secondary-action {
+  background: var(--bg-btn-secondary);
+  color: var(--color-text-main);
+  border: var(--border-btn);
+  padding: 0.5rem 0.85rem;
+  border-radius: var(--radius-sm);
+  font-size: var(--font-size-xs);
+  font-weight: 500;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  text-decoration: none;
+  transition: all 0.2s ease;
+}
+
+.btn-secondary-action:hover:not(:disabled) {
+  background: var(--bg-btn-secondary-hover);
+  border-color: rgba(255, 255, 255, 0.15);
+}
+
+.btn-danger-action {
+  background: rgba(239, 68, 68, 0.1);
+  color: #fca5a5;
+  border: 1px solid rgba(239, 68, 68, 0.2);
+  padding: 0.5rem 0.85rem;
+  border-radius: var(--radius-sm);
+  font-size: var(--font-size-xs);
+  font-weight: 500;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  transition: all 0.2s ease;
+}
+
+.btn-danger-action:hover:not(:disabled) {
+  background: rgba(239, 68, 68, 0.2);
+  border-color: rgba(239, 68, 68, 0.4);
+}
+
+button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}

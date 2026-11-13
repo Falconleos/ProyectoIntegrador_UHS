@@ -127,6 +127,10 @@ export const routes: Routes = [
             {
                 path:'room-type-edit/:id',
                 loadComponent:()=>import('./components/room/room-type-edit/room-type-edit.component').then(m=>m.RoomTypeEditComponent)
+            },
+            {
+                path:'room-attentions',
+                loadComponent:()=>import('./components/room-attention-global-list/room-attention-global-list.component').then(m=>m.RoomAttentionGlobalListComponent)
             }
             
         ]

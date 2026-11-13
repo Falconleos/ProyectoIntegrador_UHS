@@ -9,9 +9,12 @@
     
     <nav class="sidebar-nav">
       @if (userRole.toLowerCase() === 'guest') {
-        <!-- Menú exclusivo para Huéspedes (Guest): Reservas y Comentarios -->
+        <!-- Menú para Huéspedes (Guest): Reservas, Estadías y Comentarios -->
         <a routerLink="/dashboard/booking-list" routerLinkActive="active">
           <i class="fa-solid fa-calendar-days"></i> Mis Reservas
+        </a>
+        <a routerLink="/dashboard/check-in-list" routerLinkActive="active">
+          <i class="fa-solid fa-circle-check"></i> Estadías
         </a>
         <a routerLink="/dashboard/comment-list" routerLinkActive="active">
           <i class="fa-solid fa-comments"></i> Comentarios
@@ -32,6 +35,9 @@
         </a>
         <a routerLink="/dashboard/item-list" routerLinkActive="active">
           <i class="fa-solid fa-box-archive"></i> Items
+        </a>
+        <a routerLink="/dashboard/room-attentions" routerLinkActive="active">
+          <i class="fa-solid fa-bell-concierge"></i> Servicio al cuarto
         </a>
         <a routerLink="/dashboard/comment-list" routerLinkActive="active">
           <i class="fa-solid fa-comments"></i> Comentarios
@@ -74,9 +80,17 @@
       
       <div class="top-bar-right">
         <div class="top-actions">
-          <button class="icon-btn" title="Notificaciones">
+          <!-- Botón de Notificaciones con Badge de Pendientes -->
+          <button 
+            class="icon-btn notification-btn" 
+            title="Servicio al Cuarto Pendientes"
+            routerLink="/dashboard/room-attentions">
             <i class="fa-regular fa-bell"></i>
+            @if (pendingAttentionsCount() > 0) {
+              <span class="notification-badge">{{ pendingAttentionsCount() }}</span>
+            }
           </button>
+  
           <button class="icon-btn" title="Configuración">
             <i class="fa-solid fa-gear"></i>
           </button>

@@ -219,6 +219,25 @@
   flex-grow: 1;
 }
 
+.notification-btn {
+  position: relative;
+}
+
+.notification-badge {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  background-color: #ef4444; /* Rojo alerta */
+  color: #ffffff;
+  font-size: 0.7rem;
+  font-weight: 700;
+  padding: 0.15rem 0.4rem;
+  border-radius: 50px;
+  min-width: 18px;
+  text-align: center;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
 /* --- Responsividad (Móviles y Tablets) --- */
 @media (max-width: 768px) {
   .dashboard {
@@ -236,4 +255,5 @@
   .user-info {
     display: none; /* Oculta el texto del usuario en pantallas muy pequeñas para ahorrar espacio */
   }
+
 }

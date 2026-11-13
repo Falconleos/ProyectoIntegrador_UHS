@@ -5,14 +5,13 @@
       <i class="bi bi-basket me-2"></i> Consumos y Servicios de la Reserva
     </h2>
     
-    @if (canModify()) {
-      <button 
-        type="button"
-        class="btn-primary-action" 
-        [routerLink]="['/dashboard/bookings', bookingId(), 'agregar-servicio']">
-        <i class="bi bi-plus-lg me-1"></i> Agregar Consumo
-      </button>
-    }
+    <!-- Botón visible para Admin, Recepción y Huéspedes -->
+    <button 
+      type="button"
+      class="btn-primary-action" 
+      [routerLink]="['/dashboard/bookings', bookingId(), 'agregar-servicio']">
+      <i class="bi bi-plus-lg me-1"></i> Agregar Consumo
+    </button>
   </div>
 
   <hr class="divider" />
@@ -46,6 +45,7 @@
                 <th>Cantidad</th>
                 <th>Precio Unitario</th>
                 <th>Subtotal</th>
+                <th>Registrado por</th>
                 <th>Estado</th>
                 @if (canModify()) {
                   <th class="text-end">Acciones</th>
@@ -58,7 +58,7 @@
                   <td><strong class="text-subtitle">#{{ item.id }}</strong></td>
                   <td>
                     <div class="text-main fw-medium">
-                    {{ $any(item).description || $any(item).itemName || $any(item).name || $any(item).title || 'Consumo #' + item.id }}
+                      {{ item.itemDTOResponse.description || $any(item).description || 'Consumo #' + item.id }}
                     </div>
                   </td>
                   <td>
@@ -69,6 +69,11 @@
                   </td>
                   <td>
                     <span class="text-main fw-bold text-success">${{ item.subtotal | number:'1.2-2' }}</span>
+                  </td>
+                  <td>
+                    <span class="badge badge-secondary" style="font-size: 0.8rem;">
+                      <i class="bi bi-person-fill me-1"></i> {{ item.employeeUsername || 'Sistema' }}
+                    </span>
                   </td>
                   <td>
                     @if (item.delivered) {
@@ -82,7 +87,7 @@
                     }
                   </td>
                   
-                  <!-- Acciones restringidas -->
+                  <!-- Acciones restringidas exclusivamente al Staff (Admin / Recepción) -->
                   @if (canModify()) {
                     <td class="text-end">
                       <div class="d-flex justify-content-end gap-2">
@@ -100,7 +105,7 @@
                           class="btn-danger-action" 
                           [disabled]="deletingId() === item.id"
                           (click)="deleteAttention(item.id)">
-                          <i class="bi bi-trash me-1"></i> Eliminar
+                            <i class="bi bi-trash me-1"></i> Eliminar
                         </button>
                       </div>
                     </td>

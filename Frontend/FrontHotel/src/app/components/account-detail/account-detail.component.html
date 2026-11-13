@@ -17,8 +17,9 @@
       </div>
     }
 
-    <div class="row-grid">
-      <!-- Columna Izquierda: Desglose, Ajuste y Totales -->
+    <!-- Estructura condicional con enlace de estilo seguro para Angular -->
+    <div [ngClass]="canModify() ? 'row-grid' : 'row-grid-single'" [style.grid-template-columns]="canModify() ? '2fr 1fr' : '1fr'" style="display: grid; gap: 1.5rem;">
+      <!-- Columna Principal: Desglose, Totales e Historial (Visible para todos) -->
       <div class="column-main">
         <!-- Desglose de Cargos -->
         <div class="glass-card mb-4">
@@ -70,25 +71,26 @@
               </table>
             </div>
 
-            <hr class="divider my-4" />
-
-            <!-- Control Unificado de Ajuste -->
-            <div class="glass-subcard p-3 mb-4">
-              <div class="row-grid-form">
-                <div>
-                  <label class="form-label">Ajuste (%) <span class="subtitle fw-normal">(Usa '-' para descuento, ej: -10)</span></label>
-                  <div class="input-wrapper">
-                    <span class="input-icon-prefix"><i class="bi bi-percent"></i></span>
-                    <input type="number" class="form-control" [ngModel]="adjustmentPercentage()" (ngModelChange)="adjustmentPercentage.set($event)" [disabled]="account()!.isPaid" placeholder="Ej: 21 o -10">
+            <!-- Control Unificado de Ajuste: Solo para Admin/Recepción -->
+            @if (canModify()) {
+              <hr class="divider my-4" />
+              <div class="glass-subcard p-3 mb-4">
+                <div class="row-grid-form">
+                  <div>
+                    <label class="form-label">Ajuste (%) <span class="subtitle fw-normal">(Usa '-' para descuento, ej: -10)</span></label>
+                    <div class="input-wrapper">
+                      <span class="input-icon-prefix"><i class="bi bi-percent"></i></span>
+                      <input type="number" class="form-control" [ngModel]="adjustmentPercentage()" (ngModelChange)="adjustmentPercentage.set($event)" [disabled]="account()!.isPaid" placeholder="Ej: 21 o -10">
+                    </div>
+                  </div>
+                  <div>
+                    <button class="btn-primary w-100" (click)="applyAdjustments()" [disabled]="account()!.isPaid">
+                      <i class="bi bi-check2 me-1"></i> Aplicar
+                    </button>
                   </div>
                 </div>
-                <div>
-                  <button class="btn-primary w-100" (click)="applyAdjustments()" [disabled]="account()!.isPaid">
-                    <i class="bi bi-check2 me-1"></i> Aplicar
-                  </button>
-                </div>
               </div>
-            </div>
+            }
 
             <!-- Totales -->
             <div class="d-flex justify-content-between align-items-center mb-2">
@@ -142,53 +144,55 @@
         </div>
       </div>
 
-      <!-- Columna Derecha: Formulario para Registrar Pago -->
-      <div class="column-sidebar">
-        <div class="glass-card h-100 p-4">
-          <div class="d-flex align-items-center mb-4">
-            <div class="header-icon-container me-3">
-              <i class="bi bi-cash-stack text-success fs-4"></i>
+      <!-- Columna Derecha: Formulario para Registrar Pago (SOLO visible si canModify es true) -->
+      @if (canModify()) {
+        <div class="column-sidebar">
+          <div class="glass-card h-100 p-4">
+            <div class="d-flex align-items-center mb-4">
+              <div class="header-icon-container me-3">
+                <i class="bi bi-cash-stack text-success fs-4"></i>
+              </div>
+              <h4 class="text-white mb-0 fw-bold fs-5">Registrar Pago</h4>
             </div>
-            <h4 class="text-white mb-0 fw-bold fs-5">Registrar Pago</h4>
-          </div>
 
-          <div class="form-group mb-4">
-            <label class="form-label">Monto a Pagar ($) *</label>
-            <div class="input-wrapper">
-              <span class="input-icon-prefix"><i class="bi bi-currency-dollar"></i></span>
-              <input type="number" class="form-control" [ngModel]="paymentAmount()" (ngModelChange)="paymentAmount.set($event)" [disabled]="account()!.isPaid">
+            <div class="form-group mb-4">
+              <label class="form-label">Monto a Pagar ($) *</label>
+              <div class="input-wrapper">
+                <span class="input-icon-prefix"><i class="bi bi-currency-dollar"></i></span>
+                <input type="number" class="form-control" [ngModel]="paymentAmount()" (ngModelChange)="paymentAmount.set($event)" [disabled]="account()!.isPaid">
+              </div>
             </div>
-          </div>
 
-          <div class="form-group mb-4">
-            <label class="form-label">Método de Pago *</label>
-            <div class="input-wrapper">
-              <span class="input-icon-prefix"><i class="bi bi-wallet2"></i></span>
-              <select class="form-control" [ngModel]="paymentMethod()" (ngModelChange)="paymentMethod.set($event)" [disabled]="account()!.isPaid">
-                <option value="CASH">Efectivo</option>
-                <option value="CREDIT_CARD">Tarjeta de Crédito</option>
-                <option value="DEBIT_CARD">Tarjeta de Débito</option>
-                <option value="TRANSFER">Transferencia</option>
-              </select>
+            <div class="form-group mb-4">
+              <label class="form-label">Método de Pago *</label>
+              <div class="input-wrapper">
+                <span class="input-icon-prefix"><i class="bi bi-wallet2"></i></span>
+                <select class="form-control" [ngModel]="paymentMethod()" (ngModelChange)="paymentMethod.set($event)" [disabled]="account()!.isPaid">
+                  <option value="CASH">Efectivo</option>
+                  <option value="CREDIT_CARD">Tarjeta de Crédito</option>
+                  <option value="DEBIT_CARD">Tarjeta de Débito</option>
+                  <option value="TRANSFER">Transferencia</option>
+                </select>
+              </div>
             </div>
-          </div>
 
-          <div class="form-group mb-4">
-            <label class="form-label">Referencia / Comprobante</label>
-            <div class="input-wrapper">
-              <span class="input-icon-prefix"><i class="bi bi-receipt"></i></span>
-              <input type="text" class="form-control" [ngModel]="transactionReference()" (ngModelChange)="transactionReference.set($event)" placeholder="Ej: Transacción #1234" [disabled]="account()!.isPaid">
+            <div class="form-group mb-4">
+              <label class="form-label">Referencia / Comprobante</label>
+              <div class="input-wrapper">
+                <span class="input-icon-prefix"><i class="bi bi-receipt"></i></span>
+                <input type="text" class="form-control" [ngModel]="transactionReference()" (ngModelChange)="transactionReference.set($event)" placeholder="Ej: Transacción #1234" [disabled]="account()!.isPaid">
+              </div>
             </div>
-          </div>
 
-          <button 
-            class="btn-success-action w-100 py-3 fw-bold" 
-            (click)="submitPayment()" 
-            [disabled]="account()!.isPaid || calculateRemaining() === 0 || checkInState() === 'INTERRUPTED' || checkInState() === 'COMPLETED'">
-            <i class="bi bi-check-circle me-2"></i> Procesar Pago
-          </button>
+            <button 
+              class="btn-success-action w-100 py-3 fw-bold" 
+              (click)="submitPayment()" 
+              [disabled]="account()!.isPaid || calculateRemaining() === 0 || checkInState() === 'INTERRUPTED' || checkInState() === 'COMPLETED'">
+              <i class="bi bi-check-circle me-2"></i> Procesar Pago
+            </button>
+          </div>
         </div>
-      </div>
+      }
     </div>
   </div>
 }
