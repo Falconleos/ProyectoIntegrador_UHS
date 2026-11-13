@@ -22,8 +22,8 @@ public class BookingCancellationEntity {
     @JoinColumn(name = "booking_id", referencedColumnName = "id", nullable = false, unique = true)
     private BookingEntity booking;
 
-    @OneToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "user_id", nullable = false)
+    @ManyToOne(fetch = FetchType.LAZY, optional = true)
+    @JoinColumn(name = "user_id", nullable = true) // Guarda el ID del empleado logueado (nullable por si se hace un proceso automático)
     private UserEntity userEntity;
 
     @Column(nullable = false)

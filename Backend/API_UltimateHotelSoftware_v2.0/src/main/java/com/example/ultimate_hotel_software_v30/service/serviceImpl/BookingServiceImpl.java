@@ -211,13 +211,10 @@ public class BookingServiceImpl implements BookingService {
         System.out.println("[BACKEND DEBUG] Cuenta financiera asociada: " + (account != null ? "Encontrada (ID: " + account.getId() + ")" : "No encontrada"));
 
         // 2. Validar condiciones de negocio:
-        // - Que la reserva anide un userEntity
-        // - Que existan pagos asociados a la cuenta de esta reserva
         boolean hasUserEntity = (booking.getUserEntity() != null);
         boolean hasPayments = (account != null && account.getPayments() != null && !account.getPayments().isEmpty() && account.getPaidAmount() > 0);
         System.out.println("[BACKEND DEBUG] hasUserEntity: " + hasUserEntity + ", hasPayments: " + hasPayments);
 
-        // - Que el front-end confirme explícitamente la creación de la nota de crédito
         boolean wantsCreditNote = Boolean.TRUE.equals(request.getIssueCreditNote());
         System.out.println("[BACKEND DEBUG] wantsCreditNote: " + wantsCreditNote);
 
@@ -242,23 +239,30 @@ public class BookingServiceImpl implements BookingService {
         bookingRepository.save(booking);
         System.out.println("[BACKEND DEBUG] Reserva actualizada a CANCELLED y guardada en DB.");
 
-        Object principal = SecurityContextHolder.getContext()
-                .getAuthentication().getPrincipal();
+        // Resolver de forma segura el usuario autenticado (permitiendo nulo si aplica)
+        UserEntity currentUser = null;
+        try {
+            Object principal = SecurityContextHolder.getContext()
+                    .getAuthentication().getPrincipal();
 
-        String currentUsername = "";
-        if (principal instanceof UserDetails) {
-            currentUsername = ((UserDetails) principal).getUsername();
+            String currentUsername = "";
+            if (principal instanceof UserDetails) {
+                currentUsername = ((UserDetails) principal).getUsername();
+            }
+            System.out.println("[BACKEND DEBUG] Usuario autenticado ejecutando la acción: " + currentUsername);
+
+            if (!currentUsername.isEmpty()) {
+                currentUser = userService.findEntityByUsername(currentUsername);
+                if (currentUser != null && !currentUser.isEnabled()) {
+                    System.out.println("[BACKEND DEBUG] El usuario actual está deshabilitado.");
+                    throw new DisabledUserException("A disabled user cannot generate a cancellation.");
+                }
+            }
+        } catch (Exception e) {
+            System.out.println("[BACKEND DEBUG] No se pudo resolver el usuario autenticado, registrando cancelación sin usuario asociado...");
         }
-        System.out.println("[BACKEND DEBUG] Usuario autenticado ejecutando la acción: " + currentUsername);
 
-        UserEntity currentUser = userService.findEntityByUsername(currentUsername);
-
-        if (!currentUser.isEnabled()) {
-            System.out.println("[BACKEND DEBUG] El usuario actual está deshabilitado.");
-            throw new DisabledUserException("A disabled user cannot generate a cancellation.");
-        }
-
-        // Construcción limpia utilizando únicamente la relación de la entidad Booking
+        // Construcción permitiendo userEntity nulo para reservas por referencia
         BookingCancellationEntity cancellation = BookingCancellationEntity.builder()
                 .userEntity(currentUser)
                 .booking(booking)
@@ -272,7 +276,7 @@ public class BookingServiceImpl implements BookingService {
             return bookingCancellationMapper.toBookingCancellationDTOResponse(savedCancellation);
         } catch (Exception e) {
             System.err.println("[BACKEND ERROR CRÍTICO] Falló al intentar guardar BookingCancellationEntity para la reserva ID: " + booking.getId());
-            e.printStackTrace(); // Imprime la traza completa en rojo en IntelliJ
+            e.printStackTrace();
             throw e;
         }
     }
