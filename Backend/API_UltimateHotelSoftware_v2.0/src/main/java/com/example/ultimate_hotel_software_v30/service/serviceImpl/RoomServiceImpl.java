@@ -143,11 +143,13 @@ public class RoomServiceImpl implements RoomService {
     public RoomDTOResponse doMaintenance(Long id) {
         RoomEntity room = findEntityById(id);
 
+        // Lógica de interruptor (Toggle): Si ya está en mantenimiento, pasa a AVAILABLE. Si no, a MAINTENANCE.
         if (room.getState() == RoomState.MAINTENANCE) {
-            throw new RoomUnderMaintenanceException("The room is already under maintenance.");
+            room.setState(RoomState.AVAILABLE);
+        } else {
+            room.setState(RoomState.MAINTENANCE);
         }
 
-        room.setState(RoomState.MAINTENANCE);
         RoomEntity updatedRoom = roomRepository.save(room);
 
         return roomMapper.toRoomDTOResponse(updatedRoom);
