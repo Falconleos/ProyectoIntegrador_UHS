@@ -30,6 +30,7 @@ export class RoomEditComponent implements OnInit, OnDestroy {
 
   roomTypes = signal<RoomTypeDTOResponse[]>([]);
   selectedImages = signal<File[]>([]); // Nuevas imágenes a subir
+  selectedImagePreviews = signal<string[]>([]); // Vistas previas de las nuevas imágenes
   existingImages = signal<string[]>([]); // URLs temporales de las imágenes actuales
 
   loading = signal(true);
@@ -89,7 +90,6 @@ export class RoomEditComponent implements OnInit, OnDestroy {
     });
   }
 
-  // Carga las imágenes actuales del servidor para mostrarlas como miniaturas
   loadExistingImages(room: RoomDtoResponse): void {
     const total = room.imagesCount ?? 0;
     if (total === 0) return;
@@ -118,16 +118,12 @@ export class RoomEditComponent implements OnInit, OnDestroy {
     }
   }
 
-  // Eliminar una imagen existente directamente llamando al backend
   removeExistingImage(index: number): void {
     if (!window.confirm('¿Estás seguro de eliminar esta imagen?')) return;
 
     this.roomService.deleteRoomImage(this.roomId, index).subscribe({
       next: (roomActualizada) => {
-        // Liberamos la URL en memoria
         URL.revokeObjectURL(this.existingImages()[index]);
-        
-        // Volvemos a cargar las imágenes actualizadas
         this.existingImages.set([]);
         this.loadExistingImages(roomActualizada);
       },
@@ -137,10 +133,18 @@ export class RoomEditComponent implements OnInit, OnDestroy {
     });
   }
 
+  // Captura los archivos nuevos y genera sus miniaturas temporales
   onImagesSelected(event: Event): void {
     const input = event.target as HTMLInputElement;
     if (input.files) {
-      this.selectedImages.set(Array.from(input.files));
+      // Limpiamos previsualizaciones anteriores para evitar fugas de memoria
+      this.selectedImagePreviews().forEach(url => URL.revokeObjectURL(url));
+
+      const files = Array.from(input.files);
+      this.selectedImages.set(files);
+
+      const previews = files.map(file => URL.createObjectURL(file));
+      this.selectedImagePreviews.set(previews);
     }
   }
 
@@ -155,12 +159,10 @@ export class RoomEditComponent implements OnInit, OnDestroy {
 
     const request = this.roomForm.getRawValue();
 
-    // 1. Actualizamos datos básicos
     this.roomService.updateRoom(this.roomId, request).subscribe({
       next: () => {
         const newImages = this.selectedImages();
 
-        // 2. Si hay nuevas imágenes para agregar, las mandamos
         if (newImages.length > 0) {
           this.roomService.addImages(this.roomId, newImages).subscribe({
             next: () => {
@@ -185,7 +187,8 @@ export class RoomEditComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    // Limpieza de URLs en memoria
+    // Limpieza de todas las URLs en memoria
     this.existingImages().forEach(url => URL.revokeObjectURL(url));
+    this.selectedImagePreviews().forEach(url => URL.revokeObjectURL(url));
   }
 }

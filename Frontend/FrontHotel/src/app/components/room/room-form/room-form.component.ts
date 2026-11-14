@@ -1,4 +1,4 @@
-import { Component, inject, OnInit, signal } from '@angular/core';
+import { Component, inject, OnInit, signal, OnDestroy } from '@angular/core';
 import {
   ReactiveFormsModule,
   NonNullableFormBuilder,
@@ -17,7 +17,7 @@ import { RoomTypeDTOResponse } from '../../../models/RoomType-model';
   templateUrl: './room-form.component.html',
   styleUrl: './room-form.component.css'
 })
-export class RoomFormComponent implements OnInit {
+export class RoomFormComponent implements OnInit, OnDestroy {
 
   private fb = inject(NonNullableFormBuilder);
   private roomService = inject(RoomService);
@@ -27,12 +27,12 @@ export class RoomFormComponent implements OnInit {
 
   roomTypes = signal<RoomTypeDTOResponse[]>([]);
   selectedImages = signal<File[]>([]);
+  imagePreviews = signal<string[]>([]); // Señal para almacenar las URLs temporales de las miniaturas
 
   loadingTypes = signal(false);
   saving = signal(false);
   errorMessage = signal('');
 
-  // Definición del formulario reactivo con sus validaciones iniciales
   roomForm = this.fb.group({
     number: [0, [Validators.required, Validators.min(1)]],
     roomTypeId: [0, [Validators.required, Validators.min(1)]],
@@ -44,7 +44,6 @@ export class RoomFormComponent implements OnInit {
     this.checkUrlParameters(); 
   }
 
-  // Carga los tipos de habitación desde el servicio
   loadRoomTypes(): void {
     this.loadingTypes.set(true);
     this.errorMessage.set('');
@@ -61,28 +60,32 @@ export class RoomFormComponent implements OnInit {
     });
   }
 
-  // Captura el parámetro de la URL (si viene por queryParams al hacer clic en "crear tipo similar")
   checkUrlParameters(): void {
     const typeIdParam = this.route.snapshot.queryParamMap.get('roomTypeId');
     
     if (typeIdParam) {
       const parsedId = Number(typeIdParam);
-      // Asignamos el valor al campo correspondiente del formulario de manera directa
       this.roomForm.patchValue({ roomTypeId: parsedId });
     }
   }
 
-  // Captura los archivos seleccionados en el input de tipo file
+  // Captura los archivos y genera las URLs para las miniaturas
   onImagesSelected(event: Event): void {
     const input = event.target as HTMLInputElement;
     if (input.files) {
-      this.selectedImages.set(Array.from(input.files));
+      // Limpiamos URLs anteriores para evitar fugas de memoria si selecciona varias veces
+      this.imagePreviews().forEach(url => URL.revokeObjectURL(url));
+
+      const files = Array.from(input.files);
+      this.selectedImages.set(files);
+
+      // Generamos las vistas previas en miniatura
+      const previews = files.map(file => URL.createObjectURL(file));
+      this.imagePreviews.set(previews);
     }
   }
 
-  // Envía los datos al servidor para registrar la nueva habitación
   createRoom(): void {
-    // Si el formulario es inválido, marcamos los campos para mostrar los errores en la vista
     if (this.roomForm.invalid || this.saving()) {
       this.roomForm.markAllAsTouched();
       return;
@@ -103,5 +106,10 @@ export class RoomFormComponent implements OnInit {
         this.saving.set(false);
       }
     });
+  }
+
+  ngOnDestroy(): void {
+    // Liberamos las URLs temporales de memoria al destruir el componente
+    this.imagePreviews().forEach(url => URL.revokeObjectURL(url));
   }
 }

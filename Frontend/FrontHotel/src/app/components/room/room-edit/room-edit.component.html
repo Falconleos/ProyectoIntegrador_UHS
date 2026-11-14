@@ -22,7 +22,7 @@
       </div>
     }
 
-    <!-- Tarjeta contenedora del formulario (estilo glassmorphism unificado) -->
+    <!-- Tarjeta contenedora del formulario -->
     <div class="form-card-wrapper">
       <form [formGroup]="roomForm" (ngSubmit)="updateRoom()" class="form-layout">
 
@@ -112,16 +112,31 @@
         <!-- Añadir Nuevas Imágenes -->
         <div class="form-group">
           <label for="newImages" class="form-label">
-            <i class="fa-solid fa-plus"></i> Agregar nuevas imágenes (JPG)
+            <i class="fa-solid fa-plus"></i> Agregar nuevas imágenes
           </label>
           <input
             id="newImages"
             type="file"
-            accept="image/jpeg"
+            accept="image/*"
             multiple
             class="form-control"
             (change)="onImagesSelected($event)"
           >
+
+          @if (selectedImages().length > 0) {
+            <p class="subtitle file-count-text">
+              <i class="fa-solid fa-file-image"></i> Nuevas imágenes seleccionadas: {{ selectedImages().length }}
+            </p>
+
+            <!-- Cuadrícula de vistas previas de las nuevas imágenes -->
+            <div class="edit-images-grid">
+              @for (previewUrl of selectedImagePreviews(); track $index) {
+                <div class="image-thumbnail-card">
+                  <img [src]="previewUrl" alt="Vista previa de nueva imagen">
+                </div>
+              }
+            </div>
+          }
         </div>
 
         <!-- Acciones del Formulario -->

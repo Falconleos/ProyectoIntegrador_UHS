@@ -1,10 +1,14 @@
-<section class="room-form-container">
+<div class="room-form-container">
 
-  <h1>Crear nueva habitación</h1>
+  <!-- Título Principal -->
+  <h1>
+    <i class="bi bi-plus-square"></i> Crear nueva habitación
+  </h1>
 
+  <!-- Mensaje de Error General -->
   @if (errorMessage()) {
     <p class="error-message" role="alert">
-      {{ errorMessage() }}
+      <i class="bi bi-exclamation-triangle"></i> {{ errorMessage() }}
     </p>
   }
 
@@ -12,73 +16,64 @@
 
     <!-- Número de habitación -->
     <div class="form-group">
-
-      <label for="number">Número de habitación</label>
+      <label for="number">Número de habitación *</label>
 
       <input
         id="number"
         type="number"
         formControlName="number"
         min="1"
+        placeholder="Ej. 101"
       >
 
-      @if (roomForm.controls.number.touched &&
-           roomForm.controls.number.hasError('required')) {
+      @if (roomForm.controls.number.touched && roomForm.controls.number.hasError('required')) {
         <p class="error-message">
-          El número de habitación es obligatorio.
+          <i class="bi bi-info-circle"></i> El número de habitación es obligatorio.
         </p>
       }
 
-      @if (roomForm.controls.number.touched &&
-           roomForm.controls.number.hasError('min')) {
+      @if (roomForm.controls.number.touched && roomForm.controls.number.hasError('min')) {
         <p class="error-message">
-          El número debe ser mayor a 0.
+          <i class="bi bi-info-circle"></i> El número debe ser mayor a 0.
         </p>
       }
-
     </div>
 
     <!-- Tipo de habitación -->
     <div class="form-group">
-
-      <label for="roomTypeId">Tipo de habitación</label>
+      <label for="roomTypeId">Tipo de habitación *</label>
 
       @if (loadingTypes()) {
-        <p>Cargando tipos de habitación...</p>
+        <p class="loading-text">
+          <i class="bi bi-arrow-repeat spin"></i> Cargando tipos de habitación...
+        </p>
       } @else {
-
         <select
           id="roomTypeId"
           formControlName="roomTypeId"
         >
-
-          <option [ngValue]="0">
+          <option [ngValue]="0" disabled>
             Seleccione un tipo de habitación
           </option>
 
           @for (type of roomTypes(); track type.id) {
             <option [ngValue]="type.id">
-              {{ type.name }}
+              {{ type.name }} (${{ type.pricePerNight }} - Cap. {{ type.capacity }})
             </option>
           }
-
         </select>
-
       }
 
-      @if (roomForm.controls.roomTypeId.touched &&
-           roomForm.controls.roomTypeId.invalid) {
+      @if (roomForm.controls.roomTypeId.touched && roomForm.controls.roomTypeId.invalid) {
         <p class="error-message">
-          Debe seleccionar un tipo de habitación.
+          <i class="bi bi-info-circle"></i> Debe seleccionar un tipo de habitación.
         </p>
       }
-
     </div>
 
     <!-- Estado -->
     <div class="form-group">
-
-      <label for="state">Estado inicial</label>
+      <label for="state">Estado inicial *</label>
 
       <select
         id="state"
@@ -90,19 +85,16 @@
         <option value="CLEANING">Limpieza</option>
       </select>
 
-      @if (roomForm.controls.state.touched &&
-           roomForm.controls.state.hasError('required')) {
+      @if (roomForm.controls.state.touched && roomForm.controls.state.hasError('required')) {
         <p class="error-message">
-          Debe seleccionar un estado.
+          <i class="bi bi-info-circle"></i> Debe seleccionar un estado.
         </p>
       }
-
     </div>
 
-    <!-- Imágenes -->
+    <!-- Imágenes con previsualización en miniatura -->
     <div class="form-group">
-
-      <label for="images">Imágenes de la habitación</label>
+      <label for="images">Imágenes de la habitación (Opcional)</label>
 
       <input
         id="images"
@@ -113,24 +105,23 @@
       >
 
       @if (selectedImages().length > 0) {
-
-        <p>
-          Imágenes seleccionadas: {{ selectedImages().length }}
+        <p class="file-count-text">
+          <i class="bi bi-file-earmark-image"></i> Imágenes seleccionadas: {{ selectedImages().length }}
         </p>
 
-        <ul>
-          @for (image of selectedImages(); track $index) {
-            <li>{{ image.name }}</li>
+        <!-- Cuadrícula de miniaturas -->
+        <div class="preview-images-grid">
+          @for (previewUrl of imagePreviews(); track $index) {
+            <div class="image-thumbnail-card">
+              <img [src]="previewUrl" alt="Vista previa de imagen">
+            </div>
           }
-        </ul>
-
+        </div>
       }
-
     </div>
 
     <!-- Acciones -->
     <div class="form-actions">
-
       <a routerLink="/dashboard/room-list">
         Cancelar
       </a>
@@ -140,14 +131,13 @@
         [disabled]="roomForm.invalid || saving() || loadingTypes()"
       >
         @if (saving()) {
-          Guardando...
+          <i class="bi bi-arrow-repeat spin"></i> Guardando...
         } @else {
-          Crear habitación
+          <i class="bi bi-check-lg"></i> Crear habitación
         }
       </button>
-
     </div>
 
   </form>
 
-</section>
+</div>

@@ -242,6 +242,13 @@ input[type="file"].form-control {
   background: var(--bg-btn-secondary-hover);
 }
 
+/* --- Texto de conteo de archivos seleccionados --- */
+.file-count-text {
+    color: #34d399;
+    font-size: 0.75rem;
+    margin-top: 0.5rem;
+}
+
 /* --- Responsividad --- */
 @media (max-width: 640px) {
   .header-section {
