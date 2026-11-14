@@ -82,4 +82,11 @@ public class ItemController {
                 .contentType(MediaType.IMAGE_JPEG)
                 .body(image);
     }
+
+    @DeleteMapping("/{id}/image")
+    @PreAuthorize("hasAnyRole('ADMIN', 'RECEPCIONIST')")
+    public ResponseEntity<ItemDTOResponse> removeImage(@PathVariable Long id) {
+        ItemDTOResponse updatedItem = itemService.removeImage(id);
+        return ResponseEntity.ok(updatedItem);
+    }
 }

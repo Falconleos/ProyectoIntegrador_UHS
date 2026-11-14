@@ -113,4 +113,17 @@ public class ItemServiceImpl implements ItemService {
         return entity.getImage();
     }
 
+    @Override
+    @Transactional
+    public ItemDTOResponse removeImage(Long id) {
+        ItemEntity entity = itemRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Item no encontrado con ID: " + id));
+
+        // Borramos la imagen asignando null
+        entity.setImage(null);
+
+        ItemEntity updatedEntity = itemRepository.save(entity);
+        return itemMapper.toItemDTOResponse(updatedEntity);
+    }
+
 }

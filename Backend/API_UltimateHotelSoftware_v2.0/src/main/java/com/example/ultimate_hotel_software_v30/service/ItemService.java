@@ -12,6 +12,6 @@ public interface ItemService {
     ItemDTOResponse createItem(ItemDTORequest request, MultipartFile file);
     ItemDTOResponse updateItem(Long id, ItemDTORequest request, MultipartFile file);
     void deleteItem(Long id);
-    // Añade esta firma a tu interfaz
     byte[] getItemImage(Long id);
+    ItemDTOResponse removeImage(Long id);
 }
