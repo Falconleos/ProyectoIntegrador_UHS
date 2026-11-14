@@ -80,6 +80,50 @@
           }
         </div>
 
+        <!-- Gestión de Imágenes Actuales -->
+        <div class="form-group">
+          <label class="form-label">
+            <i class="fa-solid fa-images"></i> Imágenes actuales
+          </label>
+
+          @if (loadingImages()) {
+            <p class="subtitle"><i class="fa-solid fa-spinner fa-spin"></i> Cargando imágenes...</p>
+          } @else if (existingImages().length === 0) {
+            <p class="subtitle">Esta habitación no tiene imágenes cargadas.</p>
+          } @else {
+            <div class="edit-images-grid">
+              @for (imgUrl of existingImages(); track $index) {
+                <div class="image-thumbnail-card">
+                  <img [src]="imgUrl" alt="Miniatura de habitación">
+                  <button
+                    type="button"
+                    class="btn-danger-icon"
+                    (click)="removeExistingImage($index)"
+                    title="Eliminar imagen"
+                  >
+                    <i class="fa-solid fa-trash-can"></i>
+                  </button>
+                </div>
+              }
+            </div>
+          }
+        </div>
+
+        <!-- Añadir Nuevas Imágenes -->
+        <div class="form-group">
+          <label for="newImages" class="form-label">
+            <i class="fa-solid fa-plus"></i> Agregar nuevas imágenes (JPG)
+          </label>
+          <input
+            id="newImages"
+            type="file"
+            accept="image/jpeg"
+            multiple
+            class="form-control"
+            (change)="onImagesSelected($event)"
+          >
+        </div>
+
         <!-- Acciones del Formulario -->
         <div class="form-actions">
           <a routerLink="/dashboard/room-list" class="btn-secondary-action">

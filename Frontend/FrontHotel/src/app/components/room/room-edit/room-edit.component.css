@@ -116,6 +116,65 @@
   color: var(--color-text-main);
 }
 
+/* Estilo específico para input type="file" */
+input[type="file"].form-control {
+  padding: 10px;
+  cursor: pointer;
+}
+
+/* --- Subtítulos y Textos Secundarios --- */
+.subtitle {
+  color: var(--color-text-muted);
+  font-size: 0.75rem;
+  margin: 0;
+}
+
+/* --- Galería de Miniaturas para Edición de Imágenes --- */
+.edit-images-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-top: 0.5rem;
+}
+
+.image-thumbnail-card {
+  position: relative;
+  width: 90px;
+  height: 90px;
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  border: var(--border-input);
+  background: rgba(15, 23, 42, 0.9);
+}
+
+.image-thumbnail-card img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.btn-danger-icon {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  background: rgba(239, 68, 68, 0.85);
+  color: #fff;
+  border: none;
+  border-radius: 50%;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 0.7rem;
+  transition: background 0.2s ease;
+}
+
+.btn-danger-icon:hover {
+  background: rgb(239, 68, 68);
+}
+
 /* --- Mensajes de Error en Validación --- */
 .error-text {
   color: #fca5a5;

@@ -1,5 +1,4 @@
-
-import { Component, inject, OnInit, signal } from '@angular/core';
+import { Component, inject, OnInit, signal, OnDestroy } from '@angular/core';
 import {
   ReactiveFormsModule,
   NonNullableFormBuilder,
@@ -19,7 +18,7 @@ import { RoomDtoResponse } from '../../../models/Room-model';
   templateUrl: './room-edit.component.html',
   styleUrl: './room-edit.component.css'
 })
-export class RoomEditComponent implements OnInit {
+export class RoomEditComponent implements OnInit, OnDestroy {
 
   private fb = inject(NonNullableFormBuilder);
   private roomService = inject(RoomService);
@@ -30,7 +29,11 @@ export class RoomEditComponent implements OnInit {
   roomId = 0;
 
   roomTypes = signal<RoomTypeDTOResponse[]>([]);
+  selectedImages = signal<File[]>([]); // Nuevas imágenes a subir
+  existingImages = signal<string[]>([]); // URLs temporales de las imágenes actuales
+
   loading = signal(true);
+  loadingImages = signal(false);
   saving = signal(false);
   errorMessage = signal('');
 
@@ -40,7 +43,7 @@ export class RoomEditComponent implements OnInit {
   });
 
   ngOnInit(): void {
-    const id = Number(this.route.snapshot.paramMap.get('id')); //Captura de id de la pagina
+    const id = Number(this.route.snapshot.paramMap.get('id'));
 
     if (!Number.isInteger(id) || id <= 0) {
       this.errorMessage.set('El ID de la habitación no es válido.');
@@ -52,19 +55,19 @@ export class RoomEditComponent implements OnInit {
     this.loadRoomData();
   }
 
-  loadRoomData(): void { //Obtiene valores actuales de la habitacion
+  loadRoomData(): void {
     this.loading.set(true);
     this.errorMessage.set('');
 
     this.roomService.getById(this.roomId).subscribe({
       next: (room: RoomDtoResponse) => {
-
         this.roomForm.patchValue({
           number: Number(room.number),
           roomTypeId: room.roomTypeDTOResponse?.id ?? 0
         });
 
         this.loadRoomTypes();
+        this.loadExistingImages(room);
       },
       error: () => {
         this.errorMessage.set('No se pudo cargar la habitación.');
@@ -86,6 +89,61 @@ export class RoomEditComponent implements OnInit {
     });
   }
 
+  // Carga las imágenes actuales del servidor para mostrarlas como miniaturas
+  loadExistingImages(room: RoomDtoResponse): void {
+    const total = room.imagesCount ?? 0;
+    if (total === 0) return;
+
+    this.loadingImages.set(true);
+    const urls: string[] = [];
+    let descargadas = 0;
+
+    for (let i = 0; i < total; i++) {
+      this.roomService.getRoomImage(room.id, i).subscribe({
+        next: (blob) => {
+          urls[i] = URL.createObjectURL(blob);
+          descargadas++;
+          if (descargadas === total) {
+            this.existingImages.set(urls);
+            this.loadingImages.set(false);
+          }
+        },
+        error: () => {
+          descargadas++;
+          if (descargadas === total) {
+            this.loadingImages.set(false);
+          }
+        }
+      });
+    }
+  }
+
+  // Eliminar una imagen existente directamente llamando al backend
+  removeExistingImage(index: number): void {
+    if (!window.confirm('¿Estás seguro de eliminar esta imagen?')) return;
+
+    this.roomService.deleteRoomImage(this.roomId, index).subscribe({
+      next: (roomActualizada) => {
+        // Liberamos la URL en memoria
+        URL.revokeObjectURL(this.existingImages()[index]);
+        
+        // Volvemos a cargar las imágenes actualizadas
+        this.existingImages.set([]);
+        this.loadExistingImages(roomActualizada);
+      },
+      error: () => {
+        this.errorMessage.set('No se pudo eliminar la imagen.');
+      }
+    });
+  }
+
+  onImagesSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    if (input.files) {
+      this.selectedImages.set(Array.from(input.files));
+    }
+  }
+
   updateRoom(): void {
     if (this.roomForm.invalid || this.saving() || this.loading()) {
       this.roomForm.markAllAsTouched();
@@ -97,10 +155,27 @@ export class RoomEditComponent implements OnInit {
 
     const request = this.roomForm.getRawValue();
 
+    // 1. Actualizamos datos básicos
     this.roomService.updateRoom(this.roomId, request).subscribe({
       next: () => {
-        this.saving.set(false);
-        this.router.navigate(['/dashboard/room-list']);
+        const newImages = this.selectedImages();
+
+        // 2. Si hay nuevas imágenes para agregar, las mandamos
+        if (newImages.length > 0) {
+          this.roomService.addImages(this.roomId, newImages).subscribe({
+            next: () => {
+              this.saving.set(false);
+              this.router.navigate(['/dashboard/room-list']);
+            },
+            error: () => {
+              this.errorMessage.set('Datos actualizados, pero falló la subida de nuevas imágenes.');
+              this.saving.set(false);
+            }
+          });
+        } else {
+          this.saving.set(false);
+          this.router.navigate(['/dashboard/room-list']);
+        }
       },
       error: () => {
         this.errorMessage.set('No se pudo actualizar la habitación.');
@@ -108,5 +183,9 @@ export class RoomEditComponent implements OnInit {
       }
     });
   }
-}
 
+  ngOnDestroy(): void {
+    // Limpieza de URLs en memoria
+    this.existingImages().forEach(url => URL.revokeObjectURL(url));
+  }
+}
