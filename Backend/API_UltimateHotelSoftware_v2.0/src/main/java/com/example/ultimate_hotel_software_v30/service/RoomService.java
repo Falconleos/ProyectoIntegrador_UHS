@@ -40,4 +40,6 @@ public interface RoomService {
 
     // Nuevo método para recuperar el byte[] de una imagen específica por su índice
     byte[] getImage(Long roomId, int imageIndex);
+
+    RoomDTOResponse removeImage(Long roomId, int imageIndex);
 }

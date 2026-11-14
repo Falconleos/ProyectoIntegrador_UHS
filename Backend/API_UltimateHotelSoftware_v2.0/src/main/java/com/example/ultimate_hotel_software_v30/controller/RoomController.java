@@ -135,4 +135,12 @@ public class RoomController {
                 .body(imageBytes);
     }
 
+    @DeleteMapping("/{id}/images/{index}")
+    @PreAuthorize("hasAnyRole('ADMIN', 'RECEPCIONIST')")
+    @Operation(summary = "Eliminar una imagen específica de la habitación por su índice")
+    public ResponseEntity<RoomDTOResponse> removeImage(@PathVariable Long id, @PathVariable int index) {
+        RoomDTOResponse updatedRoom = roomService.removeImage(id, index);
+        return ResponseEntity.ok(updatedRoom);
+    }
+
 }

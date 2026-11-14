@@ -213,4 +213,24 @@ public class RoomServiceImpl implements RoomService {
         return room.getImages().get(imageIndex);
     }
 
+    @Override
+    @Transactional
+    public RoomDTOResponse removeImage(Long roomId, int imageIndex) {
+        RoomEntity room = findEntityById(roomId);
+
+        if (room.getImages() == null || room.getImages().isEmpty()) {
+            throw new RuntimeException("No images found for room ID: " + roomId);
+        }
+
+        if (imageIndex < 0 || imageIndex >= room.getImages().size()) {
+            throw new RuntimeException("Image index out of bounds: " + imageIndex);
+        }
+
+        // Removemos la imagen de la lista en memoria
+        room.getImages().remove(imageIndex);
+
+        RoomEntity updatedRoom = roomRepository.save(room);
+        return roomMapper.toRoomDTOResponse(updatedRoom);
+    }
+
 }
