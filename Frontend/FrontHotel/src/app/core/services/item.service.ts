@@ -82,4 +82,9 @@ export class ItemService {
         withCredentials: true
       });
   }
+
+  deleteItemImage(id: number): Observable<ItemDtoResponse> {
+  return this.http.delete<ItemDtoResponse>(`${this.apiUrl}/${id}/image`);
+}
+
 }

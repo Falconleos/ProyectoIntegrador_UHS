@@ -22,7 +22,12 @@
   color: var(--color-text-main);
   display: flex;
   align-items: center;
+  gap: 0.6rem;
   margin-bottom: 0;
+}
+
+.header-section h2 i {
+  color: var(--color-primary);
 }
 
 .subtitle {
@@ -112,6 +117,23 @@
   cursor: pointer;
 }
 
+/* Clases auxiliares para textos de archivos y bloques */
+.file-feedback {
+  margin-top: 0.25rem;
+  display: block;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.text-success {
+  color: #34d399 !important;
+}
+
+.text-muted {
+  color: var(--color-text-muted) !important;
+}
+
 /* Checkbox personalizado */
 .checkbox-group {
   margin-top: 0.5rem;
@@ -141,6 +163,7 @@
   margin-top: 0.25rem;
   display: flex;
   align-items: center;
+  gap: 0.4rem;
 }
 
 /* Botones de Acción */
@@ -202,6 +225,9 @@
   border-radius: var(--radius-sm);
   font-size: var(--font-size-sm);
   margin-bottom: 1.25rem;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
 }
 
 .alert-danger {
@@ -214,4 +240,63 @@
   background: rgba(129, 140, 248, 0.15);
   border: 1px solid rgba(129, 140, 248, 0.3);
   color: var(--color-primary);
+}
+
+/* Animación de giro para iconos de carga */
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.spin {
+  animation: spin 1s linear infinite;
+}
+
+/* --- Miniatura de la imagen actual del ítem --- */
+.image-thumbnail-card {
+  position: relative;
+  width: 100px;
+  height: 100px;
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  border: var(--border-input);
+  background: rgba(15, 23, 42, 0.9);
+  margin-top: 0.5rem;
+}
+
+.image-thumbnail-card img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.btn-danger-icon {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  background: rgba(239, 68, 68, 0.85);
+  color: #fff;
+  border: none;
+  border-radius: 50%;
+  width: 26px;
+  height: 26px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 0.75rem;
+  transition: background 0.2s ease;
+}
+
+.btn-danger-icon:hover {
+  background: rgb(239, 68, 68);
+}
+
+/* --- Contenedor de Vista Previa para Nueva Imagen --- */
+.preview-container {
+  margin-top: 0.75rem;
+}
+
+.preview-title {
+  margin-bottom: 0.25rem;
 }

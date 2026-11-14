@@ -25,7 +25,12 @@
   color: var(--color-text-main);
   display: flex;
   align-items: center;
+  gap: 0.6rem;
   margin-bottom: 0;
+}
+
+.header-section h2 i {
+  color: var(--color-primary);
 }
 
 .subtitle {
@@ -91,6 +96,11 @@
   font-size: var(--font-size-xs);
 }
 
+.item-no-image i {
+  font-size: 1.75rem;
+  color: var(--color-text-muted);
+}
+
 /* Contenido de la tarjeta */
 .item-content {
   padding: 1.5rem;
@@ -123,6 +133,16 @@
   justify-content: space-between;
   align-items: center;
   margin-bottom: 0;
+}
+
+.item-value-bold {
+  font-weight: 600;
+  color: var(--color-text-main);
+}
+
+.item-price {
+  font-weight: 700;
+  color: #34d399;
 }
 
 /* Botones de acción */
@@ -222,6 +242,9 @@
   border-radius: var(--radius-sm);
   font-size: var(--font-size-sm);
   margin-bottom: 1.25rem;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
 }
 
 .alert-info {
@@ -234,4 +257,14 @@
   background: rgba(239, 68, 68, 0.15);
   border: 1px solid rgba(239, 68, 68, 0.3);
   color: #fca5a5;
+}
+
+/* Animación de giro para iconos de carga */
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.spin {
+  animation: spin 1s linear infinite;
 }

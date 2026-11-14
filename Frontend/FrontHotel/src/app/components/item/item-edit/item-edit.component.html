@@ -2,7 +2,7 @@
   <!-- Encabezado -->
   <div class="header-section">
     <h2>
-      <i class="bi bi-pencil-square me-2"></i> Editar Producto o Servicio
+      <i class="bi bi-pencil-square"></i> Editar Producto o Servicio
     </h2>
   </div>
 
@@ -11,14 +11,14 @@
   <!-- Mensaje de Error General -->
   @if (errorMessage()) {
     <div class="alert alert-danger">
-      <i class="bi bi-exclamation-triangle me-2"></i> {{ errorMessage() }}
+      <i class="bi bi-exclamation-triangle"></i> {{ errorMessage() }}
     </div>
   }
 
   <!-- Estado de Carga -->
   @if (loading()) {
     <div class="alert alert-info">
-      <i class="bi bi-arrow-repeat spin me-2"></i> Cargando datos del ítem...
+      <i class="bi bi-arrow-repeat spin"></i> Cargando datos del ítem...
     </div>
   } @else if (itemLoaded()) {
     <form [formGroup]="itemForm" (ngSubmit)="onSubmit()" class="form-grid">
@@ -38,14 +38,13 @@
         </div>
         @if (itemForm.controls.description.touched && itemForm.controls.description.hasError('required')) {
           <small class="error-text">
-            <i class="bi bi-info-circle me-1"></i> La descripción es obligatoria.
+            <i class="bi bi-info-circle"></i> La descripción es obligatoria.
           </small>
         }
       </div>
 
-      <!-- Cantidad y Precio Unitario (En dos columnas) -->
+      <!-- Cantidad y Precio Unitario -->
       <div class="row-grid-inputs">
-        <!-- Cantidad -->
         <div class="form-group">
           <label class="form-label" for="quantity">Cantidad *</label>
           <div class="input-wrapper">
@@ -69,7 +68,6 @@
           }
         </div>
 
-        <!-- Precio unitario -->
         <div class="form-group">
           <label class="form-label" for="unitPrice">Precio unitario ($) *</label>
           <div class="input-wrapper">
@@ -95,7 +93,7 @@
         </div>
       </div>
 
-      <!-- Tipo de ítem (Checkbox estilizado) -->
+      <!-- Tipo de ítem -->
       <div class="form-group checkbox-group">
         <label class="checkbox-label" for="isService">
           <input
@@ -108,7 +106,29 @@
         </label>
       </div>
 
-      <!-- Imagen opcional -->
+      <!-- Gestión de Imagen Actual -->
+      <div class="form-group">
+        <label class="form-label">Imagen actual</label>
+        @if (loadingImage()) {
+          <p class="subtitle"><i class="bi bi-arrow-repeat spin"></i> Cargando imagen...</p>
+        } @else if (existingImageUrl()) {
+          <div class="image-thumbnail-card">
+            <img [src]="existingImageUrl()" alt="Imagen actual del ítem">
+            <button
+              type="button"
+              class="btn-danger-icon"
+              (click)="removeExistingImage()"
+              title="Eliminar imagen actual"
+            >
+              <i class="bi bi-trash"></i>
+            </button>
+          </div>
+        } @else {
+          <p class="subtitle">Este ítem no tiene una imagen asignada.</p>
+        }
+      </div>
+
+      <!-- Seleccionar Nueva Imagen -->
       <div class="form-group">
         <label class="form-label" for="image">Nueva imagen (opcional)</label>
         <div class="input-wrapper file-input-wrapper">
@@ -120,14 +140,24 @@
             (change)="onImageSelected($event)"
           >
         </div>
+
+        <!-- Vista previa de la nueva imagen seleccionada -->
+        @if (selectedImagePreview()) {
+          <div class="preview-container">
+            <p class="subtitle text-success preview-title">
+              <i class="bi bi-eye"></i> Vista previa de la nueva imagen:
+            </p>
+            <div class="image-thumbnail-card">
+              <img [src]="selectedImagePreview()" alt="Vista previa de nueva imagen">
+            </div>
+          </div>
+        }
+
         @if (selectedImage()) {
-          <small class="subtitle mt-1 d-block text-success">
-            <i class="bi bi-file-earmark-image me-1"></i> Nueva imagen seleccionada: <strong>{{ selectedImage()?.name }}</strong>
+          <small class="subtitle file-feedback text-success">
+            <i class="bi bi-file-earmark-image"></i> Nueva imagen seleccionada: <strong>{{ selectedImage()?.name }}</strong>
           </small>
         }
-        <small class="subtitle mt-1 d-block text-muted">
-          <i class="bi bi-info-circle me-1"></i> Si no seleccionás una nueva imagen, se mantendrá la actual.
-        </small>
       </div>
 
       <!-- Acciones -->
@@ -138,9 +168,9 @@
           [disabled]="saving() || loading()"
         >
           @if (saving()) {
-            <i class="bi bi-arrow-repeat spin me-2"></i> Guardando cambios...
+            <i class="bi bi-arrow-repeat spin"></i> Guardando cambios...
           } @else {
-            <i class="bi bi-check-lg me-2"></i> Guardar cambios
+            <i class="bi bi-check-lg"></i> Guardar cambios
           }
         </button>
 
