@@ -354,11 +354,11 @@
   border-top: var(--border-glass);
 }
 
-.roomTypes{
-    padding: 10px;
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
+.roomTypes {
+  padding: 10px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
 }
 
 /* --- Contenedor en Cuadrícula para los Tipos de Habitación --- */
@@ -440,4 +440,33 @@
   gap: 6px;
   padding-top: 8px;
   border-top: var(--border-glass);
+}
+
+/* --- Clases Utilitarias (Reemplazos de estilos en línea y Bootstrap) --- */
+.text-right {
+  text-align: right;
+}
+
+.error-message-wrapper {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  gap: 1rem;
+}
+
+.room-types-empty {
+  width: 100%;
+}
+
+.detail-item-full {
+  grid-column: span 2;
+}
+
+.modal-alert-margin {
+  margin-top: 0.75rem;
+}
+
+.modal-subtitle-margin {
+  margin-top: 0.5rem;
 }

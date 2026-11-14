@@ -1,6 +1,6 @@
 import { Component, inject, OnInit, OnDestroy, signal } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
-import { forkJoin, Subscription } from 'rxjs';
+import { Subscription } from 'rxjs';
 
 import { RoomService } from '../../../core/services/room.service';
 import { RoomTypeService } from '../../../core/services/room-type.service';
@@ -21,14 +21,14 @@ export class RoomListComponent implements OnInit, OnDestroy {
   private route = inject(Router);
 
   rooms = signal<RoomDtoResponse[]>([]);
-  roomTypes = signal<RoomTypeDTOResponse[]>([]); // Señal para los tipos de habitación
+  roomTypes = signal<RoomTypeDTOResponse[]>([]);
   loading = signal(true);
-  errorMessage = signal(''); // Para errores al cargar habitaciones
-  actionError = signal(''); // Para errores al eliminar o actualizar habitaciones
+  errorMessage = signal('');
+  actionError = signal('');
 
   selectedRoom = signal<RoomDtoResponse | null>(null);
 
-  // Señales del proceso de carga de imagenes
+  // Señales para el manejo de imágenes
   roomImages = signal<string[]>([]);
   loadingImages = signal(false);
   imageError = signal('');
@@ -38,7 +38,7 @@ export class RoomListComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.loadRooms();
-    this.loadRoomTypes(); // Cargamos los tipos de habitación al iniciar
+    this.loadRoomTypes();
   }
 
   loadRooms(): void {
@@ -63,7 +63,6 @@ export class RoomListComponent implements OnInit, OnDestroy {
         this.roomTypes.set(Array.isArray(data) ? data : []);
       },
       error: () => {
-        
         console.error('No se pudieron cargar los tipos de habitación.');
       }
     });
@@ -74,9 +73,9 @@ export class RoomListComponent implements OnInit, OnDestroy {
 
     this.roomService.deleteRoom(id).subscribe({
       next: () => {
-        this.rooms.update(rooms =>
-          rooms.filter(room => room.id !== id)
-        );
+        // Creamos un nuevo arreglo excluyendo la habitación eliminada
+        const habitacionesActualizadas = this.rooms().filter(room => room.id !== id);
+        this.rooms.set(habitacionesActualizadas);
       },
       error: () => {
         this.actionError.set('No se pudo eliminar la habitación.');
@@ -84,23 +83,30 @@ export class RoomListComponent implements OnInit, OnDestroy {
     });
   }
 
-  putInMaintenance(id: number): void {
+ putInMaintenance(id: number): void {
     this.actionError.set('');
 
     this.roomService.putInMaintenance(id).subscribe({
-      next: () => {
-        this.rooms.update(rooms =>
-          rooms.map(room =>
-            room.id === id
-              ? { ...room, state: 'MAINTENANCE' }
-              : room
-          )
-        );
+      next: (roomActualizada) => {
+        // Obtenemos el nuevo estado que determinó el backend ('MAINTENANCE' o 'AVAILABLE')
+        const nuevoEstado = roomActualizada.state;
 
+        // Recorremos la lista y actualizamos el estado de la habitación correspondiente
+        const listaModificada = this.rooms().map(room => {
+          if (room.id === id) {
+            return { ...room, state: nuevoEstado };
+          }
+          return room;
+        });
+
+        this.rooms.set(listaModificada);
+
+        // Si la habitación seleccionada en el modal es la misma, actualizamos su estado también
         if (this.selectedRoom()?.id === id) {
-          this.selectedRoom.update(room =>
-            room ? { ...room, state: 'MAINTENANCE' } : null
-          );
+          const habSeleccionada = this.selectedRoom();
+          if (habSeleccionada) {
+            this.selectedRoom.set({ ...habSeleccionada, state: nuevoEstado });
+          }
         }
       },
       error: () => {
@@ -112,69 +118,79 @@ export class RoomListComponent implements OnInit, OnDestroy {
   openRoomModal(room: RoomDtoResponse): void {
     this.closeRoomModal(); 
     this.selectedRoom.set(room); 
-    this.loadRoomImages(room); 
+    this.loadRoomImagesSimple(room);
   }
 
-  loadRoomImages(room: RoomDtoResponse): void {
-    const count = room.imagesCount ?? 0;
+  
+  loadRoomImagesSimple(room: RoomDtoResponse): void {
+    const totalImagenes = room.imagesCount ?? 0;
 
-    this.loadingImages.set(count > 0);
+    this.loadingImages.set(totalImagenes > 0);
     this.imageError.set('');
     this.currentImageIndex.set(0);
 
-    if (count === 0) {
+    if (totalImagenes === 0) {
       return;
     }
 
-    const requests = Array.from(
-      { length: count },
-      (_, index) => this.roomService.getRoomImage(room.id, index)
-    );
+    const urlsTemporales: string[] = [];
+    let imagenesDescargadas = 0;
 
-    this.imageSubscription = forkJoin(requests).subscribe({
-      next: (blobs) => {
-        if (this.selectedRoom()?.id !== room.id) {
-          return;
+    // Recorremos con un bucle
+    for (let i = 0; i < totalImagenes; i++) {
+      this.roomService.getRoomImage(room.id, i).subscribe({
+        next: (blob) => {
+          // Validamos que el usuario siga viendo la misma habitación
+          if (this.selectedRoom()?.id !== room.id) return;
+
+          // Convertimos el archivo binario a URL web
+          const url = URL.createObjectURL(blob);
+          urlsTemporales[i] = url; // Guardamos en la posición exacta
+          imagenesDescargadas++;
+
+          // Cuando terminamos de descargar todas las imágenes, actualizamos la señal
+          if (imagenesDescargadas === totalImagenes) {
+            this.roomImages.set(urlsTemporales);
+            this.loadingImages.set(false);
+          }
+        },
+        error: () => {
+          if (this.selectedRoom()?.id === room.id) {
+            this.imageError.set('No se pudieron cargar las imágenes.');
+            this.loadingImages.set(false);
+          }
         }
-
-        const urls = blobs.map(blob => URL.createObjectURL(blob));
-
-        this.roomImages.set(urls);
-        this.loadingImages.set(false);
-      },
-      error: () => {
-        if (this.selectedRoom()?.id === room.id) {
-          this.imageError.set('No se pudieron cargar las imágenes.');
-          this.loadingImages.set(false);
-        }
-      }
-    });
+      });
+    }
   }
 
   previousImage(): void {
     const total = this.roomImages().length;
-
     if (total === 0) return;
 
-    this.currentImageIndex.update(index =>
-      (index - 1 + total) % total
-    );
+    let nuevoIndice = this.currentImageIndex() - 1;
+    if (nuevoIndice < 0) {
+      nuevoIndice = total - 1; // Si llega al principio, vuelve a la última foto
+    }
+    this.currentImageIndex.set(nuevoIndice);
   }
 
   nextImage(): void {
     const total = this.roomImages().length;
-
     if (total === 0) return;
 
-    this.currentImageIndex.update(index =>
-      (index + 1) % total
-    );
+    let nuevoIndice = this.currentImageIndex() + 1;
+    if (nuevoIndice >= total) {
+      nuevoIndice = 0; // Si llega al final, vuelve a la primera foto
+    }
+    this.currentImageIndex.set(nuevoIndice);
   }
 
   closeRoomModal(): void {
     this.imageSubscription?.unsubscribe();
     this.imageSubscription = undefined;
 
+    // Liberamos memoria de las URLs creadas
     this.roomImages().forEach(url => URL.revokeObjectURL(url));
 
     this.roomImages.set([]);
@@ -206,7 +222,8 @@ export class RoomListComponent implements OnInit, OnDestroy {
 
     this.roomTypeService.deleteRoomType(id).subscribe({
       next: () => {
-        this.roomTypes.update(types => types.filter(type => type.id !== id));
+        const tiposActualizados = this.roomTypes().filter(type => type.id !== id);
+        this.roomTypes.set(tiposActualizados);
       },
       error: (err) => {
         console.error('Error al eliminar tipo de habitación:', err);
@@ -215,5 +232,4 @@ export class RoomListComponent implements OnInit, OnDestroy {
       }
     });
   }
-
 }

@@ -36,7 +36,6 @@
             <i class="fa-solid fa-plus"></i>
           </button>
 
-          <!-- Enlace actualizado al componente de editar tipo de habitación con el ID dinámico -->
           <a
             [routerLink]="['/dashboard/room-type-edit', type.id]"
             class="btn-warning"
@@ -56,7 +55,7 @@
 
       </div>
     } @empty {
-      <div class="alert alert-warning" style="width: 100%;">
+      <div class="alert alert-warning room-types-empty">
         <i class="fa-solid fa-circle-info"></i> No hay tipos de habitación registrados.
       </div>
     }
@@ -75,8 +74,8 @@
       <i class="fa-solid fa-spinner fa-spin"></i> Cargando habitaciones...
     </div>
   } @else if (errorMessage()) {
-    <div class="alert alert-danger">
-      <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+    <div class="alert alert-danger error-alert-content">
+      <div class="error-message-wrapper">
         <span><i class="fa-solid fa-triangle-exclamation"></i> {{ errorMessage() }}</span>
         <button type="button" class="btn-warning" (click)="loadRooms()">
           <i class="fa-solid fa-rotate-right"></i> Reintentar
@@ -99,7 +98,7 @@
             <th>Capacidad</th>
             <th>Estado</th>
             <th>Precio por noche</th>
-            <th style="text-align: right;">Acciones</th>
+            <th class="text-right">Acciones</th>
           </tr>
         </thead>
         <tbody>
@@ -108,15 +107,15 @@
               <td><strong>#{{ room.number }}</strong></td>
 
               <td>
-                {{ room.roomTypeDTOResponse?.name
-                    ?? room.roomTypeName
+                {{ room.roomTypeDTOResponse?.name 
+                    ?? room.roomTypeName 
                     ?? 'Sin tipo' }}
               </td>
 
               <td>
                 <i class="fa-solid fa-user-group"></i> 
-                {{ room.roomTypeDTOResponse?.capacity
-                    ?? room.capacity
+                {{ room.roomTypeDTOResponse?.capacity 
+                    ?? room.capacity 
                     ?? 'Sin datos' }}
               </td>
 
@@ -149,8 +148,8 @@
               </td>
 
               <td>
-                <strong>${{ room.roomTypeDTOResponse?.pricePerNight
-                    ?? room.pricePerNight
+                <strong>${{ room.roomTypeDTOResponse?.pricePerNight 
+                    ?? room.pricePerNight 
                     ?? 'Sin datos' }}</strong>
               </td>
 
@@ -177,8 +176,7 @@
                     type="button"
                     class="btn-secondary-action"
                     (click)="putInMaintenance(room.id)"
-                    [disabled]="room.state === 'MAINTENANCE'"
-                    title="Poner en mantenimiento"
+                    [title]="room.state === 'MAINTENANCE' ? 'Quitar de mantenimiento' : 'Poner en mantenimiento'"
                   >
                     <i class="fa-solid fa-screwdriver-wrench"></i>
                   </button>
@@ -247,7 +245,7 @@
             {{ room.roomTypeDTOResponse?.capacity ?? room.capacity ?? 'Sin datos' }} personas
           </span>
         </div>
-        <div class="detail-item" style="grid-column: span 2;">
+        <div class="detail-item detail-item-full">
           <span class="detail-label"><i class="fa-solid fa-dollar-sign"></i> Precio por noche:</span>
           <span class="detail-value">
             ${{ room.roomTypeDTOResponse?.pricePerNight ?? room.pricePerNight ?? 'Sin datos' }}
@@ -260,15 +258,15 @@
         <h3><i class="fa-solid fa-images"></i> Imágenes de la habitación</h3>
 
         @if (loadingImages()) {
-          <div class="alert alert-info" style="margin-top: 0.75rem;">
+          <div class="alert alert-info modal-alert-margin">
             <i class="fa-solid fa-spinner fa-spin"></i> Cargando imágenes...
           </div>
         } @else if (imageError()) {
-          <div class="alert alert-danger" style="margin-top: 0.75rem;">
+          <div class="alert alert-danger modal-alert-margin">
             <i class="fa-solid fa-triangle-exclamation"></i> {{ imageError() }}
           </div>
         } @else if (roomImages().length === 0) {
-          <p class="subtitle" style="margin-top: 0.5rem;">Esta habitación no tiene imágenes.</p>
+          <p class="subtitle modal-subtitle-margin">Esta habitación no tiene imágenes.</p>
         } @else {
           <div class="image-gallery">
             <img
