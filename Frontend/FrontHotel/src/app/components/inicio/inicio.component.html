@@ -1,0 +1,107 @@
+<div class="inicio-container">
+  
+  <!-- Banner de Bienvenida -->
+  <div class="welcome-banner">
+    <h2>Panel General</h2>
+    <p>Resumen de operaciones y métricas clave del hotel en tiempo real.</p>
+  </div>
+
+  <!-- Grilla de KPIs -->
+  <div class="kpi-grid">
+    
+    <!-- 1. Total Habitaciones -->
+    <div class="kpi-card">
+      <div class="kpi-icon rooms">
+        <i class="fa-solid fa-bed"></i>
+      </div>
+      <div class="kpi-info">
+        <span>Total Habitaciones</span>
+        <h3>{{ totalRooms() }}</h3>
+      </div>
+    </div>
+
+    <!-- 2. Estadías Activas -->
+    <div class="kpi-card">
+      <div class="kpi-icon bookings">
+        <i class="fa-solid fa-calendar-check"></i>
+      </div>
+      <div class="kpi-info">
+        <span>Estadías Activas</span>
+        <h3>{{ activeBookingsCount() }}</h3>
+      </div>
+    </div>
+
+    <!-- 3. Reservas Pendientes -->
+    <div class="kpi-card">
+      <div class="kpi-icon pending-bookings">
+        <i class="fa-solid fa-clock"></i>
+      </div>
+      <div class="kpi-info">
+        <span>Reservas Pendientes</span>
+        <h3>{{ pendingBookingsCount() }}</h3>
+      </div>
+    </div>
+
+    <!-- 4. Ingresos del Día -->
+    <div class="kpi-card">
+      <div class="kpi-icon revenue">
+        <i class="fa-solid fa-wallet"></i>
+      </div>
+      <div class="kpi-info">
+        <span>Ingresos del Día</span>
+        <h3>$ {{ todayRevenue() | number:'1.2-2' }}</h3>
+      </div>
+    </div>
+
+    <!-- 5. Servicios Pendientes -->
+    <div class="kpi-card">
+      <div class="kpi-icon attentions">
+        <i class="fa-solid fa-bell-concierge"></i>
+      </div>
+      <div class="kpi-info">
+        <span>Servicios Pendientes</span>
+        <h3>{{ pendingAttentionsCount() }}</h3>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Sección de Gráfico de Ocupación -->
+  <div class="dashboard-section">
+    <div class="chart-card">
+      <div class="chart-header">
+        <h3>Porcentaje de Ocupación del Hotel</h3>
+        <span class="chart-subtitle">Relación entre habitaciones ocupadas y totales</span>
+      </div>
+
+      <div class="chart-content">
+        <div class="pie-chart-wrapper">
+          <div class="pie-chart" [style.--occupancy]="occupancyPercentage() + '%'">
+            <div class="pie-chart-inner">
+              <span class="percentage-value">{{ occupancyPercentage() }}%</span>
+              <span class="percentage-label">Ocupado</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="chart-legend">
+          <div class="legend-item">
+            <span class="legend-color occupied"></span>
+            <div class="legend-text">
+              <strong>Ocupadas</strong>
+              <span>{{ occupiedRoomsCount() }} habitaciones</span>
+            </div>
+          </div>
+          <div class="legend-item">
+            <span class="legend-color available"></span>
+            <div class="legend-text">
+              <strong>Disponibles</strong>
+              <span>{{ availableRoomsCount() }} habitaciones</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>

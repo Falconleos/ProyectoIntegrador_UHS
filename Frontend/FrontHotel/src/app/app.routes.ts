@@ -2,6 +2,7 @@ import { Routes } from '@angular/router';
 import { LoginComponent } from './pages/login/login.component';
 import { DashboardComponent } from './pages/dashboard/dashboard.component';
 import { LandingComponent } from './pages/landing/landing.component';
+import { noGuestGuard } from './core/guards/no-guest-guard';
 
 export const routes: Routes = [
     {
@@ -24,6 +25,11 @@ export const routes: Routes = [
         path: 'dashboard',
         component: DashboardComponent,
         children: [
+            {
+                path: '',
+                redirectTo: 'inicio',
+                pathMatch: 'full',
+            },
             {
                 path: 'usuarios',
                 loadComponent: () => import('./components/user-list/user-list.component').then(m => m.UserListComponent)
@@ -131,6 +137,11 @@ export const routes: Routes = [
             {
                 path:'room-attentions',
                 loadComponent:()=>import('./components/room-attention-global-list/room-attention-global-list.component').then(m=>m.RoomAttentionGlobalListComponent)
+            },
+            {
+                path:'inicio',
+                loadComponent:()=>import('./components/inicio/inicio.component').then(m=>m.InicioComponent),
+                canActivate: [noGuestGuard]
             }
             
         ]

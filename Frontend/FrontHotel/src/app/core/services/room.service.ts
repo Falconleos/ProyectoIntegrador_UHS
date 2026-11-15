@@ -136,8 +136,11 @@ export class RoomService {
   }
 
   deleteRoomImage(roomId: number, index: number): Observable<RoomDtoResponse> {
-  return this.http.delete<RoomDtoResponse>(`${this.apiUrl}/${roomId}/images/${index}`);
-}
+    return this.http.delete<RoomDtoResponse>(
+      `${this.apiUrl}/${roomId}/images/${index}`,
+      { withCredentials: true } 
+    );
+  }
 
 }
 

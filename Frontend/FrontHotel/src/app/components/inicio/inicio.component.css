@@ -1,0 +1,236 @@
+/* Contenedor Principal */
+.inicio-container {
+  padding: 1.5rem;
+  color: var(--color-text-main);
+  background-color: transparent;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+/* Banner de Bienvenida */
+.welcome-banner h2 {
+  font-size: var(--font-size-title-fluid);
+  font-weight: 600;
+  color: var(--color-text-main);
+  margin-bottom: 0.35rem;
+}
+
+.welcome-banner p {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+}
+
+/* Grilla de KPIs (5 columnas arriba) */
+.kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(180px, 1fr));
+  gap: 1rem;
+}
+
+@media (max-width: 1400px) {
+  .kpi-grid {
+    grid-template-columns: repeat(3, minmax(220px, 1fr));
+  }
+}
+
+@media (max-width: 900px) {
+  .kpi-grid {
+    grid-template-columns: repeat(2, minmax(220px, 1fr));
+  }
+}
+
+@media (max-width: 600px) {
+  .kpi-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Tarjeta Estilo Glassmorphism */
+.kpi-card {
+  background: var(--bg-secondary);
+  backdrop-filter: var(--backdrop-blur);
+  -webkit-backdrop-filter: var(--backdrop-blur);
+  border: var(--border-glass);
+  box-shadow: var(--shadow-main);
+  border-radius: var(--radius-lg);
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column; /* Apila el icono/título arriba y el número abajo si se prefiere, o diseño en bloque */
+  gap: 0.85rem;
+  transition: transform 0.2s ease, border-color 0.2s ease;
+}
+
+.kpi-card:hover {
+  transform: translateY(-2px);
+  border-color: rgba(129, 140, 248, 0.3);
+}
+
+/* Cabecera interna de la tarjeta (Icono + Título arriba) */
+.kpi-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  width: 100%;
+}
+
+/* Permitir que el texto salte de línea en lugar de cortarse con puntos suspensivos */
+.kpi-info span {
+  font-size: 0.75rem;
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-weight: 600;
+  white-space: normal; /* Permite que baje a la siguiente línea si es largo */
+  line-height: 1.2;
+}
+
+/* El número o valor métrico grande abajo */
+.kpi-info h3 {
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: var(--color-text-main);
+  margin: 0;
+}
+
+/* Iconos */
+.kpi-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+  color: var(--color-text-main);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.kpi-icon.rooms { background: linear-gradient(135deg, #6366f1, #4f46e5); }
+.kpi-icon.bookings { background: linear-gradient(135deg, #0ea5e9, #0284c7); }
+.kpi-icon.pending-bookings { background: linear-gradient(135deg, #8b5cf6, #7c3aed); }
+.kpi-icon.revenue { background: linear-gradient(135deg, #10b981, #059669); }
+.kpi-icon.attentions { background: linear-gradient(135deg, #f59e0b, #d97706); }
+
+/* --- SECCIÓN DEL GRÁFICO DE TORTA --- */
+.dashboard-section {
+  width: 100%;
+}
+
+.chart-card {
+  background: var(--bg-secondary);
+  backdrop-filter: var(--backdrop-blur);
+  -webkit-backdrop-filter: var(--backdrop-blur);
+  border: var(--border-glass);
+  box-shadow: var(--shadow-main);
+  border-radius: var(--radius-lg);
+  padding: 1.5rem 2rem;
+  width: 100%;
+}
+
+.chart-header h3 {
+  font-size: var(--font-size-md);
+  color: var(--color-text-main);
+  font-weight: 600;
+}
+
+.chart-subtitle {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+}
+
+.chart-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  flex-wrap: wrap;
+  gap: 2rem;
+  margin-top: 1.5rem;
+}
+
+/* Gráfico Circular con Conic Gradient puro */
+.pie-chart-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.pie-chart {
+  width: 160px;
+  height: 160px;
+  border-radius: 50%;
+  background: conic-gradient(
+    #6366f1 0% var(--occupancy), 
+    rgba(255, 255, 255, 0.06) var(--occupancy) 100%
+  );
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+  position: relative;
+}
+
+.pie-chart-inner {
+  width: 120px;
+  height: 120px;
+  background-color: #0f172a;
+  border-radius: 50%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.percentage-value {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--color-text-main);
+}
+
+.percentage-label {
+  font-size: 0.75rem;
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+}
+
+/* Leyenda del Gráfico */
+.chart-legend {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.legend-color {
+  width: 14px;
+  height: 14px;
+  border-radius: 4px;
+}
+
+.legend-color.occupied {
+  background-color: #6366f1;
+}
+
+.legend-color.available {
+  background-color: rgba(255, 255, 255, 0.15);
+}
+
+.legend-text {
+  display: flex;
+  flex-direction: column;
+}
+
+.legend-text strong {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-main);
+}
+
+.legend-text span {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+}
