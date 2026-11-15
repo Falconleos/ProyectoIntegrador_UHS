@@ -293,6 +293,7 @@
   color: var(--color-text-main);
   border: var(--border-btn);
   padding: 8px 14px;
+  margin-right: 10px;
   border-radius: var(--radius-sm);
   font-weight: 500;
   cursor: pointer;
@@ -326,4 +327,174 @@
   background: rgba(239, 68, 68, 0.15);
   border: 1px solid rgba(239, 68, 68, 0.3);
   color: #fca5a5;
+}
+
+/* =========================================================
+   ESTILOS DE IMPRESIÓN Y RECIBO FORMAL
+   ========================================================= */
+
+/* Por defecto, el recibo de impresión está oculto en la pantalla normal */
+.print-only-receipt {
+  display: none;
+}
+
+@media print {
+  /* 1. Ocultamos la barra de navegación global, menús, cabeceras del dashboard y botones */
+  app-sidebar, 
+  .sidebar, 
+  nav, 
+  header, 
+  footer, 
+  .header-section, 
+  .no-print,
+  .btn-secondary-action, 
+  .btn-primary, 
+  .btn-success-action, 
+  .glass-subcard, 
+  .column-sidebar,
+  i.bi {
+    display: none !important;
+  }
+
+  /* 2. Configuramos los márgenes de página y evitamos cortes de texto */
+  @page {
+    margin: 1cm;
+    size: portrait;
+  }
+
+  body, html {
+    background: white !important;
+    color: black !important;
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    box-shadow: none !important;
+    border: none !important;
+    font-family: Arial, sans-serif !important;
+    -webkit-print-color-adjust: exact;
+  }
+
+  /* 3. Mostramos la estructura limpia y formal del recibo a ancho completo */
+  .print-only-receipt {
+    display: block !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    background: white !important;
+    color: black !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    box-sizing: border-box !important;
+    overflow: visible !important;
+  }
+
+  .receipt-header {
+    text-align: center;
+    margin-bottom: 25px;
+    width: 100% !important;
+  }
+
+  .receipt-header h1 {
+    font-size: 24px !important;
+    font-weight: bold !important;
+    margin-bottom: 5px !important;
+    color: #111 !important;
+    white-space: normal !important;
+    word-wrap: break-word !important;
+  }
+
+  .receipt-header h3 {
+    font-size: 16px !important;
+    font-weight: 600 !important;
+    color: #444 !important;
+    margin-bottom: 8px !important;
+  }
+
+  .receipt-meta {
+    font-size: 13px !important;
+    color: #666 !important;
+  }
+
+  .receipt-divider {
+    border: 0;
+    height: 1px;
+    background: #ccc;
+    margin: 15px 0;
+    width: 100% !important;
+  }
+
+  .receipt-section {
+    margin-bottom: 20px;
+    width: 100% !important;
+  }
+
+  .receipt-section h4 {
+    font-size: 14px;
+    font-weight: bold;
+    text-transform: uppercase;
+    color: #333;
+    border-bottom: 1.5px solid #333;
+    padding-bottom: 5px;
+    margin-bottom: 10px;
+  }
+
+  .receipt-table {
+    width: 100% !important;
+    border-collapse: collapse;
+    font-size: 13px;
+  }
+
+  .receipt-table th, 
+  .receipt-table td {
+    padding: 8px 10px;
+    border-bottom: 1px solid #e0e0e0;
+    text-align: left;
+    color: #222;
+  }
+
+  .receipt-table th {
+    font-weight: bold;
+    background-color: #f8f9fa !important;
+  }
+
+  .text-end {
+    text-align: right !important;
+  }
+
+  .receipt-totals {
+    background: #f8f9fa !important;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    padding: 15px;
+    margin-top: 20px;
+  }
+
+  .total-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 14px;
+    margin-bottom: 8px;
+    color: #333;
+  }
+
+  .total-row:last-child {
+    margin-bottom: 0;
+    border-top: 1px dashed #ccc;
+    padding-top: 8px;
+    font-size: 15px;
+  }
+
+  .no-payments-text {
+    font-size: 13px;
+    color: #666;
+    font-style: italic;
+    margin: 5px 0;
+  }
+
+  .receipt-footer {
+    text-align: center;
+    margin-top: 40px;
+    font-size: 11px;
+    color: #777;
+    width: 100% !important;
+  }
 }

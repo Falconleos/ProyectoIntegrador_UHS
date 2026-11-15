@@ -22,6 +22,7 @@ export class AccountDetailComponent implements OnInit {
   checkInState = signal<string>('');
   loading = signal<boolean>(true);
   errorMessage = signal<string>('');
+  today = signal<Date>(new Date());
   
   // Control de permisos para edición (Admin / Recepción vs Guest)
   canModify = signal<boolean>(false);
@@ -34,6 +35,7 @@ export class AccountDetailComponent implements OnInit {
   // Ajuste por porcentaje
   adjustmentPercentage = signal<number>(0);
   adjustedTotal = signal<number>(0);
+  
 
   constructor(
     private route: ActivatedRoute,
@@ -92,6 +94,7 @@ export class AccountDetailComponent implements OnInit {
 
             this.adjustedTotal.set(this.calculateAdjustedTotal());
             this.paymentAmount.set(this.calculateRemaining());
+            this.paymentAmount.set(this.calculateRemaining());
 
             this.checkInService.getAll().subscribe({
               next: (checkIns) => {
@@ -129,19 +132,19 @@ export class AccountDetailComponent implements OnInit {
   }
 
   calculateAdjustmentAmount(): number {
-    return this.calculateRawTotal() * (this.adjustmentPercentage() / 100);
+    return Math.abs(this.calculateRawTotal() * (this.adjustmentPercentage() / 100));
   }
 
   applyAdjustments(): void {
     const acc = this.account();
     if (!acc || acc.isPaid || !this.canModify()) return;
 
-    this.accountService.updateAdjustmentPercentage(this.checkInId, this.adjustmentPercentage()).subscribe({
-      next: (updatedAccount: AccountDTOResponse) => {
-        this.account.set(updatedAccount);
-        this.adjustmentPercentage.set(updatedAccount.adjustmentPercentage ?? this.adjustmentPercentage());
-        this.adjustedTotal.set(this.calculateAdjustedTotal());
-        this.paymentAmount.set(this.calculateRemaining());
+    // Forzamos a que sea un número válido
+    const numericAdjustment = Number(this.adjustmentPercentage());
+
+    this.accountService.updateAdjustmentPercentage(this.checkInId, numericAdjustment).subscribe({
+      next: () => {
+        this.loadData();
       },
       error: (err: any) => {
         alert('Error al aplicar el porcentaje de ajuste.');
@@ -153,14 +156,15 @@ export class AccountDetailComponent implements OnInit {
   calculateAdjustedTotal(): number {
     const rawTotal = this.calculateRawTotal();
     const adjustmentFactor = 1 + (this.adjustmentPercentage() / 100);
-    return rawTotal * adjustmentFactor;
+    return Math.max(0, rawTotal * adjustmentFactor); // Evita valores negativos por seguridad
   }
 
   calculateRemaining(): number {
     const acc = this.account();
     if (!acc) return 0;
     const totalPaid = acc.payments ? acc.payments.reduce((sum, p) => sum + p.amount, 0) : 0;
-    return Math.max(0, this.calculateAdjustedTotal() - totalPaid);
+    const remaining = Math.max(0, this.calculateAdjustedTotal() - totalPaid);
+    return Number(remaining.toFixed(2));
   }
 
   submitPayment(): void {
@@ -185,6 +189,11 @@ export class AccountDetailComponent implements OnInit {
         console.error(err);
       }
     });
+  }
+
+  // Método para disparar la impresión del recibo
+  printAccount(): void {
+    window.print();
   }
 
   goBack(): void {
