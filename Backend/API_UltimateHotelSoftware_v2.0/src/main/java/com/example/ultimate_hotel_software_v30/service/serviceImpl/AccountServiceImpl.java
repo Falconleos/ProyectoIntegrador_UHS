@@ -112,8 +112,10 @@ public class AccountServiceImpl implements AccountService {
 
         // Subtotal antes de ajuste
         double subtotal = base + services;
-        // Aplicar porcentaje de recargo o descuento
+
+        // Aplicar porcentaje de recargo o descuento de forma segura
         double finalTotal = subtotal + (subtotal * adjustment / 100.0);
+        finalTotal = Math.max(0.0, finalTotal); // Evita totales negativos
 
         // Sumar todos los pagos registrados
         double totalPaid = account.getPayments().stream()
@@ -121,7 +123,6 @@ public class AccountServiceImpl implements AccountService {
                 .sum();
 
         account.setPaidAmount(totalPaid);
-        // Se marca como pagado si lo abonado cubre o supera el total final calculado
         account.setIsPaid(totalPaid >= finalTotal);
 
         accountRepository.save(account);
