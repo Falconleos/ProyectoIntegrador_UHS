@@ -43,6 +43,10 @@ export const routes: Routes = [
                 loadComponent: () => import('./components/user-edit/user-edit.component').then(m => m.UserEditComponent)
             },
             {
+                path: 'change-password',
+                loadComponent: () => import('./components/change-password/change-password.component').then(m => m.ChangePasswordComponent)
+            },
+            {
                 path:'room-list',
                 loadComponent:()=>import('./components/room/room-list/room-list.component').then(m=>m.RoomListComponent)
             },
