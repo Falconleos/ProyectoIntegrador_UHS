@@ -1,12 +1,11 @@
 import { Component, OnInit, ChangeDetectionStrategy, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { CheckInService } from '../../core/services/check-in.service';
 import { BookingDtoResponse } from '../../models/Booking-model';
 import { AuthService } from '../../core/services/auth.service';
 import { UserService } from '../../core/services/user.service';
-import { AccountService } from '../../core/services/account.service'; // <-- Importado para verificar cuentas y pagos
+import { AccountService } from '../../core/services/account.service';
 import * as QRCode from 'qrcode';
 // @ts-ignore
 import jsQR from 'jsqr';
@@ -14,7 +13,7 @@ import jsQR from 'jsqr';
 @Component({
   selector: 'app-check-in-list',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule], // Ya no requerimos FormsModule
   templateUrl: './check-in-list.component.html',
   styleUrls: ['./check-in-list.component.css'],
   changeDetection: ChangeDetectionStrategy.OnPush
@@ -56,17 +55,18 @@ export class CheckInListComponent implements OnInit {
     private checkInService: CheckInService,
     private authService: AuthService,
     private userService: UserService,
-    private accountService: AccountService, // <-- Inyectado aquí
+    private accountService: AccountService,
     private router: Router
   ) {}
 
   ngOnInit(): void {
+    // Inicialización del componente: validamos los permisos del usuario y cargamos los datos iniciales
     this.checkUserRole();
     this.loadData();
     this.loadUsers();
   }
 
-  // --- NUEVA FUNCIÓN AUXILIAR PARA MOSTRAR EL NOMBRE CORRECTO ---
+  // --- FUNCIÓN AUXILIAR PARA MOSTRAR EL NOMBRE CORRECTO ---
   getGuestDisplayName(booking: BookingDtoResponse): string {
     if (booking.name || booking.surname) {
       return `${booking.name || ''} ${booking.surname || ''}`.trim();
@@ -90,6 +90,7 @@ export class CheckInListComponent implements OnInit {
   }
 
   loadData(): void {
+    // Activamos el estado de carga y solicitamos al servicio las reservas previstas para hoy
     this.loading.set(true);
     this.errorMessage.set('');
 
@@ -128,6 +129,7 @@ export class CheckInListComponent implements OnInit {
   }
 
   loadCheckedInBookings(): void {
+    // Obtenemos el listado de estadías activas con estado CHECKED_IN y finalizamos el indicador de carga
     this.checkInService.getBookingsByState('CHECKED_IN').subscribe({
       next: (bookings) => {
         this.checkedInBookings.set(Array.isArray(bookings) ? bookings : []);
@@ -141,6 +143,7 @@ export class CheckInListComponent implements OnInit {
   }
 
   loadUsers(): void {
+    // Obtenemos la lista general de usuarios para la asignación manual en caso de requerirse
     this.userService.getAll().subscribe({
       next: (data) => { 
         this.users.set(Array.isArray(data) ? data : []); 
@@ -207,7 +210,6 @@ export class CheckInListComponent implements OnInit {
     this.qrError.set('');
     this.qrSuccess.set('');
   }
-  // ------------------------------------------
 
   goToCreateCheckIn(booking: BookingDtoResponse): void {
     if (!this.canModify()) return;
@@ -231,6 +233,7 @@ export class CheckInListComponent implements OnInit {
   }
 
   executeCheckInDirectly(bookingId: number): void {
+    // Invocamos al servicio de check-in y actualizamos el estado local removiendo la reserva procesada
     this.checkInService.checkInBooking(bookingId).subscribe({
       next: () => {
         this.checkInSuccess.set('¡Check-in realizado con éxito!');
@@ -259,6 +262,7 @@ export class CheckInListComponent implements OnInit {
     }
 
     const bId = booking.id;
+    // Paso secuencial: Primero asociamos el usuario a la reserva y luego ejecutamos el check-in
     this.checkInService.assignUserToBooking(bId, userId).subscribe({
       next: () => {
         this.checkInService.checkInBooking(bId).subscribe({
@@ -289,6 +293,7 @@ export class CheckInListComponent implements OnInit {
     if (!booking) return;
     const bId = booking.id;
 
+    // Enviamos la petición de check-in utilizando el DNI provisto por el usuario
     this.checkInService.checkInBooking(bId, this.inputDni()).subscribe({
       next: () => {
         this.checkInSuccess.set('¡Check-in realizado con éxito!');
@@ -316,6 +321,7 @@ export class CheckInListComponent implements OnInit {
     if (!booking) return;
     const bId = booking.id;
 
+    // Secuencia completa: creamos el usuario, lo asociamos a la reserva y ejecutamos el check-in
     this.checkInService.createUser(this.newUser()).subscribe({
       next: (createdUser) => {
         this.checkInService.assignUserToBooking(bId, createdUser.id).subscribe({
@@ -342,7 +348,14 @@ export class CheckInListComponent implements OnInit {
     });
   }
 
-  updateNewUserField(field: string, value: any): void {
+  // --- MÉTODOS NATIVOS PARA REEMPLAZAR NGMODEL ---
+  onUserSelectChange(event: Event): void {
+    const value = (event.target as HTMLSelectElement).value;
+    this.selectedUserId.set(value ? Number(value) : null);
+  }
+
+  updateNewUserField(field: string, event: Event): void {
+    const value = (event.target as HTMLInputElement).value;
     this.newUser.update(u => ({ ...u, [field]: value }));
   }
 
@@ -353,7 +366,7 @@ export class CheckInListComponent implements OnInit {
       return;
     }
 
-    // 1. Consultamos la cuenta financiera asociada para validar si está pagada
+    // Paso 1: Consultamos la cuenta financiera para comprobar si el saldo se encuentra totalmente pagado
     this.accountService.getAccountByBookingId(id).subscribe({
       next: (account: any) => {
         if (!account || !account.isPaid) {
@@ -367,7 +380,7 @@ export class CheckInListComponent implements OnInit {
           issueCreditNote: false // Ya no aplica para interrupciones
         };
 
-        // 2. Ejecutamos la interrupción de forma directa
+        // Paso 2: Si la cuenta está saldada, ejecutamos la interrupción de la estadía
         this.checkInService.interruptStay(requestPayload).subscribe({
           next: () => {
             alert('Estadía interrumpida con éxito.');

@@ -1,7 +1,7 @@
 @import "bootstrap-icons/font/bootstrap-icons.css";
 
 .container {
-  max-width: 800px;
+  max-width: 900px;
   margin: 2.5rem auto;
   padding: 2.5rem;
   background: var(--bg-secondary);
@@ -13,7 +13,10 @@
 }
 
 .header-section {
-  margin-bottom: 1.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
 }
 
 .header-section h2 {
@@ -30,6 +33,20 @@
   height: 1px;
   background: rgba(255, 255, 255, 0.08);
   margin: 2rem 0;
+}
+
+/* Clases auxiliares para espaciado de iconos */
+.icon-title {
+  margin-right: 0.6rem;
+  color: var(--color-primary);
+}
+
+.icon-margin {
+  margin-right: 0.4rem;
+}
+
+.rating-star-icon {
+  color: #f59e0b;
 }
 
 /* Estructura del formulario */
@@ -51,7 +68,7 @@
   color: var(--color-text-main);
 }
 
-/* Contenedor e Inputs */
+/* Inputs y Contenedores con Iconos */
 .input-wrapper {
   position: relative;
   display: flex;
@@ -75,25 +92,25 @@
 .form-control {
   width: 100%;
   padding: 12px 14px 12px 38px;
-  background: var(--bg-secondary);
+  background: rgba(15, 23, 42, 0.4);
   border: var(--border-input);
   border-radius: var(--radius-sm);
   color: var(--color-text-main);
   font-size: var(--font-size-sm);
   outline: none;
   transition: border-color 0.2s;
-  resize: vertical;
 }
 
 textarea.form-control {
-  padding-top: 12px;
+  resize: vertical;
+  min-height: 110px;
 }
 
 .form-control:focus {
   border-color: var(--color-primary);
 }
 
-/* Texto de Errores */
+/* Textos de Error */
 .error-text {
   font-size: var(--font-size-xs);
   color: #fca5a5;
@@ -161,6 +178,14 @@ textarea.form-control {
   border-radius: var(--radius-sm);
   font-size: var(--font-size-sm);
   margin-bottom: 1.25rem;
+  display: flex;
+  align-items: center;
+}
+
+.alert-info {
+  background: rgba(129, 140, 248, 0.15);
+  border: 1px solid rgba(129, 140, 248, 0.3);
+  color: var(--color-primary);
 }
 
 .alert-danger {
@@ -169,8 +194,12 @@ textarea.form-control {
   color: #fca5a5;
 }
 
-.alert-info {
-  background: rgba(129, 140, 248, 0.15);
-  border: 1px solid rgba(129, 140, 248, 0.3);
-  color: var(--color-primary);
+/* Animación de giro */
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.spin {
+  animation: spin 1s linear infinite;
 }

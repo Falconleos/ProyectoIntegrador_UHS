@@ -2,7 +2,7 @@
   <!-- Encabezado -->
   <div class="header-section">
     <h2>
-      <i class="bi bi-file-earmark-text me-2"></i> Gestión de Pagos Registrados
+      <i class="bi bi-file-earmark-text icon-title"></i> Gestión de Pagos Registrados
     </h2>
     <p class="subtitle">Historial completo de señas y pagos registrados en el sistema.</p>
   </div>
@@ -12,15 +12,15 @@
   <!-- Mensajes de carga, error o listado vacío -->
   @if (loading()) {
     <div class="alert alert-info">
-      <i class="bi bi-arrow-repeat bi-spin me-2"></i> Cargando registros de pagos...
+      <i class="bi bi-arrow-repeat bi-spin icon-margin"></i> Cargando registros de pagos...
     </div>
   } @else if (errorMessage()) {
     <div class="alert alert-danger">
-      <i class="bi bi-exclamation-triangle-fill me-2"></i> {{ errorMessage() }}
+      <i class="bi bi-exclamation-triangle-fill icon-margin"></i> {{ errorMessage() }}
     </div>
   } @else if (payments().length === 0) {
     <div class="alert alert-warning">
-      <i class="bi bi-info-circle me-2"></i> No se encontraron pagos registrados en el sistema.
+      <i class="bi bi-info-circle icon-margin"></i> No se encontraron pagos registrados en el sistema.
     </div>
   } @else {
 
@@ -29,20 +29,20 @@
       <table class="table">
         <thead>
           <tr>
-            <th class="ps-4">ID Pago</th>
+            <th class="col-first">ID Pago</th>
             <th>Huésped (Nombre y Apellido)</th>
             <th>Registrado por</th>
             <th>ID Cuenta</th>
-            <th style="text-align: right;">Monto ($)</th>
+            <th class="col-end">Monto ($)</th>
             <th>Fecha y Hora</th>
             <th>Método de Pago</th>
-            <th style="padding-right: 1.5rem;">Referencia / Transacción</th>
+            <th class="col-last">Referencia / Transacción</th>
           </tr>
         </thead>
         <tbody>
           @for (payment of payments(); track payment.id) {
             <tr>
-              <td class="ps-4"><strong>#{{ payment.id }}</strong></td>
+              <td class="col-first"><strong>#{{ payment.id }}</strong></td>
               
               <!-- Columna Huésped -->
               <td>
@@ -65,12 +65,12 @@
               <!-- Columna Cuenta -->
               <td>
                 <span class="badge badge-secondary">
-                  <i class="bi bi-wallet2 me-1"></i> Cuenta #{{ payment.accountId }}
+                  <i class="bi bi-wallet2 icon-margin"></i> Cuenta #{{ payment.accountId }}
                 </span>
               </td>
 
               <!-- Columna Monto -->
-              <td style="text-align: right;" class="text-success">
+              <td class="col-end text-success">
                 <strong>${{ payment.amount | number:'1.2-2' }}</strong>
               </td>
 
@@ -80,12 +80,12 @@
               <!-- Columna Método de Pago -->
               <td>
                 <span class="badge badge-secondary">
-                  <i class="bi bi-credit-card me-1"></i> {{ payment.paymentMethod || 'N/D' }}
+                  <i class="bi bi-credit-card icon-margin"></i> {{ payment.paymentMethod || 'N/D' }}
                 </span>
               </td>
 
               <!-- Columna Referencia -->
-              <td class="subtitle" style="padding-right: 1.5rem;">
+              <td class="subtitle col-last">
                 {{ payment.transactionReference || 'Sin referencia' }}
               </td>
             </tr>
@@ -94,5 +94,4 @@
       </table>
     </div>
   }
-
 </div>

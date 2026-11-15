@@ -1,4 +1,4 @@
-/* --- Estilos para CreditNoteListComponent --- */
+@import "bootstrap-icons/font/bootstrap-icons.css";
 
 .container-fluid {
   background-color: var(--bg-main);
@@ -29,6 +29,8 @@
   font-size: var(--font-size-sm);
   border: var(--border-glass);
   backdrop-filter: var(--backdrop-blur);
+  padding: 0.85rem 1.15rem;
+  margin-bottom: 1.25rem;
 }
 
 .alert-info {
@@ -48,13 +50,17 @@
   border: var(--border-glass);
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-main);
-  overflow: hidden;
+  overflow-x: auto;
+  width: 100%;
 }
 
 .table {
   color: var(--color-text-main);
   margin-bottom: 0;
   font-size: var(--font-size-sm);
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
 }
 
 .table thead th {
@@ -66,12 +72,14 @@
   letter-spacing: 0.05em;
   border-bottom: var(--border-glass);
   padding: 1rem;
+  white-space: nowrap;
 }
 
 .table tbody td {
   padding: 1rem;
   border-bottom: var(--border-glass);
   color: var(--color-text-main);
+  vertical-align: middle;
 }
 
 .table tbody tr {
@@ -86,7 +94,77 @@
   border-bottom: none;
 }
 
-/* --- Botones personalizados --- */
+/* --- Clases semánticas de celda y tipografía --- */
+.cell-client {
+  font-weight: 600;
+}
+
+.cell-amount {
+  font-weight: 700;
+  color: #34d399;
+}
+
+.cell-reason {
+  max-width: 200px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: var(--color-text-muted);
+}
+
+.text-secondary {
+  color: var(--color-text-muted);
+}
+
+/* --- Insignias (Badges) --- */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 8px;
+  border-radius: var(--radius-sm);
+  font-size: var(--font-size-xs);
+  font-weight: 500;
+}
+
+.badge-secondary {
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--color-text-main);
+  border: var(--border-btn);
+}
+
+/* --- Botón de Estado (Paid/Pending) --- */
+.btn-status {
+  padding: 6px 12px;
+  border-radius: var(--radius-sm);
+  font-size: var(--font-size-xs);
+  font-weight: 500;
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: all 0.2s ease;
+}
+
+.status-paid {
+  background-color: rgba(52, 211, 153, 0.2);
+  color: #34d399;
+  border-color: rgba(52, 211, 153, 0.4);
+}
+
+.status-paid:hover {
+  background-color: rgba(52, 211, 153, 0.3);
+}
+
+.status-pending {
+  background-color: rgba(255, 255, 255, 0.06);
+  color: var(--color-text-muted);
+  border-color: var(--border-btn);
+}
+
+.status-pending:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+  color: var(--color-text-main);
+}
+
+/* --- Botón de Acción (Detalle) --- */
 .btn-dark-solid {
   background-color: var(--bg-btn-secondary);
   color: var(--color-text-main);
@@ -94,6 +172,8 @@
   border-radius: var(--radius-sm);
   font-size: var(--font-size-xs);
   font-weight: 500;
+  padding: 6px 12px;
+  cursor: pointer;
   transition: all 0.2s ease-in-out;
 }
 
@@ -130,10 +210,48 @@
   max-width: 600px;
   color: var(--color-text-main);
   animation: scaleUp 0.25s ease-out;
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
 }
 
-.text-main {
-  color: var(--color-text-main) !important;
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.modal-header h3 {
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin: 0;
+  color: var(--color-text-main);
+}
+
+.btn-close-modal {
+  background: transparent;
+  border: none;
+  color: var(--color-text-muted);
+  font-size: 1.1rem;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.btn-close-modal:hover {
+  color: var(--color-text-main);
+}
+
+.modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 1rem;
+}
+
+.detail-content-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
 }
 
 .d-small-label {
@@ -142,6 +260,7 @@
   letter-spacing: 0.04em;
   display: block;
   margin-bottom: 0.25rem;
+  color: var(--color-text-muted);
 }
 
 .detail-item-box {
@@ -159,6 +278,7 @@
   padding: 0.75rem;
   border-radius: var(--radius-sm);
   border: 1px solid rgba(255, 255, 255, 0.04);
+  margin: 0;
 }
 
 /* --- Animaciones del Modal --- */

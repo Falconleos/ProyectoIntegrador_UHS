@@ -2,12 +2,12 @@
   <!-- Encabezado -->
   <div class="header-section">
     <h2>
-      <i class="bi bi-chat-square-text me-2"></i> Listado de Comentarios
+      <i class="bi bi-chat-square-text icon-title"></i> Listado de Comentarios
     </h2>
     
     @if (canCreate()) {
       <a routerLink="/dashboard/comment-create" class="btn-primary-action">
-        <i class="bi bi-plus-lg me-1"></i> Nuevo comentario
+        <i class="bi bi-plus-lg icon-margin"></i> Nuevo comentario
       </a>
     }
   </div>
@@ -17,19 +17,19 @@
   <!-- Mensaje de Error -->
   @if (errorMessage()) {
     <div class="alert alert-danger">
-      <i class="bi bi-exclamation-triangle me-2"></i> {{ errorMessage() }}
+      <i class="bi bi-exclamation-triangle icon-margin"></i> {{ errorMessage() }}
     </div>
   }
 
   <!-- Estado de Carga -->
   @if (loading()) {
     <div class="alert alert-info">
-      <i class="bi bi-arrow-repeat spin me-2"></i> Cargando comentarios...
+      <i class="bi bi-arrow-repeat spin icon-margin"></i> Cargando comentarios...
     </div>
   } @else {
     @if (comments().length === 0) {
       <div class="alert alert-info">
-        <i class="bi bi-info-circle me-2"></i> No hay comentarios disponibles.
+        <i class="bi bi-info-circle icon-margin"></i> No hay comentarios disponibles.
       </div>
     } @else {
       <!-- Grilla de Tarjetas de Comentarios -->
@@ -40,9 +40,16 @@
             <!-- Cabecera del Comentario (Autor y Avatar) -->
             <div class="comment-header">
               <div class="avatar-wrapper">
-                <div class="avatar-placeholder">
-                  <i class="bi bi-person-fill"></i>
-                </div>
+                @if (comment.username && !hasAvatarError(comment.username)) {
+                  <img [src]="getUserAvatarUrl(comment.username)" 
+                       (error)="onAvatarError(comment.username)" 
+                       alt="Avatar de {{ comment.name }}" 
+                       class="avatar-img" />
+                } @else {
+                  <div class="avatar-placeholder">
+                    <i class="bi bi-person-fill"></i>
+                  </div>
+                }
               </div>
 
               <div class="user-meta">
@@ -65,24 +72,23 @@
 
             <!-- Panel de Control de Moderación (Solo visible para ADMIN / RECEPCIONIST) -->
             @if (isAdminOrReceptionist()) {
-              <div class="moderation-panel p-2 mb-2 rounded bg-dark bg-opacity-25 d-flex justify-content-between align-items-center">
-                <div class="form-check form-switch m-0">
+              <div class="moderation-panel">
+                <div class="switch-container">
                   <input 
-                    class="form-check-input" 
+                    class="custom-switch-input" 
                     type="checkbox" 
-                    role="switch" 
                     [id]="'visibilitySwitch-' + comment.id"
                     [checked]="comment.showable"
                     [disabled]="togglingId() === comment.id"
                     (change)="onToggleVisibility(comment)"
                   >
-                  <label class="form-check-label small fw-bold text-white-50" [for]="'visibilitySwitch-' + comment.id">
+                  <label class="switch-label" [for]="'visibilitySwitch-' + comment.id">
                     Mostrable
                   </label>
                 </div>
 
                 @if (togglingId() === comment.id) {
-                  <span class="spinner-border spinner-border-sm text-light" role="status"></span>
+                  <span class="custom-spinner" role="status"></span>
                 }
               </div>
             }
@@ -90,7 +96,7 @@
             <!-- Pie de tarjeta (Fecha y Acciones) -->
             <div class="comment-footer">
               <span class="comment-date">
-                <i class="bi bi-clock me-1"></i> {{ comment.createdAt }}
+                <i class="bi bi-clock icon-margin"></i> {{ comment.createdAt }}
               </span>
 
               <div class="comment-actions">
@@ -102,9 +108,9 @@
                     (click)="deleteComment(comment.id)"
                   >
                     @if (deletingId() === comment.id) {
-                      <i class="bi bi-arrow-repeat spin me-1"></i> Eliminando...
+                      <i class="bi bi-arrow-repeat spin icon-margin"></i> Eliminando...
                     } @else {
-                      <i class="bi bi-trash me-1"></i> Eliminar
+                      <i class="bi bi-trash icon-margin"></i> Eliminar
                     }
                   </button>
                 }
