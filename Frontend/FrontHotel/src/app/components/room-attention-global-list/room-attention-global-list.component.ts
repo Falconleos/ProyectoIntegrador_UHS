@@ -2,10 +2,10 @@ import { Component, OnInit, ChangeDetectionStrategy, signal, inject } from '@ang
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { RoomAttentionService } from '../../core/services/room-attention.service';
-import { BookingService } from '../../core/services/booking.service'; // <-- Ajusta la ruta a tu servicio de reservas si es necesario
+import { BookingService } from '../../core/services/booking.service';
 import { RoomAttentionDtoResponse } from '../../models/RoomAttention-model';
 import { forkJoin, of } from 'rxjs';
-import { catchError, map } from 'rxjs/operators';
+import { catchError } from 'rxjs/operators';
 
 @Component({
   selector: 'app-room-attention-global-list',
@@ -23,37 +23,36 @@ export class RoomAttentionGlobalListComponent implements OnInit {
   deletingId = signal<number | null>(null);
 
   private roomAttentionService = inject(RoomAttentionService);
-  private bookingService = inject(BookingService); // <-- Inyecta tu servicio que trae las reservas o check-ins
+  private bookingService = inject(BookingService);
 
   ngOnInit(): void {
     this.loadAllAttentions();
   }
 
+  // Traigo en paralelo los consumos y las reservas para unificar la información y ordenar la lista
   loadAllAttentions(): void {
     this.loading.set(true);
     this.errorMessage.set('');
 
-    // Traemos los consumos y las reservas en paralelo para cruzarlos
     forkJoin({
       attentions: this.roomAttentionService.getAll(),
-      bookings: this.bookingService.getAll().pipe(catchError(() => of([]))) // Ajusta el método de tu servicio si se llama diferente (ej: getCheckIns)
+      bookings: this.bookingService.getAll().pipe(catchError(() => of([])))
     }).subscribe({
       next: ({ attentions, bookings }) => {
-        // Creamos un mapa de bookingId -> roomNumber para búsqueda rápida O(1)
+        // Mapeo las reservas para asociar cada ID con su respectivo número de habitación
         const roomMap = new Map<number, string>();
         bookings.forEach((b: any) => {
-          // Asume que la reserva tiene 'id' y el número de habitación está en 'roomNumber', 'room.number', etc.
           const roomNum = b.roomNumber || b.room?.number || b.roomEntity?.number || 'N/A';
           roomMap.set(b.id, roomNum);
         });
 
-        // Enriquecemos cada consumo con su respectivo número de habitación
+        // Enriquezco los ítems de atención agregando el número de habitación correspondiente
         const enriched = attentions.map(item => ({
           ...item,
           roomNumber: roomMap.get(item.bookingId) || 'N/A'
         }));
 
-        // Ordenamiento: Pendientes arriba, luego por fecha descendente
+        // Ordeno los elementos colocando los pendientes primero y luego por fecha descendente
         const sorted = enriched.sort((a, b) => {
           if (a.delivered === b.delivered) {
             return new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime();
@@ -72,6 +71,7 @@ export class RoomAttentionGlobalListComponent implements OnInit {
     });
   }
 
+  // Actualizo el estado del consumo a entregado mediante el servicio
   markAsDelivered(id: number): void {
     this.deliveringId.set(id);
     this.roomAttentionService.markAsDelivered(id).subscribe({
@@ -86,6 +86,7 @@ export class RoomAttentionGlobalListComponent implements OnInit {
     });
   }
 
+  // Solicito confirmación y elimino el registro de consumo a través del servicio
   deleteAttention(id: number): void {
     if (confirm('¿Estás seguro de eliminar este consumo?')) {
       this.deletingId.set(id);

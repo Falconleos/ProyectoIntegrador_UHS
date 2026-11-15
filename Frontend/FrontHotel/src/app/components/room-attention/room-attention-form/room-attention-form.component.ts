@@ -49,7 +49,6 @@ export class RoomAttentionFormComponent implements OnInit {
   });
 
   ngOnInit(): void {
-    // CORREGIDO: Cambiado de 'bookingId' a 'id' para que coincida con la ruta (:id)
     const idParam = this.route.snapshot.paramMap.get('id');
     const id = Number(idParam);
 

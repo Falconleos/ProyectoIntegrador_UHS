@@ -34,6 +34,7 @@ export class RoomAttentionListComponent implements OnInit {
     )
   );
 
+  // Al iniciar el componente, valido los permisos del usuario y obtengo el ID de la reserva desde la ruta
   ngOnInit(): void {
     this.checkUserRole();
 
@@ -48,6 +49,7 @@ export class RoomAttentionListComponent implements OnInit {
     }
   }
 
+  // Verifico los roles almacenados en el navegador para definir si el usuario puede modificar o eliminar registros
   checkUserRole(): void {
     const storedRoles = localStorage.getItem('role');
 
@@ -86,6 +88,7 @@ export class RoomAttentionListComponent implements OnInit {
     this.canModify.set(allowed);
   }
 
+  // Invoco al servicio para obtener la lista de consumos asociados a la reserva actual
   loadAttentions(): void {
     const id = this.bookingId();
 
@@ -106,6 +109,7 @@ export class RoomAttentionListComponent implements OnInit {
     });
   }
 
+  // Valido permisos y elimino un consumo específico a través del servicio
   deleteAttention(id: number): void {
     if (!this.canModify() || this.deletingId() !== null) return;
 
@@ -126,6 +130,7 @@ export class RoomAttentionListComponent implements OnInit {
     });
   }
 
+  // Valido permisos y marco un consumo como entregado mediante el servicio
   markAsDelivered(id: number): void {
     if (!this.canModify() || this.deliveringId() !== null) return;
 

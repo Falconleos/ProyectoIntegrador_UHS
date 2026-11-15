@@ -2,7 +2,7 @@
   <!-- Encabezado -->
   <div class="header-section">
     <h2>
-      <i class="bi bi-basket me-2"></i> Consumos y Servicios de la Reserva
+      <i class="fa-solid fa-basket-shopping" style="margin-right: 0.5rem;"></i> Consumos y Servicios de la Reserva
     </h2>
     
     <!-- Botón visible para Admin, Recepción y Huéspedes -->
@@ -10,7 +10,7 @@
       type="button"
       class="btn-primary-action" 
       [routerLink]="['/dashboard/bookings', bookingId(), 'agregar-servicio']">
-      <i class="bi bi-plus-lg me-1"></i> Agregar Consumo
+      <i class="fa-solid fa-plus" style="margin-right: 0.25rem;"></i> Agregar Consumo
     </button>
   </div>
 
@@ -19,19 +19,19 @@
   <!-- Mensaje de Error -->
   @if (errorMessage()) {
     <div class="alert alert-danger">
-      <i class="bi bi-exclamation-triangle me-2"></i> {{ errorMessage() }}
+      <i class="fa-solid fa-triangle-exclamation" style="margin-right: 0.5rem;"></i> {{ errorMessage() }}
     </div>
   }
 
   <!-- Estado de Carga -->
   @if (loading()) {
     <div class="alert alert-info">
-      <i class="bi bi-arrow-repeat spin me-2"></i> Cargando consumos...
+      <i class="fa-solid fa-rotate spin" style="margin-right: 0.5rem;"></i> Cargando consumos...
     </div>
   } @else {
     @if (attentions().length === 0) {
       <div class="alert alert-info">
-        <i class="bi bi-info-circle me-2"></i> No hay consumos ni servicios registrados para esta reserva.
+        <i class="fa-solid fa-circle-info" style="margin-right: 0.5rem;"></i> No hay consumos ni servicios registrados para esta reserva.
       </div>
     } @else {
       <!-- Contenedor con Estilo Glass para la Tabla -->
@@ -48,7 +48,7 @@
                 <th>Registrado por</th>
                 <th>Estado</th>
                 @if (canModify()) {
-                  <th class="text-end">Acciones</th>
+                  <th style="text-align: right;">Acciones</th>
                 }
               </tr>
             </thead>
@@ -57,7 +57,7 @@
                 <tr>
                   <td><strong class="text-subtitle">#{{ item.id }}</strong></td>
                   <td>
-                    <div class="text-main fw-medium">
+                    <div class="text-main" style="font-weight: 500;">
                       {{ item.itemDTOResponse.description || $any(item).description || 'Consumo #' + item.id }}
                     </div>
                   </td>
@@ -68,36 +68,36 @@
                     <span class="text-main">${{ item.unitPrice | number:'1.2-2' }}</span>
                   </td>
                   <td>
-                    <span class="text-main fw-bold text-success">${{ item.subtotal | number:'1.2-2' }}</span>
+                    <span class="text-main" style="font-weight: bold; color: #4ade80;">${{ item.subtotal | number:'1.2-2' }}</span>
                   </td>
                   <td>
                     <span class="badge badge-secondary" style="font-size: 0.8rem;">
-                      <i class="bi bi-person-fill me-1"></i> {{ item.employeeUsername || 'Sistema' }}
+                      <i class="fa-solid fa-user" style="margin-right: 0.25rem;"></i> {{ item.employeeUsername || 'Sistema' }}
                     </span>
                   </td>
                   <td>
                     @if (item.delivered) {
                       <span class="badge badge-success-glass">
-                        <i class="bi bi-check-circle me-1"></i> Entregado
+                        <i class="fa-solid fa-circle-check" style="margin-right: 0.25rem;"></i> Entregado
                       </span>
                     } @else {
                       <span class="badge badge-warning-glass">
-                        <i class="bi bi-clock me-1"></i> Pendiente
+                        <i class="fa-solid fa-clock" style="margin-right: 0.25rem;"></i> Pendiente
                       </span>
                     }
                   </td>
                   
                   <!-- Acciones restringidas exclusivamente al Staff (Admin / Recepción) -->
                   @if (canModify()) {
-                    <td class="text-end">
-                      <div class="d-flex justify-content-end gap-2">
+                    <td style="text-align: right;">
+                      <div style="display: flex; justify-content: flex-end; gap: 0.5rem;">
                         @if (!item.delivered) {
                           <button 
                             type="button"
                             class="btn-secondary-action" 
                             [disabled]="deliveringId() === item.id"
                             (click)="markAsDelivered(item.id)">
-                            <i class="bi bi-check2-all me-1"></i> Entregar
+                            <i class="fa-solid fa-check-double" style="margin-right: 0.25rem;"></i> Entregar
                           </button>
                         }
                         <button 
@@ -105,7 +105,7 @@
                           class="btn-danger-action" 
                           [disabled]="deletingId() === item.id"
                           (click)="deleteAttention(item.id)">
-                            <i class="bi bi-trash me-1"></i> Eliminar
+                            <i class="fa-solid fa-trash" style="margin-right: 0.25rem;"></i> Eliminar
                         </button>
                       </div>
                     </td>
@@ -118,16 +118,16 @@
       </div>
 
       <!-- Resumen de Total -->
-      <div class="total-section">
-        <h3>Total consumos: <span class="text-success">${{ total() | number:'1.2-2' }}</span></h3>
+      <div class="total-section" style="margin-top: 1.5rem; text-align: right;">
+        <h3 style="font-size: 1.2rem; color: var(--color-text-main);">Total consumos: <span style="color: #4ade80; font-weight: bold;">${{ total() | number:'1.2-2' }}</span></h3>
       </div>
     }
   }
 
   <!-- Botón Volver -->
-  <div class="mt-4">
+  <div style="margin-top: 1.5rem;">
     <a routerLink="/dashboard/check-in-list" class="btn-secondary-action">
-      <i class="bi bi-arrow-left me-1"></i> Volver a Check-ins
+      <i class="fa-solid fa-arrow-left" style="margin-right: 0.25rem;"></i> Volver a Check-ins
     </a>
   </div>
 </div>
