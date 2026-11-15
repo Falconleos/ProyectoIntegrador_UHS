@@ -23,7 +23,7 @@ export class InicioComponent implements OnInit {
   // KPIs principales
   totalRooms = signal<number>(0);
   activeBookingsCount = signal<number>(0);     // Estadías activas
-  pendingBookingsCount = signal<number>(0);    // NUEVO: Reservas pendientes
+  pendingBookingsCount = signal<number>(0);    // Reservas pendientes
   todayRevenue = signal<number>(0);            // Ingresos del día corregidos
   pendingAttentionsCount = signal<number>(0);  // Servicios pendientes
 

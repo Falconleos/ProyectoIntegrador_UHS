@@ -2,7 +2,7 @@
   <!-- Encabezado dinámico -->
   <div class="header-section">
     <h2>
-      <i class="bi" [class.bi-pencil-square]="isEditMode()" [class.bi-chat-left-text]="!isEditMode()"></i> 
+      <i class="bi icon-title" [class.bi-pencil-square]="isEditMode()" [class.bi-chat-left-text]="!isEditMode()"></i> 
       {{ isEditMode() ? 'Editar Comentario' : 'Nuevo Comentario' }}
     </h2>
   </div>
@@ -12,14 +12,14 @@
   <!-- Mensaje de Error General -->
   @if (errorMessage()) {
     <div class="alert alert-danger">
-      <i class="bi bi-exclamation-triangle me-2"></i> {{ errorMessage() }}
+      <i class="bi bi-exclamation-triangle icon-margin"></i> {{ errorMessage() }}
     </div>
   }
 
   <!-- Estado de Carga -->
   @if (loading()) {
     <div class="alert alert-info">
-      <i class="bi bi-arrow-repeat spin me-2"></i> Cargando comentario...
+      <i class="bi bi-arrow-repeat spin icon-margin"></i> Cargando comentario...
     </div>
   } @else {
     <form [formGroup]="commentForm" (ngSubmit)="saveComment()" class="form-grid">
@@ -56,7 +56,7 @@
       <div class="form-group">
         <label class="form-label" for="rating">Valoración (1 a 5) *</label>
         <div class="input-wrapper">
-          <span class="input-icon-prefix"><i class="bi bi-star-fill text-warning"></i></span>
+          <span class="input-icon-prefix"><i class="bi bi-star-fill rating-star-icon"></i></span>
           <input
             id="rating"
             type="number"
@@ -90,11 +90,11 @@
           [disabled]="saving() || loading() || commentForm.invalid"
         >
           @if (saving()) {
-            <i class="bi bi-arrow-repeat spin me-2"></i> Guardando...
+            <i class="bi bi-arrow-repeat spin icon-margin"></i> Guardando...
           } @else if (isEditMode()) {
-            <i class="bi bi-check-lg me-2"></i> Actualizar comentario
+            <i class="bi bi-check-lg icon-margin"></i> Actualizar comentario
           } @else {
-            <i class="bi bi-check-lg me-2"></i> Crear comentario
+            <i class="bi bi-check-lg icon-margin"></i> Crear comentario
           }
         </button>
 

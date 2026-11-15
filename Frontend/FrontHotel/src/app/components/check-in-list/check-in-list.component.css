@@ -44,34 +44,52 @@
   margin-bottom: 1.25rem;
 }
 
-/* Tarjeta de Scanner de QR */
+/* --- TARJETA DE SCANNER DE QR (Más pequeña y compacta) --- */
 .card-box {
   background: rgba(15, 23, 42, 0.5);
   border: var(--border-input);
   border-radius: var(--radius-md);
-  padding: 1.75rem;
-  margin-bottom: 2.5rem;
+  padding: 1rem 1.25rem; /* Reducido drásticamente el padding vertical */
+  margin-bottom: 2rem;
+}
+
+.qr-upload-layout {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.qr-upload-info {
+  flex: 1;
+  min-width: 280px;
 }
 
 .form-label {
   display: block;
-  font-size: var(--font-size-sm);
+  font-size: 0.8rem;
   font-weight: 600;
   color: var(--color-text-main);
-  margin-bottom: 0.75rem;
+  margin-bottom: 0.4rem;
 }
 
-/* Contenedor del Input de Buscador y Botón */
+.qr-hint {
+  font-size: 0.7rem;
+  margin-top: 0.25rem;
+}
+
+/* Contenedor del Input de Buscador y Botón compacto */
 .input-wrapper {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
+  gap: 0.5rem;
   width: 100%;
 }
 
 .input-wrapper .form-control {
   flex: 1;
-  padding: 12px 16px;
+  padding: 8px 12px; /* Más compacto */
   background: var(--bg-secondary);
   border: var(--border-input);
   border-radius: var(--radius-sm);
@@ -85,15 +103,16 @@
   border-color: var(--color-primary);
 }
 
-/* Grilla de Cards de Reservas */
+/* --- GRILLA DE CARDS DE RESERVAS (Mitad de tamaño) --- */
 section {
   margin-bottom: 3rem;
 }
 
 .cards-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  gap: 1.5rem;
+  /* Minmax reducido para permitir columnas más estrechas y compactas */
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); 
+  gap: 1rem;
   margin-top: 1rem;
 }
 
@@ -101,11 +120,11 @@ section {
   background: rgba(15, 23, 42, 0.6);
   border: var(--border-input);
   border-radius: var(--radius-md);
-  padding: 1.75rem;
+  padding: 1rem; /* Reducido a la mitad para que sea más pequeña */
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  gap: 1.5rem;
+  gap: 1rem;
   transition: border-color 0.2s, transform 0.2s;
 }
 
@@ -118,62 +137,89 @@ section {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 1rem;
+  margin-bottom: 0.5rem;
 }
 
 .card-title {
-  font-size: var(--font-size-md);
+  font-size: 0.95rem; /* Tamaño de fuente reducido */
   font-weight: 600;
   color: var(--color-text-main);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  margin-bottom: 1rem;
+  margin-bottom: 0.5rem;
 }
 
 .card-info {
-  font-size: var(--font-size-sm);
+  font-size: 0.75rem; /* Textos más compactos */
   color: var(--color-text-muted);
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: 0.25rem;
 }
 
 .card-info strong {
   color: var(--color-text-main);
 }
 
-/* Código QR Visualizador dentro de la card */
+/* Código QR Visualizador dentro de la card (Versión mini) */
 .qr-box {
   background: rgba(2, 6, 23, 0.8);
   border: var(--border-input);
   border-radius: var(--radius-sm);
-  padding: 12px 14px;
+  padding: 6px 8px;
+}
+
+.qr-box-centered {
+  text-align: center;
 }
 
 .qr-label {
   display: block;
-  font-size: 0.65rem;
+  font-size: 0.6rem;
   text-transform: uppercase;
   font-weight: 600;
   color: var(--color-text-muted);
-  margin-bottom: 6px;
+  margin-bottom: 4px;
 }
 
-.qr-code {
-  font-family: monospace;
-  font-size: var(--font-size-xs);
-  color: var(--color-primary);
-  word-break: break-all;
+.qr-thumbnail {
+  width: 65px; /* Miniatura de QR reducida */
+  height: 65px;
+  border-radius: 4px;
+  border: 1px solid rgba(255,255,255,0.1);
 }
 
-/* Contenedor de la tabla */
+/* Botón compacto para las cards de reservas */
+.booking-card .btn-primary {
+  padding: 6px 10px;
+  font-size: 0.75rem;
+}
+
+/* --- SECCIÓN DE ESTADÍAS ACTIVAS (Destacada y más visible) --- */
+.active-stays-section {
+  background: rgba(15, 23, 42, 0.75); /* Fondo ligeramente más opaco para darle protagonismo */
+  border: 1px solid rgba(129, 140, 248, 0.3); /* Borde sutil con tono principal para resaltarlo */
+  border-radius: var(--radius-lg);
+  padding: 2rem;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
+}
+
+.active-stays-section .section-title {
+  font-size: 1.25rem;
+  color: var(--color-primary); /* Título resaltado */
+  border-bottom: 2px solid rgba(129, 140, 248, 0.2);
+  padding-bottom: 0.5rem;
+  margin-bottom: 1.5rem;
+}
+
+/* Contenedor de la tabla mejorado */
 .table-wrapper {
   width: 100%;
   overflow-x: auto;
   border-radius: var(--radius-md);
   border: var(--border-input);
-  background: rgba(15, 23, 42, 0.4);
+  background: rgba(2, 6, 23, 0.6);
   margin-top: 1rem;
 }
 
@@ -186,28 +232,36 @@ section {
 }
 
 .table th {
-  padding: 14px 18px;
-  background: rgba(15, 23, 42, 0.8);
-  color: var(--color-text-muted);
-  font-weight: 600;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 16px 20px;
+  background: rgba(15, 23, 42, 0.95);
+  color: #fff; /* Cabeceras con texto blanco puro para máxima visibilidad */
+  font-weight: 700;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  border-bottom: 2px solid rgba(255, 255, 255, 0.1);
   white-space: nowrap;
 }
 
 .table td {
-  padding: 14px 18px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+  padding: 16px 20px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
   vertical-align: middle;
+  font-size: 0.9rem;
+}
+
+.table tbody tr {
+  transition: background-color 0.2s;
 }
 
 .table tbody tr:hover {
-  background: rgba(255, 255, 255, 0.02);
+  background: rgba(129, 140, 248, 0.08); /* Hover más marcado y elegante */
 }
 
 .table-actions {
   display: flex;
   justify-content: flex-end;
-  gap: 0.5rem;
+  gap: 0.75rem;
 }
 
 /* --- ESTILOS DE MODALES Y CONTENIDO --- */
@@ -240,6 +294,10 @@ section {
   box-sizing: border-box;
 }
 
+.modal-card-sm {
+  max-width: 360px;
+}
+
 .modal-header-profile {
   display: flex;
   flex-direction: column;
@@ -260,7 +318,7 @@ section {
   gap: 1rem;
 }
 
-.modal-body-content h6 {
+.modal-warning-title {
   font-size: var(--font-size-sm);
   font-weight: 500;
   line-height: 1.4;
@@ -316,9 +374,9 @@ section {
 .badge {
   display: inline-flex;
   align-items: center;
-  padding: 5px 10px;
+  padding: 4px 8px;
   border-radius: var(--radius-sm);
-  font-size: var(--font-size-xs);
+  font-size: 0.7rem;
   font-weight: 500;
 }
 
@@ -332,12 +390,6 @@ section {
   background: rgba(129, 140, 248, 0.15);
   color: var(--color-primary);
   border: 1px solid rgba(129, 140, 248, 0.3);
-}
-
-.actions-container {
-  display: flex;
-  gap: 1rem;
-  margin-top: 1.5rem;
 }
 
 .btn-primary {
@@ -355,8 +407,10 @@ section {
   transition: opacity 0.2s;
   font-size: var(--font-size-sm);
   white-space: nowrap;
-  width: 30%;
-  min-width: 100px;
+}
+
+.btn-full {
+  width: 100%;
 }
 
 .modal-card .btn-primary {
@@ -376,7 +430,7 @@ section {
   background: var(--bg-btn-secondary);
   color: var(--color-text-main);
   border: var(--border-btn);
-  padding: 8px 14px;
+  padding: 8px 12px;
   border-radius: var(--radius-sm);
   font-weight: 500;
   cursor: pointer;
@@ -395,7 +449,7 @@ section {
   background: rgba(239, 68, 68, 0.15);
   color: #fca5a5;
   border: 1px solid rgba(239, 68, 68, 0.3);
-  padding: 8px 14px;
+  padding: 8px 12px;
   border-radius: var(--radius-sm);
   font-weight: 500;
   cursor: pointer;
@@ -411,10 +465,10 @@ section {
 
 /* Alertas */
 .alert {
-  padding: 0.85rem 1.15rem;
+  padding: 0.75rem 1rem;
   border-radius: var(--radius-sm);
   font-size: var(--font-size-sm);
-  margin-bottom: 1.25rem;
+  margin-bottom: 1rem;
 }
 
 .alert-info {

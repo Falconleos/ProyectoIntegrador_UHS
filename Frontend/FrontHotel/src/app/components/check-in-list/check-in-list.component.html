@@ -1,20 +1,18 @@
 <div class="container">
   <!-- Encabezado -->
   <div class="header-section">
-    <h2><i class="bi bi-door-open me-2"></i> Gestión de Check-Ins y Estadías</h2>
+    <h2><i class="bi bi-door-open icon-title"></i> Gestión de Check-Ins y Estadías</h2>
     <p class="subtitle">Administre las reservas del día y controle las estadías activas del hotel.</p>
   </div>
 
   <hr class="divider" />
 
-  <!-- ========================================================== -->
-  <!-- ZONA EXCLUSIVA DE ADMINISTRACIÓN / RECEPCIÓN (Oculta al Guest) -->
-  <!-- ========================================================== -->
+  <!-- Zona exclusiva de administración / recepción -->
   @if (canModify()) {
-    <!-- BARRA DE ADJUNTO DE IMAGEN QR -->
-    <div class="card-box mb-4">
-      <div class="row align-items-center">
-        <div class="col-md-8">
+    <!-- Barra de adjunto de imagen QR -->
+    <div class="card-box">
+      <div class="qr-upload-layout">
+        <div class="qr-upload-info">
           <label for="qrFile" class="form-label">📷 Adjuntar Imagen PNG de Código QR para Check-In</label>
           <div class="input-wrapper">
             <span class="input-icon"><i class="bi bi-qr-code-scan"></i></span>
@@ -25,14 +23,14 @@
               accept="image/png, image/jpeg"
               (change)="onQrFileSelected($event)">
           </div>
-          <small class="subtitle d-block mt-2">Seleccione o adjunte el archivo PNG del código QR del huésped para iniciar el proceso de Check-In automáticamente.</small>
+          <small class="subtitle qr-hint">Seleccione o adjunte el archivo PNG del código QR del huésped para iniciar el proceso de Check-In automáticamente.</small>
         </div>
-        <div class="col-md-4 mt-3 mt-md-0">
+        <div class="qr-upload-alerts">
           @if (qrError()) {
-            <div class="alert alert-danger mb-0">{{ qrError() }}</div>
+            <div class="alert alert-danger">{{ qrError() }}</div>
           }
           @if (qrSuccess()) {
-            <div class="alert alert-success mb-0">{{ qrSuccess() }}</div>
+            <div class="alert alert-success">{{ qrSuccess() }}</div>
           }
         </div>
       </div>
@@ -46,9 +44,9 @@
       <div class="alert alert-danger">{{ errorMessage() }}</div>
     }
 
-    <!-- SECCIÓN SUPERIOR: Cards de reservas pendientes/confirmadas para hoy -->
-    <section class="mb-5">
-      <h3 class="section-title mb-3">Reservas para Check-in Hoy</h3>
+    <!-- Sección de reservas pendientes para hoy -->
+    <section>
+      <h3 class="section-title">Reservas para Check-in Hoy</h3>
       
       @if (pendingBookingsToday().length === 0 && !loading()) {
         <p class="subtitle">No hay reservas pendientes o confirmadas para realizar check-in hoy.</p>
@@ -57,7 +55,6 @@
       <div class="cards-grid">
         @for (booking of pendingBookingsToday(); track booking.id) {
           <div class="booking-card">
-            <!-- Bloque Superior -->
             <div>
               <div class="card-header-row">
                 <span class="badge badge-secondary">Reserva #{{ booking.id }}</span>
@@ -69,24 +66,23 @@
               </h5>
 
               <div class="card-info">
-                <p class="mb-1"><strong>Tel:</strong> {{ booking.guestPhone || 'No registrado' }}</p>
-                <p class="mb-1"><strong>Fechas:</strong> {{ booking.checkIn }} al {{ booking.checkOut }}</p>
-                <p class="mb-1"><strong>Total:</strong> ${{ booking.totalPrice | number:'1.2-2' }}</p>
-                <p class="mb-0"><small class="subtitle">Creado por: {{ booking.userBookingUsername || 'Sistema' }}</small></p>
+                <p><strong>Tel:</strong> {{ booking.guestPhone || 'No registrado' }}</p>
+                <p><strong>Fechas:</strong> {{ booking.checkIn }} al {{ booking.checkOut }}</p>
+                <p><strong>Total:</strong> ${{ booking.totalPrice | number:'1.2-2' }}</p>
+                <p><small class="subtitle">Creado por: {{ booking.userBookingUsername || 'Sistema' }}</small></p>
               </div>
             </div>
 
-            <!-- Bloque Inferior con Miniatura QR -->
             <div>
               @if (booking.qrBooking && qrDataUrls()[booking.id]) {
-                <div class="qr-box mb-3 text-center" style="background: rgba(2, 6, 23, 0.4); padding: 10px; border-radius: var(--radius-sm);">
-                  <span class="qr-label d-block mb-1" style="font-size: 0.75rem;">Código QR Asociado:</span>
-                  <img [src]="qrDataUrls()[booking.id]" alt="QR Reserva #{{ booking.id }}" style="width: 90px; height: 90px; border-radius: 4px; border: 1px solid rgba(255,255,255,0.1);" />
+                <div class="qr-box qr-box-centered">
+                  <span class="qr-label">Código QR Asociado:</span>
+                  <img [src]="qrDataUrls()[booking.id]" alt="QR Reserva #{{ booking.id }}" class="qr-thumbnail" />
                 </div>
               }
 
-              <button class="btn-primary w-100" (click)="goToCreateCheckIn(booking)">
-                <i class="bi bi-check2-circle me-1"></i> Realizar Check-In
+              <button class="btn-primary btn-full" (click)="goToCreateCheckIn(booking)">
+                <i class="bi bi-check2-circle icon-margin"></i> Realizar Check-In
               </button>
             </div>
           </div>
@@ -95,11 +91,9 @@
     </section>
   }
 
-  <!-- ========================================================== -->
-  <!-- SECCIÓN INFERIOR: Estadías Activas (Visible para Admin y Guests) -->
-  <!-- ========================================================== -->
-  <section>
-    <h3 class="section-title mb-3">Estadías Activas (Checked-In)</h3>
+  <!-- Sección de estadías activas -->
+  <section class="active-stays-section">
+    <h3 class="section-title">Estadías Activas (Checked-In)</h3>
 
     @if (checkedInBookings().length === 0 && !loading()) {
       <p class="subtitle">No hay pasajeros con check-in activo actualmente.</p>
@@ -110,21 +104,21 @@
         <table class="table">
           <thead>
             <tr>
-              <th class="ps-4">ID</th>
+              <th class="col-id">ID</th>
               <th>Huésped</th>
               <th>Habitación</th>
               <th>Check-In / Out</th>
-              <th style="text-align: right; padding-right: 1.5rem;">Acciones</th>
+              <th class="col-actions">Acciones</th>
             </tr>
           </thead>
           <tbody>
             @for (b of checkedInBookings(); track b.id) {
               <tr>
-                <td class="ps-4"><strong>#{{ b.id }}</strong></td>
+                <td class="col-id"><strong>#{{ b.id }}</strong></td>
                 <td>{{ getGuestDisplayName(b) }}</td>
                 <td><span class="badge badge-secondary">Hab. #{{ b.roomNumber }}</span></td>
                 <td class="subtitle">{{ b.checkIn }} al {{ b.checkOut }}</td>
-                <td style="text-align: right; padding-right: 1.5rem;">
+                <td class="col-actions">
                   <div class="table-actions">
                     <button class="btn-secondary-action" (click)="servicesPlaceholder(b.id)" title="Servicios">
                       <i class="bi bi-bag-plus"></i>
@@ -147,7 +141,7 @@
     }
   </section>
 
-  <!-- MODAL / PANEL DE CHECK-IN TRADICIONAL -->
+  <!-- Modal de Check-In Tradicional -->
   @if (selectedBookingForCheckIn(); as booking) {
     <div class="modal-backdrop" (click)="selectedBookingForCheckIn.set(null)">
       <div class="modal-card" (click)="$event.stopPropagation()">
@@ -165,24 +159,24 @@
             <div class="alert alert-success">{{ checkInSuccess() }}</div>
           }
 
-          <!-- Selector de usuarios si no tiene uno asignado -->
           @if (showUserSelector() && !showNewUserForm() && !checkInSuccess()) {
-            <div class="mb-3">
-              <h6 class="text-warning mb-3">La reserva no tiene un usuario asociado. Seleccione uno:</h6>
+            <div class="modal-inner-group">
+              <h6 class="modal-warning-title">La reserva no tiene un usuario asociado. Seleccione uno:</h6>
               
               <div class="form-group">
                 <label class="form-label">Usuario del Sistema:</label>
-                <select class="form-control" [ngModel]="selectedUserId()" (ngModelChange)="selectedUserId.set($event)">
-                    <option [ngValue]="null" disabled>-- Seleccione un usuario --</option>
+                <!-- Reemplazo de ngModel en select -->
+                <select class="form-control" [value]="selectedUserId()" (change)="onUserSelectChange($event)">
+                    <option [value]="null" disabled>-- Seleccione un usuario --</option>
                     @for (u of users(); track u.id) {
-                    <option [ngValue]="u.id">
+                    <option [value]="u.id">
                         {{ u.name }} {{ u.surname }} ({{ u.email }})
                     </option>
                     }
                 </select>
-            </div>
+              </div>
 
-              <button class="btn-primary w-100" [disabled]="!selectedUserId()" (click)="assignAndCheckIn()">
+              <button class="btn-primary btn-full" [disabled]="!selectedUserId()" (click)="assignAndCheckIn()">
                 Asociar y Registrar Check-In
               </button>
             </div>
@@ -192,19 +186,19 @@
             <p class="subtitle">Procesando check-in...</p>
           }
 
-          <!-- Formulario para crear usuario si no existe -->
           @if (showNewUserForm()) {
-            <div class="form-section pt-3">
-              <h6 class="text-warning mb-3">Usuario no encontrado. Complete los datos:</h6>
-              <div class="form-group mb-2"><input type="text" class="form-control" [ngModel]="newUser().username" (ngModelChange)="updateNewUserField('username', $event)" placeholder="Username"></div>
-              <div class="form-group mb-2"><input type="email" class="form-control" [ngModel]="newUser().email" (ngModelChange)="updateNewUserField('email', $event)" placeholder="Email"></div>
-              <div class="form-group mb-2"><input type="password" class="form-control" [ngModel]="newUser().password" (ngModelChange)="updateNewUserField('password', $event)" placeholder="Password"></div>
-              <div class="form-group mb-2"><input type="text" class="form-control" [ngModel]="newUser().name" (ngModelChange)="updateNewUserField('name', $event)" placeholder="Nombre"></div>
-              <div class="form-group mb-2"><input type="text" class="form-control" [ngModel]="newUser().surname" (ngModelChange)="updateNewUserField('surname', $event)" placeholder="Apellido"></div>
-              <div class="form-group mb-2"><input type="text" class="form-control" [ngModel]="newUser().dni" (ngModelChange)="updateNewUserField('dni', $event)" placeholder="DNI"></div>
-              <div class="form-group mb-2"><input type="text" class="form-control" [ngModel]="newUser().phoneNumber" (ngModelChange)="updateNewUserField('phoneNumber', $event)" placeholder="Teléfono"></div>
+            <div class="form-section">
+              <h6 class="modal-warning-title">Usuario no encontrado. Complete los datos:</h6>
+              <!-- Reemplazos de ngModel en inputs mediante eventos (input) y [value] -->
+              <div class="form-group"><input type="text" class="form-control" [value]="newUser().username" (input)="updateNewUserField('username', $event)" placeholder="Username"></div>
+              <div class="form-group"><input type="email" class="form-control" [value]="newUser().email" (input)="updateNewUserField('email', $event)" placeholder="Email"></div>
+              <div class="form-group"><input type="password" class="form-control" [value]="newUser().password" (input)="updateNewUserField('password', $event)" placeholder="Password"></div>
+              <div class="form-group"><input type="text" class="form-control" [value]="newUser().name" (input)="updateNewUserField('name', $event)" placeholder="Nombre"></div>
+              <div class="form-group"><input type="text" class="form-control" [value]="newUser().surname" (input)="updateNewUserField('surname', $event)" placeholder="Apellido"></div>
+              <div class="form-group"><input type="text" class="form-control" [value]="newUser().dni" (input)="updateNewUserField('dni', $event)" placeholder="DNI"></div>
+              <div class="form-group"><input type="text" class="form-control" [value]="newUser().phoneNumber" (input)="updateNewUserField('phoneNumber', $event)" placeholder="Teléfono"></div>
               
-              <button class="btn-primary w-100 mt-2" (click)="createNewUserAndProceed()">Crear Usuario y Hacer Check-In</button>
+              <button class="btn-primary btn-full" (click)="createNewUserAndProceed()">Crear Usuario y Hacer Check-In</button>
             </div>
           }
         </div>
@@ -213,15 +207,15 @@
     </div>
   }
 
-  <!-- MODAL DE ERROR UNIFICADO -->
+  <!-- Modal de Error Unificado -->
   @if (checkInError() && !selectedBookingForCheckIn()) {
     <div class="modal-backdrop" (click)="checkInError.set('')">
-      <div class="modal-card" style="max-width: 360px;" (click)="$event.stopPropagation()">
-        <div class="modal-header-profile border-bottom pb-2 mb-3">
-          <h3 class="m-0 text-danger" style="font-size: 1.1rem;"><i class="bi bi-exclamation-triangle me-2"></i> Aviso de Check-In</h3>
+      <div class="modal-card modal-card-sm" (click)="$event.stopPropagation()">
+        <div class="modal-header-profile error-header">
+          <h3><i class="bi bi-exclamation-triangle icon-margin"></i> Aviso de Check-In</h3>
         </div>
-        <p class="subtitle text-light mb-4">{{ checkInError() }}</p>
-        <button class="btn-primary w-100" (click)="checkInError.set('')">Aceptar</button>
+        <p class="subtitle text-light">{{ checkInError() }}</p>
+        <button class="btn-primary btn-full" (click)="checkInError.set('')">Aceptar</button>
       </div>
     </div>
   }

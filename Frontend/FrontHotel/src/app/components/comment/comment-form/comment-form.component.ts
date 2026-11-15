@@ -144,7 +144,7 @@ export class CommentFormComponent implements OnInit {
         next: () => {
           this.saving.set(false);
           // Redirige al listado de comentarios en el dashboard (ajusta la ruta si difiere en tu proyecto)
-          this.router.navigate(['/dashboard/comments']); 
+          this.router.navigate(['/dashboard/comment-list']); 
         },
         error: () => {
           this.errorMessage.set('No se pudo actualizar el comentario.');
@@ -157,7 +157,7 @@ export class CommentFormComponent implements OnInit {
         next: () => {
           this.saving.set(false);
           // Redirige al listado tras crear exitosamente
-          this.router.navigate(['/dashboard/comments']); 
+          this.router.navigate(['/dashboard/comment-list']); 
         },
         error: () => {
           this.errorMessage.set('No se pudo crear el comentario.');
