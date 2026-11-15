@@ -44,7 +44,7 @@ public class RoomController {
 
     /*--------- Obtener habitación por ID (ADMIN y RECEPCIONIST) ---------------*/
     @GetMapping("/{id}")
-    @PreAuthorize("hasAnyRole('ADMIN', 'RECEPCIONIST')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'RECEPCIONIST','GUEST')")
     @Operation(summary = "Obtener habitación por ID")
     public ResponseEntity<RoomDTOResponse> getById(@PathVariable Long id) {
         RoomDTOResponse room = roomService.findById(id);
@@ -53,7 +53,7 @@ public class RoomController {
 
     /*--------- Listar todas las habitaciones (ADMIN y RECEPCIONIST) ---------------*/
     @GetMapping
-    @PreAuthorize("hasAnyRole('ADMIN', 'RECEPCIONIST')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'RECEPCIONIST','GUEST')")
     @Operation(summary = "Listar todas las habitaciones físicas registradas")
     public ResponseEntity<List<RoomDTOResponse>> getAll() {
         List<RoomDTOResponse> rooms = roomService.getAll();
@@ -62,7 +62,7 @@ public class RoomController {
 
     /*--------- Listar solo habitaciones disponibles (ADMIN y RECEPCIONIST) ---------------*/
     @GetMapping("/available")
-    @PreAuthorize("hasAnyRole('ADMIN', 'RECEPCIONIST')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'RECEPCIONIST','GUEST')")
     @Operation(summary = "Listar habitaciones que están actualmente disponibles")
     public ResponseEntity<List<RoomDTOResponse>> getAvailableRooms() {
         List<RoomDTOResponse> available = roomService.availableRooms();
@@ -101,7 +101,7 @@ public class RoomController {
 
     /*--------- Obtener cantidad total de habitaciones (ADMIN y RECEPCIONIST) ---------------*/
     @GetMapping("/count")
-    @PreAuthorize("hasAnyRole('ADMIN', 'RECEPCIONIST')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'RECEPCIONIST','GUEST')")
     @Operation(summary = "Obtener el conteo total de habitaciones registradas")
     public ResponseEntity<Integer> getRoomCount() {
         return ResponseEntity.ok(roomService.roomCount());
@@ -119,9 +119,9 @@ public class RoomController {
         return ResponseEntity.ok(updatedRoom);
     }
 
-    /*--------- Obtener una imagen específica de la habitación (ADMIN y RECEPCIONIST) ---------------*/
+    /*--------- Obtener una imagen específica de la habitación (ADMIN RECEPCIONIST GUEST) ---------------*/
     @GetMapping("/{id}/images/{index}")
-    @PreAuthorize("hasAnyRole('ADMIN', 'RECEPCIONIST')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'RECEPCIONIST','GUEST')")
     @Operation(summary = "Obtener una imagen de la habitación por su índice", description = "Retorna el archivo binario de la imagen según la posición en la lista.")
     public ResponseEntity<byte[]> getRoomImage(
             @PathVariable Long id,
