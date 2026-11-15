@@ -3,7 +3,6 @@ import { RouterLink } from '@angular/router';
 import { CommonModule } from '@angular/common';
 
 import { CommentService } from '../../../core/services/comment.service';
-import { AuthService } from '../../../core/services/auth.service';
 import { CommentDtoResponse } from '../../../models/Comment-model';
 
 @Component({
@@ -16,7 +15,6 @@ import { CommentDtoResponse } from '../../../models/Comment-model';
 export class CommentListComponent implements OnInit {
 
   private commentService = inject(CommentService);
-  private authService = inject(AuthService);
 
   comments = signal<CommentDtoResponse[]>([]);
   loading = signal(false);
@@ -24,10 +22,12 @@ export class CommentListComponent implements OnInit {
   togglingId = signal<number | null>(null);
   errorMessage = signal('');
 
-  // Sincronizamos roles usando las señales y computed del AuthService (o lógica local robusta)
   isAdminOrReceptionist = signal(false);
   isGuest = signal(false);
   currentUsername = signal('');
+
+  // Diccionario local para llevar el control de qué usernames fallaron al cargar su foto (ej. no tienen imagen)
+  avatarErrorMap = signal<{ [username: string]: boolean }>({});
 
   ngOnInit(): void {
     this.checkUserRoles();
@@ -49,17 +49,15 @@ export class CommentListComponent implements OnInit {
   loadCommentsBasedOnRole(): void {
     this.loading.set(true);
     this.errorMessage.set('');
+    this.avatarErrorMap.set({});
 
     let request$;
 
     if (this.isAdminOrReceptionist()) {
-      // Admin o Recepcionista ven todo el listado para poder moderar
       request$ = this.commentService.getAll();
     } else if (this.isGuest()) {
-      // Invitado ve únicamente sus propios comentarios
       request$ = this.commentService.getMyComments();
     } else {
-      // Visitante general (por si acaso) ve solo los visibles
       request$ = this.commentService.getVisibleComments();
     }
 
@@ -75,16 +73,14 @@ export class CommentListComponent implements OnInit {
     });
   }
 
-  // Método para que el admin pueda cambiar el estado showable desde el checkbox de la card
   onToggleVisibility(comment: CommentDtoResponse): void {
     if (!this.isAdminOrReceptionist() || this.togglingId() !== null) return;
 
     this.togglingId.set(comment.id);
     this.commentService.toggleVisibility(comment.id).subscribe({
       next: (updatedComment) => {
-        // Actualizamos el estado localmente en la señal de la lista
         this.comments.update(list => 
-          list.map(c => c.id === updatedComment.id ? updatedComment : c)
+          list.map(c => c.id === updatedComment.id ? { ...c, ...updatedComment } : c)
         );
         this.togglingId.set(null);
       },
@@ -95,12 +91,22 @@ export class CommentListComponent implements OnInit {
     });
   }
 
-  getUserAvatarUrl(userId: number): string {
-    return `http://localhost:8080/private/user/${userId}/profile-picture`;
+  // Genera la URL pública directa basada en el username expuesto en tu PublicController
+  getUserAvatarUrl(username: string): string {
+    return `http://localhost:8080/public/users/username/${username}/profile-picture?t=${new Date().getTime()}`;
+  }
+
+  // Controla si la imagen del avatar falló al cargar (ej. 404 Not Found porque no tiene foto)
+  onAvatarError(username: string): void {
+    this.avatarErrorMap.update(map => ({ ...map, [username]: true }));
+  }
+
+  hasAvatarError(username: string): boolean {
+    return !!this.avatarErrorMap()[username];
   }
 
   canCreate(): boolean {
-    return true; // Permitimos a los usuarios logueados crear comentarios
+    return true;
   }
 
   canEdit(comment: CommentDtoResponse): boolean {

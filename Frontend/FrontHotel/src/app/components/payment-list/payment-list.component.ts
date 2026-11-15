@@ -19,7 +19,8 @@ export interface PaymentWithGuest extends PaymentDTOResponse {
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class PaymentListComponent implements OnInit {
-  // --- Estados con Signals ---
+  
+  // Estados reactivos gestionados con Signals
   payments = signal<PaymentWithGuest[]>([]);
   loading = signal<boolean>(true);
   errorMessage = signal<string>('');
@@ -33,34 +34,43 @@ export class PaymentListComponent implements OnInit {
     this.loadPayments();
   }
 
+  // Método principal para obtener y completar los datos del listado de pagos
   loadPayments(): void {
+    // 1. Iniciamos el estado de carga y limpiamos errores previos
     this.loading.set(true);
     this.errorMessage.set('');
     
+    // 2. Invocamos al servicio principal para obtener todos los pagos
     this.paymentService.getAllPayments().subscribe({
       next: (data: PaymentDTOResponse[]) => {
+        // 3. Procesamos la respuesta asegurando que sea un arreglo válido
         const rawPayments: PaymentWithGuest[] = Array.isArray(data) ? [...data] : [];
         this.payments.set(rawPayments);
         this.loading.set(false);
 
-        // Recorremos cada pago para buscar los datos del titular usando el accountId
+        // 4. Recorremos los pagos para consultar los datos del usuario mediante la cuenta asociada
         rawPayments.forEach(payment => {
           if (payment.accountId) {
             this.accountService.getAccountById(payment.accountId).subscribe({
               next: (account: any) => {
                 if (account) {
+                  // Asignamos los datos del huésped obtenidos desde la cuenta
                   payment.guestName = account.user?.name || account.name || '';
                   payment.guestSurname = account.user?.surname || account.surname || '';
-                  // Actualizamos la señal con el array modificado para que OnPush detecte el cambio reactivamente
+                  
+                  // Actualizamos la señal con una nueva copia del arreglo para notificar a la vista con OnPush
                   this.payments.set([...rawPayments]);
                 }
               },
-              error: (err) => console.error(`Error al cargar cuenta #${payment.accountId}`, err)
+              error: (err) => {
+                console.error(`Error al cargar cuenta #${payment.accountId}`, err);
+              }
             });
           }
         });
       },
       error: (err: any) => {
+        // 5. Manejamos el error de la petición principal y detenemos el indicador de carga
         this.errorMessage.set('No se pudieron cargar los pagos o no cuentas con los permisos necesarios.');
         this.loading.set(false);
         console.error(err);

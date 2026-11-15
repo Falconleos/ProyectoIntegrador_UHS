@@ -37,6 +37,24 @@
   margin: 2rem 0;
 }
 
+/* Clases auxiliares para espaciado de iconos y textos */
+.icon-title {
+  margin-right: 0.6rem;
+}
+
+.icon-margin {
+  margin-right: 0.5rem;
+}
+
+.icon-error {
+  margin-right: 0.35rem;
+}
+
+.file-selected-text {
+  margin-top: 0.35rem;
+  display: block;
+}
+
 /* Estructura del formulario */
 .form-grid {
   display: flex;
@@ -208,4 +226,14 @@
   background: rgba(239, 68, 68, 0.15);
   border: 1px solid rgba(239, 68, 68, 0.3);
   color: #fca5a5;
+}
+
+/* Animación de giro */
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.spin {
+  animation: spin 1s linear infinite;
 }
