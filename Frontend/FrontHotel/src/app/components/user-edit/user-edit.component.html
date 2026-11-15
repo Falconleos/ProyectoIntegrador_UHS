@@ -22,7 +22,7 @@
   }
 
   <!-- Formulario de Modificación -->
-  <form (ngSubmit)="onSubmit()" #userForm="ngForm" class="card-form">
+  <form (submit)="$event.preventDefault(); onSubmit()" class="card-form">
     
     <!-- Datos de la Cuenta -->
     <h3 class="section-title">Datos de la Cuenta</h3>
@@ -34,7 +34,8 @@
           id="username" 
           name="username" 
           class="input-field" 
-          [(ngModel)]="formData.username" 
+          [value]="formData.username" 
+          (input)="formData.username = $any($event.target).value" 
           required 
           placeholder="ej. jperez">
       </div>
@@ -52,7 +53,8 @@
           id="name" 
           name="name" 
           class="input-field" 
-          [(ngModel)]="formData.name" 
+          [value]="formData.name" 
+          (input)="formData.name = $any($event.target).value" 
           required 
           placeholder="Juan">
       </div>
@@ -64,7 +66,8 @@
           id="surname" 
           name="surname" 
           class="input-field" 
-          [(ngModel)]="formData.surname" 
+          [value]="formData.surname" 
+          (input)="formData.surname = $any($event.target).value" 
           required 
           placeholder="Pérez">
       </div>
@@ -76,7 +79,8 @@
           id="dni" 
           name="dni" 
           class="input-field" 
-          [(ngModel)]="formData.dni" 
+          [value]="formData.dni" 
+          (input)="formData.dni = $any($event.target).value" 
           required 
           placeholder="12345678">
       </div>
@@ -87,7 +91,8 @@
           id="gender" 
           name="gender" 
           class="input-field" 
-          [(ngModel)]="formData.gender">
+          [value]="formData.gender" 
+          (change)="formData.gender = $any($event.target).value">
           <option value="">Seleccione género</option>
           <option value="Masculino">Masculino</option>
           <option value="Femenino">Femenino</option>
@@ -102,7 +107,8 @@
           id="birthDay" 
           name="birthDay" 
           class="input-field" 
-          [(ngModel)]="formData.birthDay">
+          [value]="formData.birthDay" 
+          (input)="formData.birthDay = $any($event.target).value">
       </div>
     </div>
 
@@ -118,7 +124,8 @@
           id="email" 
           name="email" 
           class="input-field" 
-          [(ngModel)]="formData.email" 
+          [value]="formData.email" 
+          (input)="formData.email = $any($event.target).value" 
           required 
           placeholder="juan@example.com">
       </div>
@@ -130,7 +137,8 @@
           id="phoneNumber" 
           name="phoneNumber" 
           class="input-field" 
-          [(ngModel)]="formData.phoneNumber" 
+          [value]="formData.phoneNumber" 
+          (input)="formData.phoneNumber = $any($event.target).value" 
           placeholder="+54 9 11...">
       </div>
 
@@ -141,7 +149,8 @@
           id="address" 
           name="address" 
           class="input-field" 
-          [(ngModel)]="formData.address" 
+          [value]="formData.address" 
+          (input)="formData.address = $any($event.target).value" 
           placeholder="Calle Falsa 123">
       </div>
     </div>
@@ -176,7 +185,7 @@
       <button 
         type="submit" 
         class="btn-primary" 
-        [disabled]="loading || userForm.invalid">
+        [disabled]="loading">
         <i class="fa-solid fa-floppy-disk"></i> {{ loading ? 'Guardando...' : 'Guardar Cambios' }}
       </button>
     </div>

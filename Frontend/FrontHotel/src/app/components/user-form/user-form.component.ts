@@ -38,6 +38,7 @@ export class UserFormComponent {
     private cdr: ChangeDetectorRef
   ) {}
 
+  // Capturo el archivo seleccionado desde el input de tipo file para la foto de perfil
   onFileSelected(event: any): void {
     const file: File = event.target.files[0];
     if (file) {
@@ -45,6 +46,7 @@ export class UserFormComponent {
     }
   }
 
+  // Preparo el payload con los datos del formulario e invoco al servicio para registrar el usuario
   onSubmit(): void {
     this.errorMessage = '';
     this.loading = true;
@@ -65,6 +67,7 @@ export class UserFormComponent {
       enabled: this.formData.enabled
     };
 
+    // Envío el objeto de transferencia al backend mediante el servicio HTTP
     this.userService.createUser(payload).subscribe({
       next: () => {
         this.loading = false;

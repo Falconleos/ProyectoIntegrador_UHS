@@ -9,19 +9,25 @@
     </div>
   }
 
-  <form (ngSubmit)="onSubmit()" #userForm="ngForm" class="card-form">
+  <form (submit)="$event.preventDefault(); onSubmit()" class="card-form">
     
     <!-- Sección de Datos de Cuenta -->
     <h4 class="section-title">Datos de la Cuenta</h4>
     <div class="form-grid">
       <div class="field">
         <label for="username" class="label">Usuario *</label>
-        <input type="text" id="username" class="input-field" name="username" [(ngModel)]="formData.username" required minlength="3" #username="ngModel" placeholder="ej. jperez">
+        <input type="text" id="username" class="input-field" name="username" 
+               [value]="formData.username" 
+               (input)="formData.username = $any($event.target).value" 
+               required minlength="3" placeholder="ej. jperez">
       </div>
 
       <div class="field">
         <label for="password" class="label">Contraseña *</label>
-        <input type="password" id="password" class="input-field" name="password" [(ngModel)]="formData.password" required minlength="6" #password="ngModel" placeholder="••••••••">
+        <input type="password" id="password" class="input-field" name="password" 
+               [value]="formData.password" 
+               (input)="formData.password = $any($event.target).value" 
+               required minlength="6" placeholder="••••••••">
       </div>
     </div>
 
@@ -32,22 +38,33 @@
     <div class="form-grid">
       <div class="field">
         <label for="name" class="label">Nombre *</label>
-        <input type="text" id="name" class="input-field" name="name" [(ngModel)]="formData.name" required #name="ngModel" placeholder="Juan">
+        <input type="text" id="name" class="input-field" name="name" 
+               [value]="formData.name" 
+               (input)="formData.name = $any($event.target).value" 
+               required placeholder="Juan">
       </div>
 
       <div class="field">
         <label for="surname" class="label">Apellido *</label>
-        <input type="text" id="surname" class="input-field" name="surname" [(ngModel)]="formData.surname" required #surname="ngModel" placeholder="Pérez">
+        <input type="text" id="surname" class="input-field" name="surname" 
+               [value]="formData.surname" 
+               (input)="formData.surname = $any($event.target).value" 
+               required placeholder="Pérez">
       </div>
 
       <div class="field">
         <label for="dni" class="label">DNI / Número de Identificación *</label>
-        <input type="text" id="dni" class="input-field" name="dni" [(ngModel)]="formData.dni" required #dni="ngModel" placeholder="12345678">
+        <input type="text" id="dni" class="input-field" name="dni" 
+               [value]="formData.dni" 
+               (input)="formData.dni = $any($event.target).value" 
+               required placeholder="12345678">
       </div>
 
       <div class="field">
         <label for="gender" class="label">Género</label>
-        <select id="gender" class="input-field" name="gender" [(ngModel)]="formData.gender">
+        <select id="gender" class="input-field" name="gender" 
+                [value]="formData.gender" 
+                (change)="formData.gender = $any($event.target).value">
           <option value="" disabled selected>Seleccione género</option>
           <option value="Masculino">Masculino</option>
           <option value="Femenino">Femenino</option>
@@ -57,7 +74,9 @@
 
       <div class="field">
         <label for="birthDay" class="label">Fecha de Nacimiento</label>
-        <input type="date" id="birthDay" class="input-field" name="birthDay" [(ngModel)]="formData.birthDay">
+        <input type="date" id="birthDay" class="input-field" name="birthDay" 
+               [value]="formData.birthDay" 
+               (input)="formData.birthDay = $any($event.target).value">
       </div>
     </div>
 
@@ -68,22 +87,33 @@
     <div class="form-grid">
       <div class="field">
         <label for="email" class="label">Correo Electrónico *</label>
-        <input type="email" id="email" class="input-field" name="email" [(ngModel)]="formData.email" required email #email="ngModel" placeholder="juan@example.com">
+        <input type="email" id="email" class="input-field" name="email" 
+               [value]="formData.email" 
+               (input)="formData.email = $any($event.target).value" 
+               required placeholder="juan@example.com">
       </div>
 
       <div class="field">
         <label for="phoneNumber" class="label">Teléfono *</label>
-        <input type="text" id="phoneNumber" class="input-field" name="phoneNumber" [(ngModel)]="formData.phoneNumber" required #phone="ngModel" placeholder="+54 9 11...">
+        <input type="text" id="phoneNumber" class="input-field" name="phoneNumber" 
+               [value]="formData.phoneNumber" 
+               (input)="formData.phoneNumber = $any($event.target).value" 
+               required placeholder="+54 9 11...">
       </div>
 
       <div class="field">
         <label for="address" class="label">Dirección</label>
-        <input type="text" id="address" class="input-field" name="address" [(ngModel)]="formData.address" placeholder="Calle Falsa 123">
+        <input type="text" id="address" class="input-field" name="address" 
+               [value]="formData.address" 
+               (input)="formData.address = $any($event.target).value" 
+               placeholder="Calle Falsa 123">
       </div>
 
       <div class="field switch-field">
         <div class="switch-wrapper">
-          <input class="switch-input" type="checkbox" id="enabled" name="enabled" [(ngModel)]="formData.enabled">
+          <input class="switch-input" type="checkbox" id="enabled" name="enabled" 
+                 [checked]="formData.enabled" 
+                 (change)="formData.enabled = $any($event.target).checked">
           <label class="switch-label" for="enabled">Usuario activo</label>
         </div>
       </div>
@@ -108,7 +138,7 @@
         Cancelar
       </button>
       <button type="submit" class="btn-primary" [disabled]="loading">
-        <i class="fa-solid" [ngClass]="loading ? 'fa-spinner fa-spin' : ''"></i> 
+        <i class="fa-solid" [class.fa-spinner]="loading" [class.fa-spin]="loading"></i> 
         {{ loading ? 'Guardando...' : 'Crear Usuario' }}
       </button>
     </div>

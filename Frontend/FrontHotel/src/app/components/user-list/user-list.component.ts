@@ -18,10 +18,7 @@ export class UserListComponent implements OnInit {
   loading = true;
   errorMessage = '';
   canModify = false;
-
-  // Almacena las URLs seguras creadas con blobs para cada ID de usuario
   userAvatars: { [key: number]: string } = {};
-
   selectedUser: UserDtoResponse | null = null;
 
   constructor(
@@ -36,6 +33,7 @@ export class UserListComponent implements OnInit {
     this.loadUsers();
   }
 
+  // Valido el rol almacenado en el localStorage para definir permisos de modificación
   checkUserRole(): void {
     const storedRoles = localStorage.getItem('role');
     if (!storedRoles) {
@@ -46,8 +44,7 @@ export class UserListComponent implements OnInit {
     try {
       const roles = JSON.parse(storedRoles);
       const rolesArray = Array.isArray(roles) ? roles : [roles];
-
-      // Verificamos directamente contra el enum de Java (ADMIN, RECEPCIONIST)
+      
       this.canModify = rolesArray.some((r: any) => {
         const roleName = typeof r === 'string' ? r : (r?.name || '');
         return roleName === 'ROLE_ADMIN' || roleName === 'ROLE_RECEPCIONIST';
@@ -57,6 +54,7 @@ export class UserListComponent implements OnInit {
     }
   }
 
+  // Invoco al servicio para obtener la lista de usuarios y precargar sus avatares
   loadUsers(): void {
     this.loading = true;
     this.errorMessage = '';
@@ -66,7 +64,6 @@ export class UserListComponent implements OnInit {
         this.users = Array.isArray(data) ? data : [];
         this.loading = false;
         
-        // Precargamos los avatares para cada usuario de la lista
         this.users.forEach(user => {
           this.loadUserAvatar(user);
         });
@@ -82,6 +79,7 @@ export class UserListComponent implements OnInit {
     });
   }
 
+  // Verifico permisos y elimino el usuario seleccionado mediante el servicio
   deleteUser(id: number): void {
     if (!this.canModify) {
       alert('No tienes los permisos necesarios para realizar esta acción.');
@@ -92,7 +90,7 @@ export class UserListComponent implements OnInit {
       this.userService.deleteUser(id).subscribe({
         next: () => {
           this.users = this.users.filter(user => user.id !== id);
-          delete this.userAvatars[id]; // Limpiamos la caché de la foto si se elimina
+          delete this.userAvatars[id];
           this.cdr.markForCheck();
         },
         error: (err) => {
@@ -111,7 +109,6 @@ export class UserListComponent implements OnInit {
     }
   }
 
-  // Métodos para controlar el modal:
   openUserDetail(user: UserDtoResponse): void {
     this.selectedUser = user;
     this.loadUserAvatar(user);
@@ -126,11 +123,9 @@ export class UserListComponent implements OnInit {
     this.deleteUser(id);
   }
 
-  // Carga la imagen mediante el servicio asegurando el envío del Token JWT
+  // Solicito la imagen al servicio, genero un blob URL local y actualizo el estado
   loadUserAvatar(user: UserDtoResponse): void {
     if (!user || !user.id) return;
-
-    // Si ya fue cargada anteriormente o está cargando, evitamos solicitudes repetidas
     if (this.userAvatars[user.id]) return;
 
     this.userService.getProfilePicture(user.id).subscribe({
@@ -147,7 +142,6 @@ export class UserListComponent implements OnInit {
     });
   }
 
-  // Retorna la URL de objeto segura o la imagen por defecto
   getUserAvatarUrl(user: UserDtoResponse | null): string {
     if (!user || !user.id) {
       return 'assets/default-avatar.png';

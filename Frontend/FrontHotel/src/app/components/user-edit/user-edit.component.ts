@@ -40,6 +40,7 @@ export class UserEditComponent implements OnInit {
     private cdr: ChangeDetectorRef
   ) {}
 
+  // Al iniciar el componente, leo el parámetro ID de la URL y cargo los datos del usuario
   ngOnInit(): void {
     const idParam = this.route.snapshot.paramMap.get('id');
     if (idParam) {
@@ -48,8 +49,10 @@ export class UserEditComponent implements OnInit {
     }
   }
 
+  // Invoco al servicio para obtener la información del usuario por su ID y rellenar el formulario
   loadUserData(id: number): void {
     this.loading = true;
+    
     this.userService.getById(id).subscribe({
       next: (user: any) => {
         this.formData.username = user.username || '';
@@ -76,6 +79,7 @@ export class UserEditComponent implements OnInit {
     });
   }
 
+  // Capturo el archivo de imagen seleccionado en el input de tipo file
   onFileSelected(event: any): void {
     const file: File = event.target.files[0];
     if (file) {
@@ -83,13 +87,13 @@ export class UserEditComponent implements OnInit {
     }
   }
 
+  // Preparo el payload de actualización y envío los datos modificados al backend
   onSubmit(): void {
     if (!this.userId) return;
 
     this.errorMessage = '';
     this.loading = true;
 
-    // Usamos el DTO de modificación que no requiere password
     const updatePayload = {
       username: this.formData.username,
       name: this.formData.name,
@@ -102,10 +106,10 @@ export class UserEditComponent implements OnInit {
       birthDay: this.formData.birthDay ? this.formData.birthDay : ''
     };
 
-    // 1. Primero actualizamos los datos de texto
+    // Actualizo los datos de texto del usuario mediante el servicio
     this.userService.updateUser(this.userId, updatePayload).subscribe({
       next: () => {
-        // 2. Si el usuario seleccionó una foto nueva, la subimos en paralelo/secuencia
+        // Si se seleccionó una nueva foto de perfil, la subo a continuación
         if (this.formData.profilePictureFile && this.userId) {
           this.onUploadPhoto(this.userId, this.formData.profilePictureFile);
         } else {
@@ -124,6 +128,7 @@ export class UserEditComponent implements OnInit {
     });
   }
 
+  // Envío la nueva imagen de perfil al servidor asociada al ID del usuario
   onUploadPhoto(userId: number, file: File): void {
     const formData = new FormData();
     formData.append('profilePicture', file);
@@ -131,7 +136,6 @@ export class UserEditComponent implements OnInit {
     this.userService.updateProfilePicture(userId, formData).subscribe({
       next: (response: any) => {
         this.loading = false;
-        console.log('Foto de perfil actualizada con éxito', response);
         alert('¡Usuario y foto de perfil modificados con éxito!');
         this.router.navigate(['/dashboard/usuarios']);
       },
@@ -143,5 +147,4 @@ export class UserEditComponent implements OnInit {
       }
     });
   }
-
 }
