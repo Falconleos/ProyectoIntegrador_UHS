@@ -31,6 +31,19 @@
   margin: 1.5rem 0;
 }
 
+/* Clases auxiliares para iconos y textos */
+.icon-spacing {
+  margin-right: 0.5rem;
+}
+
+.icon-spacing-left {
+  margin-right: 0.25rem;
+}
+
+.color-primary {
+  color: var(--color-primary);
+}
+
 /* Tarjeta de Resumen */
 .summary-card {
   background: rgba(15, 23, 42, 0.5);
@@ -93,6 +106,24 @@
   border-radius: var(--radius-md);
   padding: 1rem 1.25rem;
   margin-bottom: 1.5rem;
+}
+
+.switch-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.switch-input {
+  width: 2.25rem;
+  height: 1.25rem;
+  accent-color: var(--color-primary);
+  cursor: pointer;
+}
+
+.switch-hint {
+  display: block;
+  margin-top: 0.35rem;
 }
 
 .form-check-label {

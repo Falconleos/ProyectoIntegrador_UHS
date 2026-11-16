@@ -1,13 +1,14 @@
 /* --- Layout General del Dashboard (Grid Responsivo) --- */
 .dashboard {
   min-height: 100vh;
+  /* Reducimos el ancho del aside un 20% (de 260px a 210px) para optimizar el espacio horizontal */
   display: grid;
-  grid-template-columns: 260px 1fr;
+  grid-template-columns: 210px 1fr;
   background-color: var(--bg-main);
   background-image: var(--bg-gradient-1), var(--bg-gradient-2);
 }
 
-/* --- Barra Lateral (Sidebar) --- */
+/* --- Barra Lateral (Sidebar / Aside) --- */
 .sidebar {
   background: var(--bg-secondary);
   backdrop-filter: var(--backdrop-blur);
@@ -22,16 +23,18 @@
 }
 
 .sidebar-header {
-  padding: 1.5rem 1rem;
+  /* Reducimos el padding un 20% para ajustarlo al nuevo ancho */
+  padding: 1.2rem 0.8rem;
   border-bottom: var(--border-glass);
 }
 
 .sidebar-header h2 {
   color: var(--color-text-main);
-  font-size: var(--font-size-sm);
+  /* Escalamos ligeramente la tipografía un 20% menor visualmente */
+  font-size: calc(var(--font-size-sm) * 0.9);
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
 }
 
 .sidebar-header a {
@@ -40,26 +43,27 @@
 
 .sidebar-header h2 i {
   color: var(--color-primary);
-  font-size: var(--font-size-md);
+  font-size: calc(var(--font-size-md) * 0.9);
 }
 
 /* --- Navegación del Sidebar --- */
 .sidebar-nav {
-  padding: 1rem 0.75rem;
+  padding: 0.8rem 0.6rem;
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 3px;
   flex-grow: 1;
 }
 
 .sidebar-nav a {
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 10px 14px;
+  gap: 10px;
+  /* Reducimos padding y tamaño de fuente proporcionalmente */
+  padding: 8px 10px;
   color: var(--color-text-muted);
   text-decoration: none;
-  font-size: var(--font-size-xs);
+  font-size: calc(var(--font-size-xs) * 0.95);
   border-radius: var(--radius-sm);
   transition: all 0.2s ease;
 }
@@ -77,30 +81,30 @@
 }
 
 .sidebar-nav a i {
-  width: 18px;
+  width: 16px;
   text-align: center;
   color: var(--color-primary);
 }
 
 /* --- Footer del Sidebar --- */
 .sidebar-footer {
-  padding: 1rem;
+  padding: 0.8rem;
   border-top: var(--border-glass);
 }
 
 .logout-btn {
   width: 100%;
-  padding: 10px;
+  padding: 8px;
   background: rgba(239, 68, 68, 0.15);
   border: 1px solid rgba(239, 68, 68, 0.3);
   color: #fca5a5;
   border-radius: var(--radius-sm);
-  font-size: var(--font-size-xs);
+  font-size: calc(var(--font-size-xs) * 0.95);
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
+  gap: 6px;
   transition: background 0.2s ease;
 }
 
@@ -255,5 +259,4 @@
   .user-info {
     display: none; /* Oculta el texto del usuario en pantallas muy pequeñas para ahorrar espacio */
   }
-
 }

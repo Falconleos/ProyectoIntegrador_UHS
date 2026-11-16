@@ -1,42 +1,42 @@
-/* Contenedor Principal */
+/* --- Contenedor Principal --- */
 .inicio-container {
-  padding: 1.5rem;
+  padding: 1.2rem;
   color: var(--color-text-main);
   background-color: transparent;
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
+  gap: 1.2rem;
 }
 
 /* Banner de Bienvenida */
 .welcome-banner h2 {
-  font-size: var(--font-size-title-fluid);
+  font-size: calc(var(--font-size-title-fluid) * 0.85);
   font-weight: 600;
   color: var(--color-text-main);
-  margin-bottom: 0.35rem;
+  margin-bottom: 0.25rem;
 }
 
 .welcome-banner p {
-  font-size: var(--font-size-sm);
+  font-size: calc(var(--font-size-sm) * 0.9);
   color: var(--color-text-muted);
 }
 
 /* Grilla de KPIs (5 columnas arriba) */
 .kpi-grid {
   display: grid;
-  grid-template-columns: repeat(5, minmax(180px, 1fr));
-  gap: 1rem;
+  grid-template-columns: repeat(5, minmax(110px, 1fr));
+  gap: 0.6rem;
 }
 
 @media (max-width: 1400px) {
   .kpi-grid {
-    grid-template-columns: repeat(3, minmax(220px, 1fr));
+    grid-template-columns: repeat(3, minmax(130px, 1fr));
   }
 }
 
 @media (max-width: 900px) {
   .kpi-grid {
-    grid-template-columns: repeat(2, minmax(220px, 1fr));
+    grid-template-columns: repeat(2, minmax(130px, 1fr));
   }
 }
 
@@ -54,10 +54,10 @@
   border: var(--border-glass);
   box-shadow: var(--shadow-main);
   border-radius: var(--radius-lg);
-  padding: 1.25rem;
+  padding: 0.75rem;
   display: flex;
-  flex-direction: column; /* Apila el icono/título arriba y el número abajo si se prefiere, o diseño en bloque */
-  gap: 0.85rem;
+  flex-direction: column;
+  gap: 0.4rem;
   transition: transform 0.2s ease, border-color 0.2s ease;
 }
 
@@ -66,28 +66,26 @@
   border-color: rgba(129, 140, 248, 0.3);
 }
 
-/* Cabecera interna de la tarjeta (Icono + Título arriba) */
+/* Cabecera interna de la tarjeta */
 .kpi-info {
   display: flex;
   flex-direction: column;
-  gap: 0.3rem;
+  gap: 0.1rem;
   width: 100%;
 }
 
-/* Permitir que el texto salte de línea en lugar de cortarse con puntos suspensivos */
 .kpi-info span {
-  font-size: 0.75rem;
+  font-size: 0.55rem;
   color: var(--color-text-muted);
   text-transform: uppercase;
   letter-spacing: 0.05em;
   font-weight: 600;
-  white-space: normal; /* Permite que baje a la siguiente línea si es largo */
-  line-height: 1.2;
+  white-space: normal;
+  line-height: 1.1;
 }
 
-/* El número o valor métrico grande abajo */
 .kpi-info h3 {
-  font-size: 1.35rem;
+  font-size: 0.95rem;
   font-weight: 700;
   color: var(--color-text-main);
   margin: 0;
@@ -95,13 +93,13 @@
 
 /* Iconos */
 .kpi-icon {
-  width: 40px;
-  height: 40px;
+  width: 26px;
+  height: 26px;
   border-radius: var(--radius-md);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1rem;
+  font-size: 0.75rem;
   color: var(--color-text-main);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 }
@@ -124,18 +122,18 @@
   border: var(--border-glass);
   box-shadow: var(--shadow-main);
   border-radius: var(--radius-lg);
-  padding: 1.5rem 2rem;
+  padding: 1.2rem 1.6rem;
   width: 100%;
 }
 
 .chart-header h3 {
-  font-size: var(--font-size-md);
+  font-size: calc(var(--font-size-md) * 0.9);
   color: var(--color-text-main);
   font-weight: 600;
 }
 
 .chart-subtitle {
-  font-size: var(--font-size-xs);
+  font-size: calc(var(--font-size-xs) * 0.9);
   color: var(--color-text-muted);
 }
 
@@ -144,8 +142,8 @@
   align-items: center;
   justify-content: space-around;
   flex-wrap: wrap;
-  gap: 2rem;
-  margin-top: 1.5rem;
+  gap: 1.5rem;
+  margin-top: 1.2rem;
 }
 
 /* Gráfico Circular con Conic Gradient puro */
@@ -156,8 +154,8 @@
 }
 
 .pie-chart {
-  width: 160px;
-  height: 160px;
+  width: 128px;
+  height: 128px;
   border-radius: 50%;
   background: conic-gradient(
     #6366f1 0% var(--occupancy), 
@@ -166,13 +164,13 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
   position: relative;
 }
 
 .pie-chart-inner {
-  width: 120px;
-  height: 120px;
+  width: 96px;
+  height: 96px;
   background-color: #0f172a;
   border-radius: 50%;
   display: flex;
@@ -182,13 +180,13 @@
 }
 
 .percentage-value {
-  font-size: 1.5rem;
+  font-size: 1.2rem;
   font-weight: 700;
   color: var(--color-text-main);
 }
 
 .percentage-label {
-  font-size: 0.75rem;
+  font-size: 0.65rem;
   color: var(--color-text-muted);
   text-transform: uppercase;
 }
@@ -197,19 +195,19 @@
 .chart-legend {
   display: flex;
   flex-direction: column;
-  gap: 1rem;
+  gap: 0.8rem;
 }
 
 .legend-item {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
+  gap: 0.6rem;
 }
 
 .legend-color {
-  width: 14px;
-  height: 14px;
-  border-radius: 4px;
+  width: 11px;
+  height: 11px;
+  border-radius: 3px;
 }
 
 .legend-color.occupied {
@@ -226,11 +224,11 @@
 }
 
 .legend-text strong {
-  font-size: var(--font-size-sm);
+  font-size: calc(var(--font-size-sm) * 0.95);
   color: var(--color-text-main);
 }
 
 .legend-text span {
-  font-size: var(--font-size-xs);
+  font-size: calc(var(--font-size-xs) * 0.95);
   color: var(--color-text-muted);
 }

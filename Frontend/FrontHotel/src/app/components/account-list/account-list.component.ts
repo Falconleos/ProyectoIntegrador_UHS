@@ -13,7 +13,6 @@ import { AccountDTOResponse } from '../../models/Account-model';
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class AccountListComponent implements OnInit {
-  // --- Estados con Signals ---
   accounts = signal<AccountDTOResponse[]>([]);
   loading = signal<boolean>(true);
   errorMessage = signal<string>('');
@@ -27,26 +26,17 @@ export class AccountListComponent implements OnInit {
     this.loadAccounts();
   }
 
+  // Solicita al servicio la lista de cuentas e inicializa el estado del componente
   loadAccounts(): void {
     this.loading.set(true);
     this.errorMessage.set('');
 
     this.accountService.getAllAccounts().subscribe({
       next: (data: AccountDTOResponse[]) => {
-        const processedAccounts = Array.isArray(data) ? data.map(acc => {
-          const base = acc.baseAmount || 0;
-          const services = acc.servicesTotal || 0;
-          const subtotal = base + services;
-          const adjustment = acc.adjustmentPercentage || 0;
-          const total = subtotal + (subtotal * (adjustment / 100));
-          const paid = acc.paidAmount || 0;
-          
-          return {
-            ...acc,
-            totalAmount: total,
-            remainingBalance: Math.max(0, total - paid)
-          };
-        }) : [];
+        // Procesamos cada cuenta para calcular totales y saldos antes de actualizar el estado
+        const processedAccounts = Array.isArray(data) 
+          ? data.map(account => this.calculateAccountTotals(account)) 
+          : [];
         
         this.accounts.set(processedAccounts);
         this.loading.set(false);
@@ -60,6 +50,25 @@ export class AccountListComponent implements OnInit {
     });
   }
 
+  // Calcula de forma aislada los montos totales y saldos pendientes de una cuenta individual
+  private calculateAccountTotals(acc: AccountDTOResponse): AccountDTOResponse {
+    const base = acc.baseAmount || 0;
+    const services = acc.servicesTotal || 0;
+    const subtotal = base + services;
+    
+    const adjustment = acc.adjustmentPercentage || 0;
+    const total = subtotal + (subtotal * (adjustment / 100));
+    
+    const paid = acc.paidAmount || 0;
+    
+    return {
+      ...acc,
+      totalAmount: total,
+      remainingBalance: Math.max(0, total - paid)
+    };
+  }
+
+  // Redirige a la vista de detalles utilizando el enrutador de Angular
   viewAccountDetail(id: number): void {
     this.router.navigate([`/dashboard/account-detail/${id}`]);
   }

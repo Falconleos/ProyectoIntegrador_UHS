@@ -1,7 +1,7 @@
 <div class="container">
   <!-- Encabezado -->
   <div class="header-section">
-    <h2><i class="bi bi-calendar-check me-2"></i> Completar datos de la reserva</h2>
+    <h2><i class="bi bi-calendar-check icon-spacing"></i> Completar datos de la reserva</h2>
     <p class="subtitle">Ingresa la información del titular para registrar la nueva reserva en el sistema.</p>
   </div>
 
@@ -10,7 +10,7 @@
   <!-- Alerta de Error -->
   @if (errorMessage()) {
     <div class="alert alert-danger">
-      <i class="bi bi-exclamation-triangle-fill me-2"></i> {{ errorMessage() }}
+      <i class="bi bi-exclamation-triangle-fill icon-spacing"></i> {{ errorMessage() }}
     </div>
   }
 
@@ -29,11 +29,11 @@
       
       <div class="summary-details">
         <div class="summary-item">
-          <i class="bi bi-calendar-days text-primary"></i>
+          <i class="bi bi-calendar-days color-primary"></i>
           <span><strong>Estadía:</strong> {{ bookingData.checkIn }} al {{ bookingData.checkOut }}</span>
         </div>
         <div class="summary-item">
-          <i class="bi bi-people text-primary"></i>
+          <i class="bi bi-people color-primary"></i>
           <span><strong>Huéspedes:</strong> {{ bookingData.guestCount }} persona(s)</span>
         </div>
       </div>
@@ -45,13 +45,13 @@
     
     <!-- Selector de Tipo de Cliente -->
     <div class="switch-box">
-      <div class="form-check form-switch">
-        <input class="form-check-input" type="checkbox" role="switch" id="isRegisteredUser" formControlName="isRegisteredUser">
+      <div class="switch-wrapper">
+        <input class="switch-input" type="checkbox" id="isRegisteredUser" formControlName="isRegisteredUser">
         <label class="form-check-label" for="isRegisteredUser">
           Asociar a un usuario ya registrado en el sistema
         </label>
       </div>
-      <small class="subtitle d-block mt-1">
+      <small class="subtitle switch-hint">
         @if (isGuestUser()) {
           Su cuenta de huésped ha sido vinculada automáticamente a esta reserva.
         } @else {
@@ -68,8 +68,8 @@
           <label for="userId" class="form-label">Usuario Registrado *</label>
           <div class="input-wrapper">
             <span class="input-icon"><i class="bi bi-person-check"></i></span>
-            <select id="userId" class="form-control" formControlName="userId">
-              <option [ngValue]="null">-- Seleccione un usuario --</option>
+            <select id="userId" class="form-control" formControlName="userId" (change)="onUserSelectChange($event)">
+              <option [value]="null">Seleccione usuario</option>
               @for (user of usersList(); track user.id) {
                 <option [value]="user.id">
                   {{ user.name }} {{ user.surname }} (Username: {{ user.username }})
@@ -128,10 +128,10 @@
     <!-- Botones de Acción -->
     <div class="actions-container">
       <button type="button" class="btn-secondary-action" routerLink="/dashboard/booking-list">
-        <i class="bi bi-arrow-left me-1"></i> Volver
+        <i class="bi bi-arrow-left icon-spacing-left"></i> Volver
       </button>
       <button type="submit" class="btn-primary" [disabled]="bookingForm.invalid || loading()">
-        <i class="bi" [ngClass]="loading() ? 'bi-arrow-repeat bi-spin' : 'bi-check-lg'"></i> 
+        <i [class]="getSubmitButtonIcon()"></i> 
         {{ loading() ? 'Guardando reserva...' : 'Confirmar Creación de Reserva' }}
       </button>
     </div>

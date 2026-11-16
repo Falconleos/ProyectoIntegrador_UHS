@@ -22,6 +22,7 @@
   color: var(--color-text-main);
   display: flex;
   align-items: center;
+  gap: 0.5rem;
   margin-bottom: 0.5rem;
 }
 
@@ -35,6 +36,37 @@
   height: 1px;
   background: rgba(255, 255, 255, 0.08);
   margin: 2rem 0;
+}
+
+/* Clases utilitarias de texto y espaciado migradas desde Bootstrap */
+.cell-id {
+  padding-left: 1.5rem !important;
+}
+
+.cell-actions-header {
+  text-align: right;
+  padding-right: 1.5rem;
+}
+
+.cell-actions-body {
+  text-align: right;
+  padding-right: 1.5rem;
+}
+
+.text-nowrap-custom {
+  white-space: nowrap;
+}
+
+.text-bold {
+  font-weight: 700;
+}
+
+.text-success-custom {
+  color: #34d399;
+}
+
+.text-danger-custom {
+  color: #fca5a5;
 }
 
 /* Contenedor de la tabla con scroll horizontal optimizado y suave */
@@ -74,7 +106,7 @@
   text-align: left;
   font-size: var(--font-size-sm);
   color: var(--color-text-main);
-  white-space: nowrap; /* Evita que los textos largos fuercen saltos de línea indeseados */
+  white-space: nowrap;
 }
 
 .table th {
@@ -86,7 +118,7 @@
 }
 
 .table td {
-  padding: 12px 16px; /* Padding equilibrado para evitar filas demasiado altas */
+  padding: 12px 16px;
   border-bottom: 1px solid rgba(255, 255, 255, 0.04);
   vertical-align: middle;
 }
@@ -105,6 +137,7 @@
 .badge {
   display: inline-flex;
   align-items: center;
+  gap: 0.25rem;
   padding: 5px 10px;
   border-radius: var(--radius-sm);
   font-size: var(--font-size-xs);
@@ -115,6 +148,31 @@
   background: rgba(255, 255, 255, 0.06);
   color: var(--color-text-main);
   border: var(--border-btn);
+}
+
+/* Variantes de estados extraídas de los estilos en línea */
+.badge-state-open {
+  background: rgba(251, 191, 36, 0.15);
+  color: #fbbf24;
+  border: 1px solid rgba(251, 191, 36, 0.3);
+}
+
+.badge-state-paid {
+  background: rgba(52, 211, 153, 0.15);
+  color: #34d399;
+  border: 1px solid rgba(52, 211, 153, 0.3);
+}
+
+.badge-state-cancelled {
+  background: rgba(239, 68, 68, 0.15);
+  color: #ef4444;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+.badge-state-refunded {
+  background: rgba(56, 189, 248, 0.15);
+  color: #38bdf8;
+  border: 1px solid rgba(56, 189, 248, 0.3);
 }
 
 .btn-secondary-action {
@@ -143,6 +201,9 @@
   border-radius: var(--radius-sm);
   font-size: var(--font-size-sm);
   margin-bottom: 1.25rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
 }
 
 .alert-info {

@@ -12,6 +12,10 @@
   color: var(--color-text-main);
 }
 
+.container-margin-top {
+  margin-top: 1.5rem;
+}
+
 .header-section {
   display: flex;
   justify-content: space-between;
@@ -25,6 +29,7 @@
   color: var(--color-text-main);
   display: flex;
   align-items: center;
+  gap: 0.5rem;
   margin-bottom: 0;
 }
 
@@ -40,11 +45,22 @@
   margin: 2rem 0;
 }
 
-/* Grilla de dos columnas responsiva con separación limpia */
-.row-grid {
+.divider-spacing {
+  margin: 1.5rem 0;
+}
+
+/* Grilla dinámica de dos columnas */
+.main-layout-grid {
   display: grid;
+  gap: 1.5rem;
+}
+
+.row-grid {
   grid-template-columns: 1fr;
-  gap: 2rem;
+}
+
+.row-grid-single {
+  grid-template-columns: 1fr;
 }
 
 @media (min-width: 992px) {
@@ -56,7 +72,7 @@
 .column-main, .column-sidebar {
   display: flex;
   flex-direction: column;
-  gap: 2rem; /* Separación vertical holgada entre tarjetas */
+  gap: 2rem;
 }
 
 /* Tarjetas principales con efecto Glass */
@@ -69,6 +85,18 @@
   padding: 10px;
 }
 
+.card-spacing-bottom {
+  margin-bottom: 1.5rem;
+}
+
+.h-100 {
+  height: 100%;
+}
+
+.padding-large {
+  padding: 1.5rem;
+}
+
 .glass-card-header {
   padding: 1.25rem 1.75rem;
   background: rgba(15, 23, 42, 0.85);
@@ -78,13 +106,14 @@
   color: var(--color-text-main);
   display: flex;
   align-items: center;
+  gap: 0.5rem;
 }
 
 .card-body {
-  padding: 1.75rem; /* Respiro interno uniforme */
+  padding: 1.75rem;
   display: flex;
   flex-direction: column;
-  gap: 1.5rem; /* Separación entre elementos internos de la card */
+  gap: 1.5rem;
 }
 
 .glass-subcard {
@@ -92,6 +121,10 @@
   border: var(--border-input);
   border-radius: var(--radius-sm);
   padding: 1.25rem;
+}
+
+.subcard-spacing {
+  margin-bottom: 1.5rem;
 }
 
 .row-grid-form {
@@ -114,6 +147,10 @@
   border-radius: var(--radius-sm);
   border: var(--border-input);
   background: rgba(15, 23, 42, 0.4);
+}
+
+.table-spacing-bottom {
+  margin-bottom: 1rem;
 }
 
 .table {
@@ -143,19 +180,95 @@
   background: rgba(255, 255, 255, 0.02);
 }
 
-/* Formularios, Labels e Inputs con separación correcta */
+/* Utilidades de texto y layout migradas desde clases inline/utility */
+.text-end {
+  text-align: right;
+}
+
+.text-semibold {
+  font-weight: 600;
+}
+
+.text-bold {
+  font-weight: 700;
+}
+
+.text-zero-margin {
+  margin-bottom: 0;
+}
+
+.font-normal {
+  font-weight: 400;
+}
+
+.font-monospace {
+  font-family: monospace;
+}
+
+.text-lg {
+  font-size: 1.125rem;
+}
+
+.fs-large {
+  font-size: 1.25rem;
+}
+
+.fs-medium {
+  font-size: 1.125rem;
+}
+
+.icon-primary {
+  color: var(--color-primary);
+  margin-right: 0.5rem;
+}
+
+.icon-muted {
+  color: var(--color-text-muted);
+  margin-right: 0.5rem;
+}
+
+.badge-margin-left {
+  margin-left: 0.5rem;
+}
+
+.spacing-right {
+  margin-right: 1rem;
+}
+
+.total-row-flex {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.total-spacing-bottom {
+  margin-bottom: 1rem;
+}
+
+.sidebar-header-flex {
+  display: flex;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.header-icon-container {
+  margin-right: 0.75rem;
+}
+
+/* Formularios, Labels e Inputs */
 .form-group {
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
-  margin-bottom: 1.25rem; /* Margen inferior uniforme para cada campo */
+  margin-bottom: 1.5rem;
 }
 
 .form-label {
   font-size: var(--font-size-sm);
   font-weight: 600;
   color: var(--color-text-main);
-  margin-bottom: 0.35rem; /* Espacio exacto entre la etiqueta y el input */
+  margin-bottom: 0.35rem;
   display: block;
 }
 
@@ -210,10 +323,11 @@
   border-bottom: none;
 }
 
-/* Insignias y Botones con márgenes adecuados */
+/* Insignias y Botones */
 .badge {
   display: inline-flex;
   align-items: center;
+  gap: 0.25rem;
   padding: 5px 10px;
   border-radius: var(--radius-sm);
   font-size: var(--font-size-xs);
@@ -236,6 +350,20 @@
   background: rgba(251, 191, 36, 0.15);
   color: #fbbf24;
   border: 1px solid rgba(251, 191, 36, 0.3);
+}
+
+.badge-paid {
+  background: rgba(52, 211, 153, 0.15);
+  color: #34d399;
+  border: 1px solid rgba(52, 211, 153, 0.3);
+  padding: 0.5rem 0.75rem;
+}
+
+.badge-unpaid {
+  background: rgba(251, 191, 36, 0.15);
+  color: #fbbf24;
+  border: 1px solid rgba(251, 191, 36, 0.3);
+  padding: 0.5rem 0.75rem;
 }
 
 .btn-primary {
@@ -273,9 +401,10 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  gap: 0.5rem;
   transition: opacity 0.2s;
   font-size: var(--font-size-sm);
-  margin-top: 0.5rem; /* Margen superior clave para que no pegue con el input anterior */
+  margin-top: 0.5rem;
   padding: 12px;
 }
 
@@ -293,7 +422,6 @@
   color: var(--color-text-main);
   border: var(--border-btn);
   padding: 8px 14px;
-  margin-right: 10px;
   border-radius: var(--radius-sm);
   font-weight: 500;
   cursor: pointer;
@@ -303,6 +431,10 @@
   gap: 0.5rem;
   transition: background 0.2s;
   font-size: var(--font-size-sm);
+}
+
+.btn-spacing-right {
+  margin-right: 10px;
 }
 
 .btn-secondary-action:hover {
@@ -315,6 +447,9 @@
   border-radius: var(--radius-sm);
   font-size: var(--font-size-sm);
   margin-bottom: 1.25rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
 }
 
 .alert-info {
@@ -333,13 +468,11 @@
    ESTILOS DE IMPRESIÓN Y RECIBO FORMAL
    ========================================================= */
 
-/* Por defecto, el recibo de impresión está oculto en la pantalla normal */
 .print-only-receipt {
   display: none;
 }
 
 @media print {
-  /* 1. Ocultamos la barra de navegación global, menús, cabeceras del dashboard y botones */
   app-sidebar, 
   .sidebar, 
   nav, 
@@ -356,7 +489,6 @@
     display: none !important;
   }
 
-  /* 2. Configuramos los márgenes de página y evitamos cortes de texto */
   @page {
     margin: 1cm;
     size: portrait;
@@ -374,7 +506,6 @@
     -webkit-print-color-adjust: exact;
   }
 
-  /* 3. Mostramos la estructura limpia y formal del recibo a ancho completo */
   .print-only-receipt {
     display: block !important;
     width: 100% !important;
@@ -427,6 +558,10 @@
     width: 100% !important;
   }
 
+  .receipt-margin-top {
+    margin-top: 1.5rem;
+  }
+
   .receipt-section h4 {
     font-size: 14px;
     font-weight: bold;
@@ -454,10 +589,6 @@
   .receipt-table th {
     font-weight: bold;
     background-color: #f8f9fa !important;
-  }
-
-  .text-end {
-    text-align: right !important;
   }
 
   .receipt-totals {
