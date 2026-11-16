@@ -29,4 +29,5 @@ public interface UserService {
 
     UserDTOResponse updateProfilePicture(Long id, org.springframework.web.multipart.MultipartFile file);
 
+    public boolean isOwner(Long id, String username);
 }

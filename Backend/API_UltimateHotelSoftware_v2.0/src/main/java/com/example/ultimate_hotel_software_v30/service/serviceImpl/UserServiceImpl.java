@@ -27,7 +27,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
-@Service
+@Service("userService")
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
 
@@ -231,6 +231,12 @@ public class UserServiceImpl implements UserService {
         UserEntity userEntity = findEntityById(id);
         userEntity.setPassword(passwordEncoder.encode(newPassword));
         userRepository.save(userEntity);
+    }
+
+    @Override
+    public boolean isOwner(Long id, String username) {
+        UserEntity user = findEntityByUsername(username);
+        return user != null && user.getId().equals(id);
     }
 
 }

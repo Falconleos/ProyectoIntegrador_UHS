@@ -64,9 +64,8 @@ public class UserController {
     }
 
     /*------recepcionista o administrador obtienen por id y usuario solo su id---------------------------*/
-
     @GetMapping("/{id}")
-    @PreAuthorize("hasAnyRole('ADMIN', 'RECEPCIONIST') or (hasRole('GUEST') and #id == principal.id)")
+    @PreAuthorize("hasAnyRole('ADMIN', 'RECEPCIONIST') or (hasRole('GUEST') and @userService.isOwner(#id, principal.username))")
     @Operation(
             summary = "Obtener usuario por ID",
             description = "Devuelve los detalles de un usuario. Los huéspedes solo pueden consultarse a sí mismos."
@@ -99,7 +98,7 @@ public class UserController {
 
     /*------recepcionista o administrador actualizan por id y usuario solo su id---------------------------*/
     @PutMapping("/{id}")
-    @PreAuthorize("hasAnyRole('ADMIN', 'RECEPCIONIST') or (hasRole('GUEST') and #id == principal.id)")
+    @PreAuthorize("hasAnyRole('ADMIN', 'RECEPCIONIST') or (hasRole('GUEST') and @userService.isOwner(#id, principal.username))")
     @Operation(
             summary = "Actualizar datos del usuario",
             description = "Permite modificar la información personal. Los huéspedes solo pueden modificar su propio perfil."
@@ -144,7 +143,7 @@ public class UserController {
     }
 
     @PostMapping(value = "/{id}/profile-picture", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    @PreAuthorize("hasAnyRole('ADMIN', 'RECEPCIONIST') or (hasRole('GUEST') and #id == principal.id)")
+    @PreAuthorize("hasAnyRole('ADMIN', 'RECEPCIONIST') or (hasRole('GUEST') and @userService.isOwner(#id, principal.username))")
     @Operation(
             summary = "Actualizar foto de perfil del usuario",
             description = "Permite actualizar de forma independiente la imagen de perfil de un usuario."
@@ -156,7 +155,7 @@ public class UserController {
     }
 
     @PutMapping("/{id}/update-password")
-    @PreAuthorize("hasAnyRole('ADMIN', 'RECEPCIONIST') or (hasRole('GUEST') and #id == principal.id)")
+    @PreAuthorize("hasAnyRole('ADMIN', 'RECEPCIONIST') or (hasRole('GUEST') and @userService.isOwner(#id, principal.username))")
     @Operation(
             summary = "Actualizar contraseña de usuario por ID (Sin clave anterior)",
             description = "Permite actualizar la contraseña de un usuario directamente mediante su ID sin solicitar la contraseña actual."
