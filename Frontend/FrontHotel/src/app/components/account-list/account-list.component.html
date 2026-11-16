@@ -2,7 +2,7 @@
   <!-- Encabezado -->
   <div class="header-section">
     <h2>
-      <i class="bi bi-file-earmark-text me-2"></i> Gestión de Cuentas y Pagos
+      <i class="bi bi-file-earmark-text"></i> Gestión de Cuentas y Pagos
     </h2>
     <p class="subtitle">Administre y consulte los saldos, pagos y estados de cuentas del hotel.</p>
   </div>
@@ -12,13 +12,13 @@
   <!-- Alertas de Carga / Error -->
   @if (loading()) {
     <div class="alert alert-info">
-      <i class="bi bi-arrow-repeat spin me-2"></i> Cargando registros de cuentas...
+      <i class="bi bi-arrow-repeat spin"></i> Cargando registros de cuentas...
     </div>
   }
 
   @if (errorMessage()) {
     <div class="alert alert-danger">
-      <i class="bi bi-exclamation-triangle me-2"></i> {{ errorMessage() }}
+      <i class="bi bi-exclamation-triangle"></i> {{ errorMessage() }}
     </div>
   }
 
@@ -28,7 +28,7 @@
       <table class="table">
         <thead>
           <tr>
-            <th class="ps-4">ID Cuenta</th>
+            <th class="cell-id">ID Cuenta</th>
             <th>Huésped</th>
             <th>DNI</th>
             <th>Habitación</th>
@@ -37,56 +37,56 @@
             <th>Pagado</th>
             <th>Saldo</th>
             <th>Estado</th>
-            <th style="text-align: right; padding-right: 1.5rem;">Acciones</th>
+            <th class="cell-actions-header">Acciones</th>
           </tr>
         </thead>
         <tbody>
           @for (account of accounts(); track account.id) {
             <tr>
-              <td class="ps-4"><strong>#{{ account.id }}</strong></td>
-              <td class="text-nowrap">{{ account.user ? (account.user.name + ' ' + account.user.surname) : '-' }}</td>
+              <td class="cell-id"><strong>#{{ account.id }}</strong></td>
+              <td class="text-nowrap-custom">{{ account.user ? (account.user.name + ' ' + account.user.surname) : '-' }}</td>
               <td>{{ account.user?.dni || '-' }}</td>
               <td>
                 <span class="badge badge-secondary">
-                  <i class="bi bi-door-closed me-1"></i> Hab. {{ account.roomNumber || 'N/D' }}
+                  <i class="bi bi-door-closed"></i> Hab. {{ account.roomNumber || 'N/D' }}
                 </span>
               </td>
-              <td class="subtitle text-nowrap">
-                <i class="bi bi-calendar-range me-1"></i> {{ account.checkInDate || 'N/D' }} al {{ account.checkOutDate || 'N/D' }}
+              <td class="subtitle text-nowrap-custom">
+                <i class="bi bi-calendar-range"></i> {{ account.checkInDate || 'N/D' }} al {{ account.checkOutDate || 'N/D' }}
               </td>
-              <td class="fw-bold text-nowrap">${{ account.totalAmount | number:'1.2-2' }}</td>
-              <td class="fw-bold text-nowrap" style="color: #34d399;">${{ account.paidAmount | number:'1.2-2' }}</td>
-              <td class="fw-bold text-nowrap" style="color: #fca5a5;">${{ account.remainingBalance | number:'1.2-2' }}</td>
+              <td class="text-bold text-nowrap-custom">${{ account.totalAmount | number:'1.2-2' }}</td>
+              <td class="text-bold text-nowrap-custom text-success-custom">${{ account.paidAmount | number:'1.2-2' }}</td>
+              <td class="text-bold text-nowrap-custom text-danger-custom">${{ account.remainingBalance | number:'1.2-2' }}</td>
               <td>
                 @switch (account.state) {
                   @case ('OPEN') {
-                    <span class="badge" style="background: rgba(251, 191, 36, 0.15); color: #fbbf24; border: 1px solid rgba(251, 191, 36, 0.3);">
-                      <i class="bi bi-clock me-1"></i> Abierta
+                    <span class="badge badge-state-open">
+                      <i class="bi bi-clock"></i> Abierta
                     </span>
                   }
                   @case ('PAID') {
-                    <span class="badge" style="background: rgba(52, 211, 153, 0.15); color: #34d399; border: 1px solid rgba(52, 211, 153, 0.3);">
-                      <i class="bi bi-check-circle me-1"></i> Pagada
+                    <span class="badge badge-state-paid">
+                      <i class="bi bi-check-circle"></i> Pagada
                     </span>
                   }
                   @case ('CANCELLED') {
-                    <span class="badge" style="background: rgba(239, 68, 68, 0.15); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.3);">
-                      <i class="bi bi-x-circle me-1"></i> Cancelada
+                    <span class="badge badge-state-cancelled">
+                      <i class="bi bi-x-circle"></i> Cancelada
                     </span>
                   }
                   @case ('REFUNDED') {
-                    <span class="badge" style="background: rgba(56, 189, 248, 0.15); color: #38bdf8; border: 1px solid rgba(56, 189, 248, 0.3);">
-                      <i class="bi bi-arrow-counterclockwise me-1"></i> Reembolsada
+                    <span class="badge badge-state-refunded">
+                      <i class="bi bi-arrow-counterclockwise"></i> Reembolsada
                     </span>
                   }
                   @default {
-                    <span class="badge bg-secondary">
+                    <span class="badge badge-secondary">
                       {{ account.state || 'N/D' }}
                     </span>
                   }
                 }
               </td>
-              <td style="text-align: right; padding-right: 1.5rem;">
+              <td class="cell-actions-body">
                 <div class="table-actions">
                   <button 
                     class="btn-secondary-action" 
@@ -106,7 +106,7 @@
   <!-- Mensaje si la lista está vacía -->
   @if (!loading() && !errorMessage() && accounts().length === 0) {
     <div class="alert alert-info">
-      <i class="bi bi-info-circle me-2"></i> No se encontraron cuentas registradas en el sistema.
+      <i class="bi bi-info-circle"></i> No se encontraron cuentas registradas en el sistema.
     </div>
   }
 </div>

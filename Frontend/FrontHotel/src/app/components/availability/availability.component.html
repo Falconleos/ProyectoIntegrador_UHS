@@ -2,35 +2,35 @@
 
   <!-- Sección de Encabezado -->
   <div class="header-section">
-    <h2><i class="fa-solid fa-search me-2"></i> Consultar Disponibilidad de Habitaciones</h2>
+    <h2><i class="fa-solid fa-search"></i> Consultar Disponibilidad de Habitaciones</h2>
     <a class="btn-secondary-action" routerLink="/dashboard/booking-list">
-      <i class="fa-solid fa-arrow-left me-1"></i> Volver a Reservas
+      <i class="fa-solid fa-arrow-left"></i> Volver a Reservas
     </a>
   </div>
 
-  <p class="subtitle mb-4">Selecciona las fechas y la cantidad de huéspedes para buscar habitaciones disponibles en el sistema.</p>
+  <p class="subtitle page-subtitle">Selecciona las fechas y la cantidad de huéspedes para buscar habitaciones disponibles en el sistema.</p>
 
   <hr class="divider" />
 
   <!-- Mensajes de Error o Carga -->
   @if (errorMessage()) {
     <div class="alert alert-danger">
-      <i class="fa-solid fa-triangle-exclamation me-2"></i> {{ errorMessage() }}
+      <i class="fa-solid fa-triangle-exclamation"></i> {{ errorMessage() }}
     </div>
   }
   
   @if (loading()) {
     <div class="alert alert-info">
-      <i class="fa-solid fa-spinner fa-spin me-2"></i> Buscando habitaciones disponibles...
+      <i class="fa-solid fa-spinner fa-spin"></i> Buscando habitaciones disponibles...
     </div>
   }
 
-  <!-- Formulario de Búsqueda con Estilo de Tarjeta / Glass -->
-  <div class="room-type-card mb-4" style="padding: 2rem;">
+  <!-- Formulario de Búsqueda -->
+  <div class="room-type-card search-card">
     <form [formGroup]="availabilityForm" (ngSubmit)="onSearch()">
-      <h3 style="font-size: var(--font-size-sm); color: var(--color-text-main); margin-bottom: 1.25rem;">Criterios de Búsqueda</h3>
+      <h3 class="card-title-custom">Criterios de Búsqueda</h3>
       
-      <div class="detail-grid" style="grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); margin-bottom: 1.5rem;">
+      <div class="detail-grid search-form-grid">
         
         <!-- Fecha de Check-In -->
         <div class="detail-item">
@@ -38,7 +38,7 @@
           <input type="date" id="checkIn" class="form-control" formControlName="checkIn">
           
           @if (availabilityForm.controls['checkIn'].touched && availabilityForm.controls['checkIn'].invalid) {
-            <small style="color: #f87171; font-size: 0.75rem; margin-top: 4px;">El check-in es obligatorio.</small>
+            <small class="error-text">El check-in es obligatorio.</small>
           }
         </div>
 
@@ -48,7 +48,7 @@
           <input type="date" id="checkOut" class="form-control" formControlName="checkOut">
           
           @if (availabilityForm.controls['checkOut'].touched && availabilityForm.controls['checkOut'].hasError('required')) {
-            <small style="color: #f87171; font-size: 0.75rem; margin-top: 4px;">El check-out es obligatorio.</small>
+            <small class="error-text">El check-out es obligatorio.</small>
           }
         </div>
 
@@ -58,21 +58,21 @@
           <input type="number" id="guestCount" class="form-control" formControlName="guestCount" min="1" placeholder="Ej: 2">
           
           @if (availabilityForm.controls['guestCount'].touched && availabilityForm.controls['guestCount'].invalid) {
-            <small style="color: #f87171; font-size: 0.75rem; margin-top: 4px;">Debe ingresar al menos 1 huésped.</small>
+            <small class="error-text">Debe ingresar al menos 1 huésped.</small>
           }
         </div>
 
       </div>
 
-      <hr class="divider" style="margin-bottom: 1.25rem;" />
+      <hr class="divider form-divider" />
 
       <!-- Acciones del Formulario -->
-      <div style="display: flex; justify-content: flex-end; gap: 0.75rem;">
+      <div class="form-actions">
         <button type="button" class="btn-secondary-action" routerLink="/dashboard/booking-list">
           Volver a Reservas
         </button>
         <button type="submit" class="btn-primary" [disabled]="loading()">
-          <i class="fa-solid" [ngClass]="loading() ? 'fa-spinner fa-spin' : 'fa-magnifying-glass'"></i> 
+          <i class="fa-solid" [class.fa-spinner]="loading()" [class.fa-spin]="loading()" [class.fa-magnifying-glass]="!loading()"></i> 
           {{ loading() ? 'Consultando...' : 'Consultar Disponibilidad' }}
         </button>
       </div>
@@ -82,9 +82,9 @@
 
   <!-- Lista de Habitaciones Disponibles -->
   @if (!loading() && hasSearched()) {
-    <div class="header-section" style="margin-top: 2rem;">
+    <div class="header-section results-header">
       <div>
-        <h3 style="color: var(--color-text-main); font-size: var(--font-size-md); margin-bottom: 4px;">Habitaciones Disponibles</h3>
+        <h3 class="results-title">Habitaciones Disponibles</h3>
         <p class="subtitle">Haz clic sobre la habitación que deseas reservar para avanzar.</p>
       </div>
     </div>
@@ -94,31 +94,31 @@
         <table class="table">
           <thead>
             <tr>
-              <th class="ps-4">ID</th>
+              <th class="col-id">ID</th>
               <th>Nro. Habitación</th>
               <th>Tipo</th>
               <th>Capacidad</th>
               <th>Precio por Noche</th>
-              <th style="text-align: right; padding-right: 1.5rem;">Total Est. ({{ calculateDays() }} noches)</th>
+              <th class="col-total">Total Est. ({{ calculateDays() }} noches)</th>
             </tr>
           </thead>
           <tbody>
             @for (room of availableRooms(); track room.id) {
-              <tr (click)="selectRoomAndRedirect(room)" style="cursor: pointer;" title="Haz clic para seleccionar esta habitación">
-                <td class="ps-4 subtitle">#{{ room.id }}</td>
-                <td><strong style="color: var(--color-text-main);">#{{ room.number }}</strong></td>
+              <tr class="table-row-clickable" (click)="selectRoomAndRedirect(room)" title="Haz clic para seleccionar esta habitación">
+                <td class="col-id subtitle">#{{ room.id }}</td>
+                <td><strong class="room-number">#{{ room.number }}</strong></td>
                 <td class="subtitle">{{ room.roomTypeDTOResponse?.name || room.roomTypeName || 'N/D' }}</td>
                 <td><span class="badge badge-secondary">{{ room.roomTypeDTOResponse?.capacity || room.capacity || 0 }} pers.</span></td>
                 <td class="subtitle">${{ getRoomPrice(room) | number:'1.2-2' }}</td>
-                <td style="text-align: right; padding-right: 1.5rem;"><strong style="color: var(--color-text-main);">${{ calculateTotalPrice(room) | number:'1.2-2' }}</strong></td>
+                <td class="col-total"><strong class="room-number">${{ calculateTotalPrice(room) | number:'1.2-2' }}</strong></td>
               </tr>
             }
           </tbody>
         </table>
       </div>
     } @else {
-      <div class="alert alert-warning text-center py-4" style="justify-content: center;">
-        <i class="fa-solid fa-circle-exclamation me-2"></i> No hay habitaciones disponibles para los criterios seleccionados.
+      <div class="alert alert-warning alert-center">
+        <i class="fa-solid fa-circle-exclamation"></i> No hay habitaciones disponibles para los criterios seleccionados.
       </div>
     }
   }

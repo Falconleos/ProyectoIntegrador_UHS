@@ -54,6 +54,7 @@ export class AccountDetailComponent implements OnInit {
     }
   }
 
+  // Verifica el rol almacenado en localStorage para determinar si el usuario puede modificar datos
   checkUserRole(): void {
     const storedRoles = localStorage.getItem('role') || '';
     try {
@@ -67,53 +68,14 @@ export class AccountDetailComponent implements OnInit {
     }
   }
 
+  // Inicia la carga de la cuenta y coordina la obtención de datos complementarios
   loadData(): void {
     this.loading.set(true);
     this.errorMessage.set('');
 
     this.accountService.getAccountByCheckInId(this.checkInId).subscribe({
       next: (accountData: AccountDTOResponse) => {
-        this.account.set(accountData);
-        this.adjustmentPercentage.set(accountData.adjustmentPercentage ?? 0);
-
-        this.roomAttentionService.getByBooking(this.checkInId).subscribe({
-          next: (attentions) => {
-            const currentAccount = this.account();
-            if (currentAccount) {
-              const mappedItems = attentions.map(att => ({
-                description: att.itemDTOResponse?.description || 'Room Service / Consumo',
-                quantity: att.quantity,
-                subtotal: att.subtotal
-              }));
-              
-              this.account.set({
-                ...currentAccount,
-                items: mappedItems
-              });
-            }
-
-            this.adjustedTotal.set(this.calculateAdjustedTotal());
-            this.paymentAmount.set(this.calculateRemaining());
-            this.paymentAmount.set(this.calculateRemaining());
-
-            this.checkInService.getAll().subscribe({
-              next: (checkIns) => {
-                const currentCheckIn = checkIns.find(c => c.id === this.checkInId);
-                if (currentCheckIn) {
-                  this.checkInState.set(currentCheckIn.checkInState);
-                }
-                this.loading.set(false);
-              },
-              error: () => {
-                this.loading.set(false);
-              }
-            });
-          },
-          error: (attErr) => {
-            console.error('Error al cargar las atenciones de habitación:', attErr);
-            this.loading.set(false);
-          }
-        });
+        this.handleAccountDataSuccess(accountData);
       },
       error: (err: any) => {
         this.errorMessage.set('No se pudo cargar el resumen de la cuenta.');
@@ -123,6 +85,61 @@ export class AccountDetailComponent implements OnInit {
     });
   }
 
+  // Procesa la cuenta base y solicita las atenciones de habitación asociadas
+  private handleAccountDataSuccess(accountData: AccountDTOResponse): void {
+    this.account.set(accountData);
+    this.adjustmentPercentage.set(accountData.adjustmentPercentage ?? 0);
+
+    this.roomAttentionService.getByBooking(this.checkInId).subscribe({
+      next: (attentions) => {
+        this.handleRoomAttentionsSuccess(attentions);
+      },
+      error: (attErr) => {
+        console.error('Error al cargar las atenciones de habitación:', attErr);
+        this.loading.set(false);
+      }
+    });
+  }
+
+  // Integra los consumos de room service a la cuenta y busca el estado del check-in
+  private handleRoomAttentionsSuccess(attentions: any[]): void {
+    const currentAccount = this.account();
+    if (currentAccount) {
+      const mappedItems = attentions.map(att => ({
+        description: att.itemDTOResponse?.description || 'Room Service / Consumo',
+        quantity: att.quantity,
+        subtotal: att.subtotal
+      }));
+      
+      this.account.set({
+        ...currentAccount,
+        items: mappedItems
+      });
+    }
+
+    this.adjustedTotal.set(this.calculateAdjustedTotal());
+    this.paymentAmount.set(this.calculateRemaining());
+
+    this.checkInService.getAll().subscribe({
+      next: (checkIns) => {
+        this.handleCheckInsSuccess(checkIns);
+      },
+      error: () => {
+        this.loading.set(false);
+      }
+    });
+  }
+
+  // Asigna el estado del check-in y finaliza el indicador de carga
+  private handleCheckInsSuccess(checkIns: any[]): void {
+    const currentCheckIn = checkIns.find(c => c.id === this.checkInId);
+    if (currentCheckIn) {
+      this.checkInState.set(currentCheckIn.checkInState);
+    }
+    this.loading.set(false);
+  }
+
+  // Calcula el subtotal sumando el monto base de la estadía y los ítems de consumo
   calculateRawTotal(): number {
     const acc = this.account();
     if (!acc) return 0;
@@ -131,15 +148,16 @@ export class AccountDetailComponent implements OnInit {
     return base + itemsTotal;
   }
 
+  // Calcula el monto absoluto correspondiente al porcentaje de ajuste aplicado
   calculateAdjustmentAmount(): number {
     return Math.abs(this.calculateRawTotal() * (this.adjustmentPercentage() / 100));
   }
 
+  // Envía al servidor la actualización del porcentaje de ajuste y recarga los datos
   applyAdjustments(): void {
     const acc = this.account();
     if (!acc || acc.isPaid || !this.canModify()) return;
 
-    // Forzamos a que sea un número válido
     const numericAdjustment = Number(this.adjustmentPercentage());
 
     this.accountService.updateAdjustmentPercentage(this.checkInId, numericAdjustment).subscribe({
@@ -153,12 +171,14 @@ export class AccountDetailComponent implements OnInit {
     });
   }
 
+  // Calcula el total final aplicando el porcentaje de ajuste sobre el subtotal
   calculateAdjustedTotal(): number {
     const rawTotal = this.calculateRawTotal();
     const adjustmentFactor = 1 + (this.adjustmentPercentage() / 100);
-    return Math.max(0, rawTotal * adjustmentFactor); // Evita valores negativos por seguridad
+    return Math.max(0, rawTotal * adjustmentFactor);
   }
 
+  // Calcula el saldo pendiente restando los pagos realizados al total ajustado
   calculateRemaining(): number {
     const acc = this.account();
     if (!acc) return 0;
@@ -167,6 +187,7 @@ export class AccountDetailComponent implements OnInit {
     return Number(remaining.toFixed(2));
   }
 
+  // Registra un nuevo pago en el sistema y actualiza la información en pantalla
   submitPayment(): void {
     const acc = this.account();
     if (!acc || this.paymentAmount() <= 0 || acc.isPaid || !this.canModify()) return;
@@ -191,11 +212,12 @@ export class AccountDetailComponent implements OnInit {
     });
   }
 
-  // Método para disparar la impresión del recibo
+  // Dispara la funcionalidad nativa de impresión del navegador para el recibo
   printAccount(): void {
     window.print();
   }
 
+  // Navega de regreso a la lista de check-ins utilizando el enrutador
   goBack(): void {
     this.router.navigate(['dashboard/check-in-list']);
   }

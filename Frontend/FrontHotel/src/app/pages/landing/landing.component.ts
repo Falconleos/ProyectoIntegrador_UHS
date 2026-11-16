@@ -2,10 +2,7 @@ import { Component, ChangeDetectionStrategy, signal, inject, OnInit } from '@ang
 import { CommonModule } from '@angular/common';
 import { Router, RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
-import { forkJoin, of } from 'rxjs';
-import { catchError, map } from 'rxjs/operators';
 import { CommentService } from '../../core/services/comment.service';
-import { CommentDtoResponse } from '../../models/Comment-model';
 import { UserService } from '../../core/services/user.service';
 
 @Component({
@@ -35,12 +32,10 @@ export class LandingComponent implements OnInit {
 
   ngOnInit(): void {
     this.checkAuthStatus();
-    this.loadFiveStarComments();
+    this.loadVisibleComments();
   }
 
-  /**
-   * Verifica el estado de autenticación del usuario leyendo el localStorage y el token JWT
-   */
+  // Verifica el estado de autenticación del usuario leyendo el almacenamiento local y decodificando el JWT
   checkAuthStatus(): void {
     const token = localStorage.getItem('authToken');
     if (token) {
@@ -66,14 +61,26 @@ export class LandingComponent implements OnInit {
     }
   }
 
+  // Solicita el Blob de la foto de perfil del usuario logueado en el Navbar mediante su ID
   loadProfilePictureById(id: number): void {
-    this.avatarUrl.set(`http://localhost:8080/public/auth/${id}/profile-picture?t=${new Date().getTime()}`);
+    this.userService.getProfilePicture(id).subscribe({
+      next: (blob) => {
+        const objectURL = URL.createObjectURL(blob);
+        this.avatarUrl.set(objectURL);
+      },
+      error: (err) => {
+        console.error('Error al cargar la foto de perfil en la landing', err);
+        this.avatarUrl.set(null);
+      }
+    });
   }
 
+  // Restablece la URL del avatar principal si ocurre un error de carga
   onAvatarError(): void {
     this.avatarUrl.set(null);
   }
 
+  // Limpia la sesión del usuario y redirige al inicio
   logout(): void {
     localStorage.clear();
     this.isLoggedIn.set(false);
@@ -84,42 +91,33 @@ export class LandingComponent implements OnInit {
     this.router.navigate(['/']);
   }
 
-  /**
-   * Carga los comentarios, filtra los de 5 estrellas y busca el ID del usuario por su username para su foto
-   */
-  loadFiveStarComments(): void {
-    // Llamar al endpoint público que solo trae showable = true
+  // Carga los comentarios visibles y asigna la URL pública del avatar utilizando el username del autor
+  loadVisibleComments(): void {
     this.commentService.getVisibleComments().subscribe({
       next: (comments) => {
-        // Filtramos los de 5 estrellas (o usamos todos si no hay)
-        const filtered = comments.filter((c: any) => c.rating === 5 || c.puntuacion === 5);
-        const listToProcess = filtered.length > 0 ? filtered : comments;
+        const commentList = Array.isArray(comments) ? comments : [];
 
-        // Consultamos en paralelo el ID de usuario usando el username de cada comentario
-        const requests = listToProcess.map((c: any) => {
-          if (!c.username) {
-            return of({ ...c, authorAvatar: null });
-          }
-          return this.userService.getUserByUsername(c.username).pipe(
-            map((user: any) => {
-              return {
-                ...c,
-                authorAvatar: c.username ? `http://localhost:8080/public/users/username/${c.username}/profile-picture?t=${new Date().getTime()}` : null
-              };
-            }),
-            catchError(() => of({ ...c, authorAvatar: null }))
-          );
+        if (commentList.length === 0) {
+          this.fiveStarComments.set([]);
+          return;
+        }
+
+        // Mapeamos cada comentario para asignarle la URL pública del endpoint de tu PublicController
+        const processedComments = commentList.map((c: any) => {
+          const authorUsername = c.username || c.nombreUsuario;
+          const timestamp = new Date().getTime();
+          
+          const avatar = authorUsername
+            ? `http://localhost:8080/public/users/username/${authorUsername}/profile-picture?t=${timestamp}`
+            : null;
+
+          return {
+            ...c,
+            authorAvatar: avatar
+          };
         });
 
-        forkJoin(requests).subscribe({
-          next: (processedComments) => {
-            this.fiveStarComments.set(processedComments);
-          },
-          error: (err) => {
-            console.error('Error al procesar avatares de comentarios:', err);
-            this.fiveStarComments.set(listToProcess);
-          }
-        });
+        this.fiveStarComments.set(processedComments);
       },
       error: (err) => {
         console.error('Error al cargar comentarios visibles:', err);
@@ -127,25 +125,27 @@ export class LandingComponent implements OnInit {
     });
   }
 
+  // Oculta la imagen del avatar del comentario si falla al cargar (ej. si el usuario no tiene foto)
   onCommentAvatarError(event: Event): void {
     const target = event.target as HTMLElement;
     target.style.display = 'none';
   }
 
-  // --- Controles del Carrusel ---
+  // Avanza al siguiente comentario en el carrusel
   nextComment(): void {
     const total = this.fiveStarComments().length;
     if (total === 0) return;
     this.currentCommentIndex.update(index => (index + 1) % total);
   }
 
+  // Retrocede al comentario anterior en el carrusel
   prevComment(): void {
     const total = this.fiveStarComments().length;
     if (total === 0) return;
     this.currentCommentIndex.update(index => (index - 1 + total) % total);
   }
 
-  // --- Manejo de redirección para reservas con validación de sesión ---
+  // Valida la sesión activa antes de permitir el acceso al flujo de reservas
   onReservarClick(event: Event): void {
     event.preventDefault();
     const token = localStorage.getItem('authToken');
@@ -157,5 +157,4 @@ export class LandingComponent implements OnInit {
       this.router.navigate(['/dashboard/availability']); 
     }
   }
-
 }

@@ -45,6 +45,10 @@
   font-size: var(--font-size-xs, 0.875rem);
 }
 
+.page-subtitle {
+  margin-bottom: 1.5rem;
+}
+
 .divider {
   border: none;
   border-top: var(--border-glass, 1px solid rgba(255, 255, 255, 0.08));
@@ -80,6 +84,13 @@
   color: #fcd34d;
 }
 
+.alert-center {
+  justify-content: center;
+  text-align: center;
+  padding-top: 1.5rem;
+  padding-bottom: 1.5rem;
+}
+
 /* --- Tarjeta del Formulario (Glassmorphism) --- */
 .room-type-card {
   background: var(--bg-secondary, rgba(30, 41, 59, 0.7));
@@ -87,6 +98,17 @@
   border-radius: var(--radius-lg, 16px);
   border: var(--border-glass, 1px solid rgba(255, 255, 255, 0.08));
   box-shadow: var(--shadow-main, 0 8px 32px 0 rgba(0, 0, 0, 0.37));
+}
+
+.search-card {
+  padding: 2rem;
+  margin-bottom: 1.5rem;
+}
+
+.card-title-custom {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-main);
+  margin-bottom: 1.25rem;
 }
 
 /* --- Inputs del Formulario --- */
@@ -123,6 +145,11 @@ input[type="date"].form-control::-webkit-calendar-picker-indicator {
   gap: 1rem;
 }
 
+.search-form-grid {
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  margin-bottom: 1.5rem;
+}
+
 .detail-item {
   display: flex;
   flex-direction: column;
@@ -135,7 +162,33 @@ input[type="date"].form-control::-webkit-calendar-picker-indicator {
   font-weight: 500;
 }
 
-/* --- Tabla de Datos --- */
+.error-text {
+  color: #f87171;
+  font-size: 0.75rem;
+  margin-top: 4px;
+}
+
+.form-divider {
+  margin-bottom: 1.25rem;
+}
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+}
+
+/* --- Resultados y Tabla --- */
+.results-header {
+  margin-top: 2rem;
+}
+
+.results-title {
+  color: var(--color-text-main);
+  font-size: var(--font-size-md);
+  margin-bottom: 4px;
+}
+
 .table-wrapper {
   background: var(--bg-secondary, rgba(30, 41, 59, 0.7));
   backdrop-filter: var(--backdrop-blur, blur(12px));
@@ -169,8 +222,26 @@ input[type="date"].form-control::-webkit-calendar-picker-indicator {
   vertical-align: middle;
 }
 
-.table tbody tr:hover {
+.table-row-clickable {
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.table-row-clickable:hover {
   background-color: rgba(255, 255, 255, 0.03);
+}
+
+.col-id {
+  padding-left: 1.5rem;
+}
+
+.col-total {
+  text-align: right;
+  padding-right: 1.5rem;
+}
+
+.room-number {
+  color: var(--color-text-main);
 }
 
 /* --- Badges --- */
