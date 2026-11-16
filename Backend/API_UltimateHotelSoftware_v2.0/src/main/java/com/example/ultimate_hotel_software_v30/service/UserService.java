@@ -19,6 +19,7 @@ public interface UserService {
     UserDTOResponse userByDni(String dni);
     Optional<UserEntity> userEntityByDni(String dni);
     UserDTOResponse findByUsername(String username);
+    void updatePasswordWithoutCurrent(Long id, String newPassword);
 
     // ¡Asegúrate de tener esta línea aquí!
     UserEntity findEntityByUsername(String username);

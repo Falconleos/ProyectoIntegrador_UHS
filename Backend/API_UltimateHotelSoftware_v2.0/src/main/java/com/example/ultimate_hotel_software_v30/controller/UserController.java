@@ -1,10 +1,8 @@
 package com.example.ultimate_hotel_software_v30.controller;
 
-import com.example.ultimate_hotel_software_v30.dto.request.ChangePasswordDTORequest;
-import com.example.ultimate_hotel_software_v30.dto.request.UserDTORequest;
-import com.example.ultimate_hotel_software_v30.dto.request.UserDTORequestCreation;
-import com.example.ultimate_hotel_software_v30.dto.request.UserDtoRequestModification;
+import com.example.ultimate_hotel_software_v30.dto.request.*;
 import com.example.ultimate_hotel_software_v30.dto.response.UserDTOResponse;
+import com.example.ultimate_hotel_software_v30.model.UserEntity;
 import com.example.ultimate_hotel_software_v30.service.UserService;
 import com.example.ultimate_hotel_software_v30.service.serviceImpl.AuthService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -155,6 +153,29 @@ public class UserController {
             @PathVariable Long id,
             @RequestParam("profilePicture") MultipartFile file) {
         return ResponseEntity.ok(userService.updateProfilePicture(id, file));
+    }
+
+    @PutMapping("/{id}/update-password")
+    @PreAuthorize("hasAnyRole('ADMIN', 'RECEPCIONIST') or (hasRole('GUEST') and #id == principal.id)")
+    @Operation(
+            summary = "Actualizar contraseña de usuario por ID (Sin clave anterior)",
+            description = "Permite actualizar la contraseña de un usuario directamente mediante su ID sin solicitar la contraseña actual."
+    )
+    public ResponseEntity<Void> updatePasswordWithoutCurrent(
+            @PathVariable Long id,
+            @Valid @RequestBody UpdatePasswordByAdminDTORequest request) {
+        userService.updatePasswordWithoutCurrent(id, request.getNewPassword());
+        return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/me")
+    @Operation(
+            summary = "Obtener datos del usuario autenticado actual",
+            description = "Devuelve la información completa del perfil del usuario que ha iniciado sesión basándose en el token JWT."
+    )
+    public ResponseEntity<UserDTOResponse> getAuthenticatedUser(java.security.Principal principal) {
+        UserEntity user = userService.findEntityByUsername(principal.getName());
+        return ResponseEntity.ok(userService.getById(user.getId()));
     }
 
 }

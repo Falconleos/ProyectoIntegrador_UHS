@@ -225,4 +225,12 @@ public class UserServiceImpl implements UserService {
         return userMapper.toUserDTOResponse(updatedUser);
     }
 
+    @Override
+    @Transactional
+    public void updatePasswordWithoutCurrent(Long id, String newPassword) {
+        UserEntity userEntity = findEntityById(id);
+        userEntity.setPassword(passwordEncoder.encode(newPassword));
+        userRepository.save(userEntity);
+    }
+
 }
