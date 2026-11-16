@@ -1,46 +1,53 @@
-import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef, inject, signal, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
+import { NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink, ActivatedRoute } from '@angular/router';
 import { UserService } from '../../core/services/user.service';
-import { RoleType, UserDtoRequest } from '../../models/User-model';
+import { RoleType } from '../../models/User-model';
 
 @Component({
   selector: 'app-user-edit',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink],
+  imports: [CommonModule, ReactiveFormsModule, RouterLink],
   templateUrl: './user-edit.component.html',
-  styleUrls: ['../user-form/user-form.component.css'] 
+  styleUrls: ['../user-form/user-form.component.css'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class UserEditComponent implements OnInit {
+  private fb = inject(NonNullableFormBuilder);
+  private userService = inject(UserService);
+  private router = inject(Router);
+  private route = inject(ActivatedRoute);
+  private cdr = inject(ChangeDetectorRef);
+
   userId: number | null = null;
+  formDataLoaded = false;
+  profilePictureFile: File | undefined = undefined;
 
-  formData = {
-    username: '',
-    name: '',
-    surname: '',
-    dni: '',
-    gender: '',
-    email: '',
-    phoneNumber: '',
-    address: '',
-    birthDay: '',
-    profilePictureFile: undefined as File | undefined,
-    role: 'GUEST' as RoleType,
-    enabled: true
-  };
+  // Estados reactivos con Signals
+  loading = signal(false);
+  successMessage = signal('');
+  errorMessage = signal('');
 
-  loading = false;
-  errorMessage = '';
+  // Formulario reactivo unificado sin contraseña actual
+  editForm = this.fb.group({
+    username: ['', Validators.required],
+    name: ['', Validators.required],
+    surname: ['', Validators.required],
+    dni: ['', Validators.required],
+    gender: [''],
+    email: ['', [Validators.required, Validators.email]],
+    phoneNumber: [''],
+    address: [''],
+    birthDay: [''],
+    role: ['GUEST' as RoleType],
+    enabled: [true],
+    passwordSection: this.fb.group({
+      newPassword: ['', [Validators.minLength(1)]],
+      confirmPassword: ['']
+    })
+  });
 
-  constructor(
-    private userService: UserService,
-    private router: Router,
-    private route: ActivatedRoute,
-    private cdr: ChangeDetectorRef
-  ) {}
-
-  // Al iniciar el componente, leo el parámetro ID de la URL y cargo los datos del usuario
   ngOnInit(): void {
     const idParam = this.route.snapshot.paramMap.get('id');
     if (idParam) {
@@ -49,102 +56,139 @@ export class UserEditComponent implements OnInit {
     }
   }
 
-  // Invoco al servicio para obtener la información del usuario por su ID y rellenar el formulario
   loadUserData(id: number): void {
-    this.loading = true;
+    this.loading.set(true);
     
     this.userService.getById(id).subscribe({
       next: (user: any) => {
-        this.formData.username = user.username || '';
-        this.formData.name = user.name || '';
-        this.formData.surname = user.surname || '';
-        this.formData.dni = user.dni || '';
-        this.formData.gender = user.gender || '';
-        this.formData.email = user.email || '';
-        this.formData.phoneNumber = user.phoneNumber || '';
-        this.formData.address = user.address || '';
-        this.formData.birthDay = user.birthDay || '';
-        this.formData.role = user.role || 'GUEST';
-        this.formData.enabled = user.enabled ?? true;
+        this.editForm.patchValue({
+          username: user.username || '',
+          name: user.name || '',
+          surname: user.surname || '',
+          dni: user.dni || '',
+          gender: user.gender || '',
+          email: user.email || '',
+          phoneNumber: user.phoneNumber || '',
+          address: user.address || '',
+          birthDay: user.birthDay || '',
+          role: user.role || 'GUEST',
+          enabled: user.enabled ?? true
+        });
 
-        this.loading = false;
+        this.formDataLoaded = true;
+        this.loading.set(false);
         this.cdr.markForCheck();
       },
       error: (err) => {
-        this.loading = false;
-        this.errorMessage = 'No se pudieron cargar los datos del usuario.';
+        this.loading.set(false);
+        this.errorMessage.set('No se pudieron cargar los datos del usuario.');
         this.cdr.markForCheck();
         console.error(err);
       }
     });
   }
 
-  // Capturo el archivo de imagen seleccionado en el input de tipo file
   onFileSelected(event: any): void {
     const file: File = event.target.files[0];
     if (file) {
-      this.formData.profilePictureFile = file;
+      this.profilePictureFile = file;
     }
   }
 
-  // Preparo el payload de actualización y envío los datos modificados al backend
   onSubmit(): void {
     if (!this.userId) return;
 
-    this.errorMessage = '';
-    this.loading = true;
+    this.errorMessage.set('');
+    this.successMessage.set('');
+
+    if (this.editForm.invalid) {
+      this.editForm.markAllAsTouched();
+      return;
+    }
+
+    const formVal = this.editForm.getRawValue();
+    const passVal = formVal.passwordSection;
+
+    // Detectar si el usuario quiere cambiar la contraseña
+    const isChangingPassword = !!passVal.newPassword || !!passVal.confirmPassword;
+    
+    if (isChangingPassword) {
+      if (!passVal.newPassword || !passVal.confirmPassword) {
+        this.errorMessage.set('Para cambiar la contraseña, debés completar ambos campos de la sección de contraseña.');
+        return;
+      }
+      if (passVal.newPassword !== passVal.confirmPassword) {
+        this.errorMessage.set('La nueva contraseña y su confirmación no coinciden.');
+        return;
+      }
+    }
+
+    this.loading.set(true);
 
     const updatePayload = {
-      username: this.formData.username,
-      name: this.formData.name,
-      surname: this.formData.surname,
-      dni: this.formData.dni,
-      gender: this.formData.gender || undefined,
-      email: this.formData.email,
-      phoneNumber: this.formData.phoneNumber || undefined,
-      address: this.formData.address || undefined,
-      birthDay: this.formData.birthDay ? this.formData.birthDay : ''
+      username: formVal.username,
+      name: formVal.name,
+      surname: formVal.surname,
+      dni: formVal.dni,
+      gender: formVal.gender || undefined,
+      email: formVal.email,
+      phoneNumber: formVal.phoneNumber || undefined,
+      address: formVal.address || undefined,
+      birthDay: formVal.birthDay ? formVal.birthDay : ''
     };
 
-    // Actualizo los datos de texto del usuario mediante el servicio
+    // 1. Actualizar los datos generales del usuario
     this.userService.updateUser(this.userId, updatePayload).subscribe({
       next: () => {
-        // Si se seleccionó una nueva foto de perfil, la subo a continuación
-        if (this.formData.profilePictureFile && this.userId) {
-          this.onUploadPhoto(this.userId, this.formData.profilePictureFile);
+        // 2. Si se indicó cambio de contraseña, la actualizamos mediante el nuevo endpoint por ID
+        if (isChangingPassword && this.userId) {
+          this.userService.updatePasswordWithoutCurrent(this.userId, passVal.newPassword).subscribe({
+            next: () => {
+              this.handleImageUploadOrFinish();
+            },
+            error: (err: any) => {
+              this.loading.set(false);
+              const msg = err.error?.mensaje || err.error?.message || 'Error al actualizar la contraseña.';
+              this.errorMessage.set(msg);
+              this.cdr.markForCheck();
+            }
+          });
         } else {
-          this.loading = false;
-          alert('¡Usuario modificado con éxito!');
-          this.router.navigate(['/dashboard/usuarios']);
+          this.handleImageUploadOrFinish();
         }
       },
       error: (err: any) => {
-        this.loading = false;
-        this.errorMessage = err.error?.mensaje || err.error?.message || 'Error al actualizar el usuario.';
+        this.loading.set(false);
+        const msg = err.error?.mensaje || err.error?.message || 'Error al actualizar el usuario.';
+        this.errorMessage.set(msg);
         this.cdr.markForCheck();
-        alert(this.errorMessage);
-        console.error(err);
       }
     });
   }
 
-  // Envío la nueva imagen de perfil al servidor asociada al ID del usuario
-  onUploadPhoto(userId: number, file: File): void {
-    const formData = new FormData();
-    formData.append('profilePicture', file);
+  handleImageUploadOrFinish(): void {
+    if (this.profilePictureFile && this.userId) {
+      const formData = new FormData();
+      formData.append('profilePicture', this.profilePictureFile);
 
-    this.userService.updateProfilePicture(userId, formData).subscribe({
-      next: (response: any) => {
-        this.loading = false;
-        alert('¡Usuario y foto de perfil modificados con éxito!');
-        this.router.navigate(['/dashboard/usuarios']);
-      },
-      error: (err: any) => {
-        this.loading = false;
-        console.error('Error al actualizar la foto', err);
-        alert('Se guardaron los datos, pero hubo un error al actualizar la foto de perfil.');
-        this.router.navigate(['/dashboard/usuarios']);
-      }
-    });
+      this.userService.updateProfilePicture(this.userId, formData).subscribe({
+        next: () => {
+          this.finalizeSuccess('¡Modificación realizada con éxito!');
+        },
+        error: (err) => {
+          console.error('Error al actualizar la foto', err);
+          this.finalizeSuccess('Se guardaron los datos, pero hubo un error al actualizar la foto de perfil.');
+        }
+      });
+    } else {
+      this.finalizeSuccess('¡Modificación realizada con éxito!');
+    }
+  }
+
+  finalizeSuccess(message: string): void {
+    this.loading.set(false);
+    this.successMessage.set(message);
+    alert(message);
+    this.router.navigate(['/dashboard/usuarios']);
   }
 }

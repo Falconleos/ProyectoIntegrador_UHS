@@ -95,4 +95,12 @@ export class UserService {
   updateProfilePicture(id: number, formData: FormData): Observable<any> {
     return this.http.post<any>(`${this.apiUrl}/${id}/profile-picture`, formData, { withCredentials: true });
   }
+
+ updatePasswordWithoutCurrent(id: number, newPassword: string): Observable<void> {
+    return this.http.put<void>(`${this.apiUrl}/${id}/update-password`, { newPassword });
+  }
+
+  getAuthenticatedUser(): Observable<UserDtoResponse> {
+    return this.http.get<UserDtoResponse>(`${this.apiUrl}/me`, { withCredentials: true });
+  }
 }
