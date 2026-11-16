@@ -75,18 +75,11 @@
         }
       </div>
 
-      @if (getSelectedItem(); as selectedItem) {
+      <!-- Total/Subtotal directo debajo de la cantidad -->
+      @if (getSelectedItem()) {
         <div class="subtotal-info">
-          <p>
-            <strong>Producto o servicio:</strong> {{ selectedItem.description }}
-          </p>
-
-          <p>
-            <strong>Precio unitario:</strong> ${{ selectedItem.unitPrice.toFixed(2) }}
-          </p>
-
           <p class="subtotal-highlight">
-            Subtotal estimado: ${{ calculateSubtotal().toFixed(2) }}
+            Total: ${{ calculateSubtotal().toFixed(2) }}
           </p>
         </div>
       }

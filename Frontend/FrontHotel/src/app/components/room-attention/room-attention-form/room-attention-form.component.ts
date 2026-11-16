@@ -77,9 +77,10 @@ export class RoomAttentionFormComponent implements OnInit {
     });
   }
 
-  // Busca el producto seleccionado
+  // Busca el producto seleccionado convirtiendo el valor del form a número
   getSelectedItem(): ItemDtoResponse | undefined {
-    const itemId = this.attentionForm.controls.itemId.value;
+    const rawItemId = this.attentionForm.controls.itemId.value;
+    const itemId = Number(rawItemId);
     return this.availableItems().find(item => item.id === itemId);
   }
 
@@ -111,7 +112,7 @@ export class RoomAttentionFormComponent implements OnInit {
 
     const request: RoomAttentionDtoRequest = {
       bookingId: id,
-      itemId: formValue.itemId,
+      itemId: Number(formValue.itemId), // Nos aseguramos de enviar un número al backend
       quantity: formValue.quantity
     };
 
