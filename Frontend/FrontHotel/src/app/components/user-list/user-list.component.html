@@ -1,4 +1,4 @@
-<div class="container">
+<div class="user-management-container">
   <!-- Sección de Encabezado -->
   <div class="header-section">
     <h2><i class="fa-solid fa-users-gear"></i> Gestión de Usuarios (Huéspedes)</h2>
@@ -14,21 +14,23 @@
 
   <!-- Mensajes de Carga y Error -->
   @if (loading) {
-    <div class="alert alert-info">
+    <div class="notification-box notification-info">
       <i class="fa-solid fa-spinner fa-spin"></i> Cargando registros...
     </div>
   }
 
   @if (errorMessage) {
-    <div class="alert alert-danger">
+    <div class="notification-box notification-danger">
       <i class="fa-solid fa-triangle-exclamation"></i> {{ errorMessage }}
     </div>
   }
 
-  <!-- Tabla de Datos -->
+  <!-- Vista de Datos (Tabla para Desktop y Cards para Móvil) -->
   @if (!loading && !errorMessage && users.length > 0) {
-    <div class="table-wrapper">
-      <table class="table">
+    
+    <!-- 1. TABLA TRADICIONAL (Visible en Escritorio) -->
+    <div class="glass-table-wrapper desktop-table">
+      <table class="glass-table">
         <thead>
           <tr>
             <th style="width: 60px;">Avatar</th>
@@ -56,11 +58,37 @@
         </tbody>
       </table>
     </div>
+
+    <!-- 2. VISTA DE TARJETAS (Visible en Dispositivos Móviles) -->
+    <div class="mobile-cards-container">
+      @for (user of users; track user.id) {
+        <div class="mobile-user-card" (click)="openUserDetail(user)">
+          <div class="mobile-card-header">
+            <img [src]="getUserAvatarUrl(user)" alt="Avatar" class="avatar-sm">
+            <div class="mobile-user-titles">
+              <strong>{{ user.name }} {{ user.surname }}</strong>
+              <span class="subtitle">&#64;{{ user.username }}</span>
+            </div>
+          </div>
+          <div class="mobile-card-body">
+            <div class="mobile-card-info">
+              <span><i class="fa-solid fa-id-card"></i> DNI:</span>
+              <span>{{ user.dni }}</span>
+            </div>
+            <div class="mobile-card-info">
+              <span><i class="fa-solid fa-phone"></i> Teléfono:</span>
+              <span>{{ user.phoneNumber || '-' }}</span>
+            </div>
+          </div>
+        </div>
+      }
+    </div>
+
   }
 
   <!-- Mensaje si la lista está vacía -->
   @if (!loading && !errorMessage && users.length === 0) {
-    <div class="alert alert-warning">
+    <div class="notification-box notification-warning">
       <i class="fa-solid fa-circle-info"></i> No se encontraron usuarios con el rol GUEST registrados en el sistema.
     </div>
   }
@@ -111,7 +139,7 @@
             <span class="detail-label"><i class="fa-solid fa-shield-halved"></i> Roles:</span>
             <span class="detail-value">
               @for (r of selectedUser.roles; track r.id; let last = $last) {
-                <span class="badge badge-secondary">
+                <span class="status-badge badge-secondary">
                   {{ r.name }}{{ !last ? ', ' : '' }}
                 </span>
               }
@@ -121,9 +149,9 @@
             <span class="detail-label"><i class="fa-solid fa-toggle-on"></i> Estado:</span>
             <span class="detail-value">
               @if (selectedUser.enabled) {
-                <span class="badge badge-success">Activo</span>
+                <span class="status-badge badge-success">Activo</span>
               } @else {
-                <span class="badge badge-danger">Inactivo</span>
+                <span class="status-badge badge-danger">Inactivo</span>
               }
             </span>
           </div>

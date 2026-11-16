@@ -18,6 +18,9 @@ export class DashboardComponent implements OnInit, OnDestroy {
   userId: number | null = null;
   avatarUrl: string | null = null;
 
+  // Estado para controlar la apertura del menú móvil (hamburguesa)
+  sidebarOpen = false;
+
   pendingAttentionsCount = signal<number>(0);
   private attentionSub?: Subscription;
 
@@ -32,13 +35,20 @@ export class DashboardComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    // Evitamos fugas de memoria cancelando la suscripción activa al destruir el componente
     if (this.attentionSub) {
       this.attentionSub.unsubscribe();
     }
   }
 
-  // Extrae la información del usuario y sus roles decodificando el token JWT almacenado
+  // Métodos para controlar el menú lateral en móvil
+  toggleSidebar(): void {
+    this.sidebarOpen = !this.sidebarOpen;
+  }
+
+  closeSidebar(): void {
+    this.sidebarOpen = false;
+  }
+
   private initUserDataFromToken(): void {
     const token = localStorage.getItem('authToken');
     if (!token) return;
@@ -58,7 +68,6 @@ export class DashboardComponent implements OnInit, OnDestroy {
     }
   }
 
-  // Obtiene el ID del usuario desde el almacenamiento local o lo consulta mediante el servicio si no existe
   private resolveUserId(): void {
     const storedId = localStorage.getItem('userId');
     if (storedId) {
@@ -83,14 +92,12 @@ export class DashboardComponent implements OnInit, OnDestroy {
     }
   }
 
-  // Establece la suscripción reactiva para actualizar el contador de atenciones pendientes en tiempo real
   private initRealtimeSubscriptions(): void {
     this.attentionSub = this.roomAttentionService.attentionUpdated$.subscribe(() => {
       this.loadPendingAttentions();
     });
   }
 
-  // Consulta al servidor las atenciones de habitación y actualiza el contador si el usuario no es huésped
   loadPendingAttentions(): void {
     if (this.userRole.toLowerCase() !== 'guest') {
       this.roomAttentionService.getAll().subscribe({
@@ -105,17 +112,14 @@ export class DashboardComponent implements OnInit, OnDestroy {
     }
   }
 
-  // Genera la URL con un parámetro temporal para refrescar la imagen de perfil del usuario
   loadProfilePictureById(id: number): void {
     this.avatarUrl = `http://localhost:8080/public/auth/${id}/profile-picture?t=${new Date().getTime()}`;
   }
 
-  // Restablece la URL del avatar a nulo si ocurre un error al cargar la imagen
   onAvatarError(): void {
     this.avatarUrl = null; 
   }
 
-  // Limpia el almacenamiento local de la sesión y redirige al usuario a la pantalla principal
   logout(): void {
     localStorage.clear();
     this.router.navigate(['/']);

@@ -43,7 +43,7 @@
         <p>Usuario actual: {{ currentEmployee.username }} | ID: {{ currentEmployee.id }}</p>
       </div>
 
-      <form [formGroup]="employeeForm" (ngSubmit)="onSubmit()" class="employee-form">
+      <form [formGroup]="employeeForm" class="employee-form">
 
         <!-- DATOS DE LA CUENTA -->
         <fieldset class="employee-fieldset">
@@ -106,6 +106,11 @@
               <input id="phoneNumber" type="text" formControlName="phoneNumber" class="form-control">
             </div>
 
+            <div class="form-group">
+              <label for="emergencyPhoneNumber">Teléfono de Emergencia</label>
+              <input id="emergencyPhoneNumber" type="text" formControlName="emergencyPhoneNumber" class="form-control">
+            </div>
+
             <div class="form-group full-width">
               <label for="address">Dirección</label>
               <input id="address" type="text" formControlName="address" class="form-control">
@@ -157,11 +162,15 @@
 
         <!-- Acciones del Formulario -->
         <div class="employee-modal-actions">
-          <button type="button" class="btn-cancel" routerLink="/dashboard/employee-list">
+          <a routerLink="/dashboard/employee-list" class="btn-cancel">
             Cancelar
-          </button>
+          </a>
 
-          <button type="submit" class="btn-save" [disabled]="saving() || employeeForm.invalid">
+          <button 
+            type="button" 
+            class="btn-save" 
+            [disabled]="saving() || employeeForm.invalid"
+            (click)="onSubmit()">
             @if (saving()) {
               Guardando cambios...
             } @else {
@@ -179,9 +188,9 @@
   @if (!loading() && !employee()) {
     <div class="employee-edit-card text-center">
       <p class="error-message">No se pudo cargar la información del empleado.</p>
-      <button type="button" class="btn-detail" routerLink="/dashboard/employee-list">
+      <a routerLink="/dashboard/employee-list" class="btn-cancel">
         Volver al listado
-      </button>
+      </a>
     </div>
   }
 

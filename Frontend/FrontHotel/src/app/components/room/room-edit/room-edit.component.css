@@ -24,7 +24,7 @@
   gap: 10px;
 }
 
-.header-section h2 i {
+.header-icon {
   color: var(--color-primary);
 }
 
@@ -55,6 +55,10 @@
   background: rgba(239, 68, 68, 0.15);
   border: 1px solid rgba(239, 68, 68, 0.3);
   color: #fca5a5;
+}
+
+.alert-icon {
+  margin-right: 0;
 }
 
 /* --- Tarjeta del Formulario --- */
@@ -88,7 +92,7 @@
   gap: 6px;
 }
 
-.form-label i {
+.label-icon {
   color: var(--color-primary);
 }
 
@@ -110,14 +114,12 @@
   box-shadow: 0 0 0 2px rgba(129, 140, 248, 0.2);
 }
 
-/* Estilo para las opciones del selector en navegadores oscuros */
 .form-control option {
   background: #0f172a;
   color: var(--color-text-main);
 }
 
-/* Estilo específico para input type="file" */
-input[type="file"].form-control {
+.file-input-custom {
   padding: 10px;
   cursor: pointer;
 }
@@ -185,6 +187,10 @@ input[type="file"].form-control {
   margin-top: 2px;
 }
 
+.error-icon {
+  margin-right: 0;
+}
+
 /* --- Acciones del Formulario --- */
 .form-actions {
   display: flex;
@@ -242,11 +248,10 @@ input[type="file"].form-control {
   background: var(--bg-btn-secondary-hover);
 }
 
-/* --- Texto de conteo de archivos seleccionados --- */
 .file-count-text {
-    color: #34d399;
-    font-size: 0.75rem;
-    margin-top: 0.5rem;
+  color: #34d399;
+  font-size: 0.75rem;
+  margin-top: 0.5rem;
 }
 
 /* --- Responsividad --- */

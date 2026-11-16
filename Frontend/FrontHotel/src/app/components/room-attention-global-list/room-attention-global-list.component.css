@@ -5,6 +5,7 @@
   margin: 0 auto;
   color: var(--color-text-main);
   font-family: var(--font-family);
+  box-sizing: border-box;
 }
 
 /* --- Encabezado --- */
@@ -21,6 +22,18 @@
   color: var(--color-text-main);
   display: flex;
   align-items: center;
+}
+
+.icon-title {
+  margin-right: 0.5rem;
+}
+
+.icon-alert {
+  margin-right: 0.5rem;
+}
+
+.icon-badge {
+  margin-right: 0.25rem;
 }
 
 /* --- Divisor --- */
@@ -64,6 +77,15 @@
   to { transform: rotate(360deg); }
 }
 
+/* --- Visibilidad Responsiva --- */
+.mobile-only {
+  display: none;
+}
+
+.desktop-only {
+  display: block;
+}
+
 /* --- Contenedor Glass para la Tabla --- */
 .glass-table-container {
   background: var(--bg-secondary);
@@ -100,6 +122,10 @@
   letter-spacing: 0.05em;
 }
 
+.th-actions {
+  text-align: right;
+}
+
 .table-glass td {
   padding: 1rem 1.25rem;
   border-bottom: var(--border-glass);
@@ -107,18 +133,127 @@
   vertical-align: middle;
 }
 
+.td-actions {
+  text-align: right;
+}
+
 /* --- Filas Condicionales por Estado --- */
 tr.row-pending {
-  background-color: rgba(251, 191, 36, 0.06); /* Tinte amarillo muy suave para destacar pendientes arriba */
+  background-color: rgba(251, 191, 36, 0.06);
 }
 
 tr.row-delivered {
-  opacity: 0.75; /* Atenúa sutilmente los entregados abajo */
+  opacity: 0.75;
 }
 
 tr.row-pending:hover,
 tr.row-delivered:hover {
   background-color: var(--bg-btn-secondary-hover);
+}
+
+/* --- Adaptación de Tarjetas Móviles --- */
+.service-mobile-cards {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.service-mobile-card {
+  background: var(--bg-secondary);
+  border: var(--border-glass);
+  border-radius: var(--radius-md);
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  transition: border-color 0.2s;
+  backdrop-filter: var(--backdrop-blur);
+}
+
+.service-mobile-card.card-pending {
+  background-color: rgba(251, 191, 36, 0.06);
+  border-color: rgba(251, 191, 36, 0.2);
+}
+
+.service-mobile-card.card-delivered {
+  opacity: 0.85;
+}
+
+.mobile-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.mobile-card-body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.service-title-row {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+}
+
+.mobile-info-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.5rem;
+  font-size: 0.8rem;
+  color: var(--color-text-muted);
+}
+
+.mobile-info-grid .full-width {
+  grid-column: span 2;
+}
+
+.mobile-card-actions {
+  display: flex;
+  gap: 0.5rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.mobile-card-actions button {
+  flex: 1;
+  justify-content: center;
+}
+
+/* --- Estilos Específicos para Celdas --- */
+.room-cell-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.badge-room {
+  background: rgba(129, 140, 248, 0.2);
+  color: #818cf8;
+  font-weight: 600;
+}
+
+.booking-id-text {
+  font-size: 0.75rem;
+}
+
+.item-description {
+  font-weight: 500;
+}
+
+.subtotal-price {
+  font-weight: bold;
+  color: #4ade80;
+}
+
+.employee-badge {
+  font-size: 0.8rem;
+}
+
+.date-text {
+  font-size: 0.85rem;
 }
 
 /* --- Textos Auxiliares y Badges --- */
@@ -128,6 +263,10 @@ tr.row-delivered:hover {
 
 .text-main {
   color: var(--color-text-main);
+}
+
+.text-zero-margin {
+  margin: 0;
 }
 
 .badge {
@@ -152,12 +291,18 @@ tr.row-delivered:hover {
 }
 
 .badge-warning-glass {
-  background: rgba(251, 191, 36, 0.15);
+  background: rgba(251, 191, 36, 0.2);
   color: #fbbf24;
   border: 1px solid rgba(251, 191, 36, 0.2);
 }
 
 /* --- Botones de Acción --- */
+.action-buttons-wrapper {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+}
+
 .btn-secondary-action {
   background: var(--bg-btn-secondary);
   color: var(--color-text-main);
@@ -200,4 +345,42 @@ tr.row-delivered:hover {
 button:disabled {
   opacity: 0.5;
   cursor: not-allowed;
+}
+
+.back-button-container {
+  margin-top: 1.5rem;
+}
+
+/* ========================================================
+    MEDIA QUERIES PARA RESPONSIVIDAD MÓVIL
+   ======================================================== */
+@media (min-width: 769px) {
+  .desktop-only {
+    display: block !important;
+  }
+  .mobile-only {
+    display: none !important;
+  }
+}
+
+@media (max-width: 768px) {
+  .container {
+    padding: 1rem;
+  }
+
+  .desktop-only {
+    display: none !important;
+  }
+  
+  .mobile-only {
+    display: block !important;
+  }
+
+  .mobile-info-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .mobile-info-grid .full-width {
+    grid-column: span 1;
+  }
 }

@@ -96,9 +96,12 @@ export class CheckInListComponent implements OnInit {
 
     this.checkInService.getTodayCheckIns().subscribe({
       next: (todayBookings) => {
-        const filtered = Array.isArray(todayBookings) 
+        let filtered = Array.isArray(todayBookings) 
           ? todayBookings.filter(b => b.state === 'CONFIRMED' || b.state === 'PENDING') 
           : [];
+        
+        // Ordenar de más reciente a más antigua (por ID descendente)
+        filtered.sort((a, b) => b.id - a.id);
         
         this.pendingBookingsToday.set(filtered);
         this.generateQrThumbnails(filtered);
@@ -132,7 +135,9 @@ export class CheckInListComponent implements OnInit {
     // Obtenemos el listado de estadías activas con estado CHECKED_IN y finalizamos el indicador de carga
     this.checkInService.getBookingsByState('CHECKED_IN').subscribe({
       next: (bookings) => {
-        this.checkedInBookings.set(Array.isArray(bookings) ? bookings : []);
+        const list = Array.isArray(bookings) ? [...bookings] : [];
+        list.sort((a, b) => b.id - a.id);
+        this.checkedInBookings.set(list);
         this.loading.set(false);
       },
       error: () => {

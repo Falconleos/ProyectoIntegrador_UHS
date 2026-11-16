@@ -2,12 +2,24 @@
 
   <!-- Sección de Encabezado -->
   <div class="header-section">
-    <h2><i class="bi bi-calendar-check me-2"></i> Gestión de Reservas</h2>
+    <h2>
+      <svg class="header-title-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+        <line x1="16" y1="2" x2="16" y2="6"></line>
+        <line x1="8" y1="2" x2="8" y2="6"></line>
+        <line x1="3" y1="10" x2="21" y2="10"></line>
+      </svg>
+      Gestión de Reservas
+    </h2>
     <button 
       class="btn-primary" 
       [routerLink]="(canModify() || isGuest()) ? '/dashboard/availability' : null" 
       [disabled]="!canModify() && !isGuest()">
-      <i class="bi bi-search me-1"></i> Consultar Disponibilidad
+      <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="11" cy="11" r="8"></circle>
+        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+      </svg>
+      Consultar Disponibilidad
     </button>
   </div>
 
@@ -16,54 +28,52 @@
   <!-- Mensajes de carga, error o listado vacío -->
   @if (loading()) {
     <div class="alert alert-info">
-      <i class="fa-solid fa-spinner fa-spin"></i> Cargando registros...
+      <span class="spin icon-margin"></span> Cargando registros...
     </div>
   } @else if (errorMessage()) {
-    <div class="alert alert-danger">
-      <i class="fa-solid fa-triangle-exclamation"></i> {{ errorMessage() }}
+    <div class="alert alert-danger" role="alert">
+      {{ errorMessage() }}
     </div>
   } @else if (bookings().length === 0) {
     <div class="alert alert-warning">
-      <i class="fa-solid fa-circle-info"></i> No se encontraron reservas registradas en el sistema.
+      No se encontraron reservas registradas en el sistema.
     </div>
   } @else {
 
-    <!-- Tabla de Datos -->
-    <div class="table-wrapper">
+    <!-- 1. VISTA DE TABLA (Visible en Escritorio) -->
+    <div class="table-wrapper desktop-table">
       <table class="table">
         <thead>
           <tr>
-            <th class="ps-4">ID</th>
+            <th class="cell-ps-4">ID</th>
             <th>Titular</th>
             <th>Teléfono</th>
             <th>Habitación</th>
             <th>Check-In</th>
             <th>Check-Out</th>
-            <th style="text-align: center;">Huéspedes</th>
-            <th style="text-align: right;">Total</th>
+            <th class="cell-center">Huéspedes</th>
+            <th class="cell-right">Total</th>
             <th>Registrada por</th>
-            <th style="text-align: center;">Estado</th>
-            <th style="text-align: right; padding-right: 1.5rem;">Acciones</th>
+            <th class="cell-center">Estado</th>
+            <th class="cell-right-actions">Acciones</th>
           </tr>
         </thead>
         <tbody>
           @for (booking of bookings(); track booking.id) {
             <tr>
-              <td class="ps-4"><strong>#{{ booking.id }}</strong></td>
-              <!-- Columna Titular con lógica de asociación de usuario -->
+              <td class="cell-ps-4"><strong>#{{ booking.id }}</strong></td>
               <td>
                 <div>{{ booking.guestFirstName }} {{ booking.guestLastName }}</div>
                 
                 @if (booking.username) {
-                  <span class="badge badge-secondary" style="font-size: 0.7rem; margin-top: 2px;">
-                    <i class="bi bi-person-check me-1"></i>{{ booking.username }}
+                  <span class="badge badge-secondary badge-xs">
+                    {{ booking.username }}
                   </span>
                 } @else if (canModify()) {
-                  <div style="display: flex; gap: 5px; align-items: center; margin-top: 4px;">
+                  <div class="user-association-group">
                     <select 
-                      class="form-select form-select-sm" 
+                      class="user-select-sm" 
                       [(ngModel)]="booking.selectedUserId"
-                      style="font-size: 0.75rem; padding: 3px 6px;"
                     >
                       <option [ngValue]="null">Asociar usuario...</option>
                       @for (u of users(); track u.id) {
@@ -72,13 +82,12 @@
                     </select>
                     <button 
                       type="button" 
-                      class="btn-primary" 
-                      style="padding: 3px 8px; font-size: 0.75rem;"
+                      class="btn-primary btn-assign-sm" 
                       (click)="assignUser(booking)"
                       [disabled]="!booking.selectedUserId"
                       title="Asignar usuario titular"
                     >
-                      <i class="bi bi-check"></i>
+                      ✓
                     </button>
                   </div>
                 }
@@ -93,19 +102,18 @@
               </td>
               <td class="subtitle">{{ booking.checkIn }}</td>
               <td class="subtitle">{{ booking.checkOut }}</td>
-              <td style="text-align: center;">{{ booking.guestCount }}</td>
-              <td style="text-align: right;"><strong>${{ booking.totalPrice | number:'1.2-2' }}</strong></td>
-              <!-- Columna Registrada por (Intacta con el usuario empleado) -->
+              <td class="cell-center">{{ booking.guestCount }}</td>
+              <td class="cell-right"><strong>${{ booking.totalPrice | number:'1.2-2' }}</strong></td>
               <td>
                 @if (booking.userBookingUsername) {
                   <span class="badge badge-secondary">
-                    <i class="bi bi-person-badge me-1"></i>{{ booking.userBookingUsername }}
+                    {{ booking.userBookingUsername }}
                   </span>
                 } @else {
                   <span class="subtitle">-</span>
                 }
               </td>
-              <td style="text-align: center;">
+              <td class="cell-center">
                 <span
                   class="badge"
                   [class.badge-warning]="booking.state === 'PENDING'"
@@ -116,7 +124,7 @@
                   {{ booking.state }}
                 </span>
               </td>
-              <td style="text-align: right; padding-right: 1.5rem;">
+              <td class="cell-right-actions">
                 <div class="table-actions">
                   <!-- Botón Descargar QR -->
                   <button
@@ -126,38 +134,46 @@
                     [disabled]="!booking.qrBooking"
                     [title]="booking.qrBooking ? 'Descargar Código QR' : 'Sin QR disponible'"
                   >
-                    <i class="bi bi-qr-code"></i>
+                    <svg class="btn-icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <rect x="3" y="3" width="7" height="7"></rect>
+                      <rect x="14" y="3" width="7" height="7"></rect>
+                      <rect x="14" y="14" width="7" height="7"></rect>
+                      <rect x="3" y="14" width="7" height="7"></rect>
+                    </svg>
                   </button>
 
-                  <button
-                    type="button"
-                    class="btn-warning"
-                    (click)="confirmBooking(booking.id)"
-                    [disabled]="!canModify() || booking.state === 'CHECKED_IN' || booking.state === 'CONFIRMED'"
-                    title="Confirmar"
-                  >
-                    <i class="bi bi-check-lg"></i>
-                  </button>
+                  <!-- Botones exclusivos para ADMIN / RECEPCIONIST -->
+                  @if (!isGuest()) {
+                    <button
+                      type="button"
+                      class="btn-warning"
+                      (click)="confirmBooking(booking.id)"
+                      [disabled]="!canModify() || booking.state === 'CHECKED_IN' || booking.state === 'CONFIRMED'"
+                      title="Confirmar"
+                    >
+                      ✓
+                    </button>
 
-                  <button
-                    type="button"
-                    class="btn-info-action"
-                    (click)="openPaymentModal(booking)"
-                    [disabled]="!canModify() || !booking.hasAccount"
-                    [title]="booking.hasAccount ? 'Señas' : 'La reserva no cuenta con una cuenta asociada'"
-                  >
-                    <i class="bi bi-cash-coin"></i>
-                  </button>
+                    <button
+                      type="button"
+                      class="btn-info-action"
+                      (click)="openPaymentModal(booking)"
+                      [disabled]="!canModify() || !booking.hasAccount"
+                      [title]="booking.hasAccount ? 'Señas' : 'La reserva no cuenta con una cuenta asociada'"
+                    >
+                      $
+                    </button>
 
-                  <button
-                    type="button"
-                    class="btn-danger"
-                    (click)="cancelBooking(booking.id)"
-                    [disabled]="!canModify() || booking.state === 'CHECKED_IN' || booking.state === 'CANCELLED' || isCancelling(booking.id)"
-                    title="Cancelar"
-                  >
-                    <i class="bi bi-x-lg"></i>
-                  </button>
+                    <button
+                      type="button"
+                      class="btn-danger"
+                      (click)="cancelBooking(booking.id)"
+                      [disabled]="!canModify() || booking.state === 'CHECKED_IN' || booking.state === 'CANCELLED' || isCancelling(booking.id)"
+                      title="Cancelar"
+                    >
+                      ✕
+                    </button>
+                  }
                 </div>
               </td>
             </tr>
@@ -165,6 +181,135 @@
         </tbody>
       </table>
     </div>
+
+    <!-- 2. VISTA DE TARJETAS (Visible en Dispositivos Móviles) -->
+    <div class="mobile-cards-container">
+      @for (booking of bookings(); track booking.id) {
+        <div class="mobile-booking-card">
+          
+          <!-- Encabezado de Tarjeta -->
+          <div class="mobile-card-header">
+            <div>
+              <span class="mobile-card-id">Reserva #{{ booking.id }}</span>
+              <h4 class="mobile-card-title">{{ booking.guestFirstName }} {{ booking.guestLastName }}</h4>
+            </div>
+            <span
+              class="badge"
+              [class.badge-warning]="booking.state === 'PENDING'"
+              [class.badge-success]="booking.state === 'CONFIRMED' || booking.state === 'CHECKED_IN'"
+              [class.badge-secondary]="booking.state === 'CONCLUDED'"
+              [class.badge-danger]="booking.state === 'CANCELLED' || booking.state === 'NO_SHOW'"
+            >
+              {{ booking.state }}
+            </span>
+          </div>
+
+          <!-- Información de la Reserva -->
+          <div class="mobile-card-body">
+            @if (booking.username) {
+              <div class="mobile-card-row">
+                <span class="detail-label">Usuario:</span>
+                <span class="badge badge-secondary badge-xs">{{ booking.username }}</span>
+              </div>
+            } @else if (canModify()) {
+              <div class="mobile-card-row mobile-card-association">
+                <span class="detail-label">Asociar usuario:</span>
+                <div class="user-association-group">
+                  <select class="user-select-sm" [(ngModel)]="booking.selectedUserId">
+                    <option [ngValue]="null">Seleccionar...</option>
+                    @for (u of users(); track u.id) {
+                      <option [ngValue]="u.id">{{ u.username || (u.name + ' ' + u.surname) }}</option>
+                    }
+                  </select>
+                  <button type="button" class="btn-primary btn-assign-sm" (click)="assignUser(booking)" [disabled]="!booking.selectedUserId">✓</button>
+                </div>
+              </div>
+            }
+
+            <div class="mobile-card-row">
+              <span class="detail-label">Teléfono:</span>
+              <span>{{ booking.guestPhone || '-' }}</span>
+            </div>
+            <div class="mobile-card-row">
+              <span class="detail-label">Habitación:</span>
+              <span>
+                @if (booking.roomNumber) {
+                  <span class="badge badge-secondary">Hab. #{{ booking.roomNumber }}</span>
+                } @else {
+                  N/A
+                }
+              </span>
+            </div>
+            <div class="mobile-card-row">
+              <span class="detail-label">Fechas (In / Out):</span>
+              <span>{{ booking.checkIn }} al {{ booking.checkOut }}</span>
+            </div>
+            <div class="mobile-card-row">
+              <span class="detail-label">Huéspedes:</span>
+              <span>{{ booking.guestCount }}</span>
+            </div>
+            <div class="mobile-card-row">
+              <span class="detail-label">Registrada por:</span>
+              <span>{{ booking.userBookingUsername || '-' }}</span>
+            </div>
+            <div class="mobile-card-row mobile-card-total">
+              <span class="detail-label">Total:</span>
+              <span class="mobile-total-price">${{ booking.totalPrice | number:'1.2-2' }}</span>
+            </div>
+          </div>
+
+          <!-- Acciones de Tarjeta Móvil -->
+          <div class="mobile-card-actions">
+            <button
+              type="button"
+              class="btn-secondary-action"
+              (click)="downloadQr(booking)"
+              [disabled]="!booking.qrBooking"
+              title="Código QR"
+            >
+              <svg class="btn-icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="3" width="7" height="7"></rect>
+                <rect x="14" y="3" width="7" height="7"></rect>
+                <rect x="14" y="14" width="7" height="7"></rect>
+                <rect x="3" y="14" width="7" height="7"></rect>
+              </svg>
+              <span>QR</span>
+            </button>
+
+            @if (!isGuest()) {
+              <button
+                type="button"
+                class="btn-warning"
+                (click)="confirmBooking(booking.id)"
+                [disabled]="!canModify() || booking.state === 'CHECKED_IN' || booking.state === 'CONFIRMED'"
+              >
+                Confirmar
+              </button>
+
+              <button
+                type="button"
+                class="btn-info-action"
+                (click)="openPaymentModal(booking)"
+                [disabled]="!canModify() || !booking.hasAccount"
+              >
+                Señas ($)
+              </button>
+
+              <button
+                type="button"
+                class="btn-danger"
+                (click)="cancelBooking(booking.id)"
+                [disabled]="!canModify() || booking.state === 'CHECKED_IN' || booking.state === 'CANCELLED' || isCancelling(booking.id)"
+              >
+                Cancelar
+              </button>
+            }
+          </div>
+
+        </div>
+      }
+    </div>
+
   }
 
 </section>
@@ -188,7 +333,7 @@
         aria-label="Cerrar modal"
         (click)="closePaymentModal()"
       >
-        <i class="fa-solid fa-xmark"></i>
+        ✕
       </button>
 
       <!-- Encabezado del Modal -->
@@ -200,20 +345,20 @@
       </div>
 
       <!-- Contenido en 2 Columnas dentro del Modal -->
-      <div class="row g-4" style="display: grid; grid-template-columns: 1fr 1.5fr; gap: 1.5rem; align-items: start;">
+      <div class="modal-grid-layout">
         
         <!-- Columna Izquierda: Formulario -->
-        <div class="detail-item" style="gap: 12px;">
-          <h4 style="font-size: var(--font-size-sm); color: var(--color-text-main); margin-bottom: 0;">Registrar Nueva Seña</h4>
+        <div class="detail-item detail-item-form">
+          <h4 class="modal-title-sm">Registrar Nueva Seña</h4>
           
           <div class="detail-item">
             <span class="detail-label">Monto ($)</span>
-            <input type="number" class="form-control" [ngModel]="newPaymentAmount()" (ngModelChange)="newPaymentAmount.set($event)" placeholder="Ej: 5000" style="padding: 8px 12px; background: var(--bg-secondary); border: var(--border-input); color: var(--color-text-main); border-radius: var(--radius-sm);">
+            <input type="number" class="modal-form-control" [ngModel]="newPaymentAmount()" (ngModelChange)="newPaymentAmount.set($event)" placeholder="Ej: 5000">
           </div>
           
           <div class="detail-item">
             <span class="detail-label">Método de Pago</span>
-            <select class="form-select" [ngModel]="newPaymentMethod()" (ngModelChange)="newPaymentMethod.set($event)" style="padding: 8px 12px; background: var(--bg-secondary); border: var(--border-input); color: var(--color-text-main); border-radius: var(--radius-sm);">
+            <select class="modal-form-select" [ngModel]="newPaymentMethod()" (ngModelChange)="newPaymentMethod.set($event)">
               <option value="CASH">Efectivo (CASH)</option>
               <option value="TRANSFER">Transferencia</option>
               <option value="CREDIT_CARD">Tarjeta de Crédito</option>
@@ -223,52 +368,52 @@
           
           <div class="detail-item">
             <span class="detail-label">Comprobante / Referencia</span>
-            <input type="text" class="form-control" [ngModel]="newPaymentReference()" (ngModelChange)="newPaymentReference.set($event)" placeholder="Número de voucher" style="padding: 8px 12px; background: var(--bg-secondary); border: var(--border-input); color: var(--color-text-main); border-radius: var(--radius-sm);">
+            <input type="text" class="modal-form-control" [ngModel]="newPaymentReference()" (ngModelChange)="newPaymentReference.set($event)" placeholder="Número de voucher">
           </div>
           
-          <button type="button" class="btn-primary" style="width: 100%; justify-content: center; margin-top: 5px;" (click)="submitBookingPayment()">Guardar Seña</button>
+          <button type="button" class="btn-primary btn-submit-full" (click)="submitBookingPayment()">Guardar Seña</button>
         </div>
 
         <!-- Columna Derecha: Listado de Señas -->
         <div class="detail-item">
-          <h4 style="font-size: var(--font-size-sm); color: var(--color-text-main); margin-bottom: 0;">Señas Registradas</h4>
+          <h4 class="modal-title-sm">Señas Registradas</h4>
 
           @if (loadingPayments()) {
-            <div class="alert alert-info" style="margin-top: 0.5rem; margin-bottom: 0;">
-              <i class="fa-solid fa-spinner fa-spin"></i> Cargando pagos...
+            <div class="alert alert-info alert-margin-sm">
+              <span class="spin icon-margin"></span> Cargando pagos...
             </div>
           } @else if (bookingPayments().length > 0) {
-            <div class="table-wrapper" style="margin-top: 0.5rem; max-height: 250px; overflow-y: auto;">
-              <table class="table" style="font-size: 0.75rem;">
+            <div class="table-wrapper table-wrapper-scroll">
+              <table class="table table-sm-text">
                 <thead>
                   <tr>
-                    <th class="ps-3">Fecha</th>
+                    <th class="cell-pl-1">Fecha</th>
                     <th>Método</th>
                     <th>Ref</th>
-                    <th style="text-align: right; padding-right: 1rem;">Monto</th>
+                    <th class="cell-right cell-pr-1">Monto</th>
                   </tr>
                 </thead>
                 <tbody>
                   @for (p of bookingPayments(); track p.id) {
                     <tr>
-                      <td class="ps-3 subtitle">{{ p.paymentDate | date:'short' }}</td>
+                      <td class="cell-pl-1 subtitle">{{ p.paymentDate | date:'short' }}</td>
                       <td><span class="badge badge-secondary">{{ p.paymentMethod }}</span></td>
                       <td class="subtitle">{{ p.transactionReference || '-' }}</td>
-                      <td style="text-align: right; padding-right: 1rem;"><strong>${{ p.amount | number:'1.2-2' }}</strong></td>
+                      <td class="cell-right cell-pr-1"><strong>${{ p.amount | number:'1.2-2' }}</strong></td>
                     </tr>
                   }
                 </tbody>
               </table>
             </div>
           } @else {
-            <p class="subtitle" style="margin-top: 0.5rem;">Esta reserva aún no registra señas previas.</p>
+            <p class="subtitle subtitle-margin-sm">Esta reserva aún no registra señas previas.</p>
           }
         </div>
 
       </div>
 
       <!-- Acciones del Modal -->
-      <div class="modal-actions" style="margin-top: 2rem;">
+      <div class="modal-actions">
         <button
           type="button"
           class="btn-secondary-action"

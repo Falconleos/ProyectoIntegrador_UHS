@@ -5,10 +5,10 @@ import {
   Validators
 } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
-import { forkJoin } from 'rxjs'; // 👈 Importante
+import { forkJoin } from 'rxjs';
 
 import { EmployeeService } from '../../../core/services/employee.service';
-import { UserService } from '../../../core/services/user.service'; // 👈 Asegúrate de tenerlo inyectado
+import { UserService } from '../../../core/services/user.service';
 
 import {
   EmployeeDtoRequest,
@@ -54,6 +54,7 @@ export class EmployeeEditComponent implements OnInit {
     gender: [''],
     email: ['', [Validators.required, Validators.email]],
     phoneNumber: [''],
+    emergencyPhoneNumber: [''], // 👈 Propiedad corregida según la interfaz
     address: [''],
     birthDay: [''],
 
@@ -80,7 +81,6 @@ export class EmployeeEditComponent implements OnInit {
     this.loading.set(true);
     this.errorMessage.set('');
 
-    // Consultamos empleado y usuario en paralelo ya que comparten el mismo ID
     forkJoin({
       employee: this.employeeService.getById(id),
       user: this.userService.getById(id)
@@ -89,7 +89,6 @@ export class EmployeeEditComponent implements OnInit {
         this.employee.set(employee);
 
         this.employeeForm.patchValue({
-          // Datos completos del usuario
           username: user.username || '',
           name: user.name || '',
           surname: user.surname || '',
@@ -100,8 +99,8 @@ export class EmployeeEditComponent implements OnInit {
           address: user.address || '',
           birthDay: user.birthDay || '',
 
-          // Datos laborales del empleado
           employeeNumber: employee.employeeNumber || '',
+          emergencyPhoneNumber: employee.emergencyPhoneNumber || '', // 👈 Seteo desde el DTO del empleado
           hireDate: employee.hireDate || '',
           shift: employee.shift || 'MORNING',
           salary: employee.salary || 0
@@ -124,7 +123,7 @@ export class EmployeeEditComponent implements OnInit {
     }
   }
 
- onSubmit(): void {
+  onSubmit(): void {
     if (this.saving() || this.loading()) return;
 
     const id = this.employeeId();
@@ -149,6 +148,7 @@ export class EmployeeEditComponent implements OnInit {
       address: formValue.address || undefined,
       birthDay: formValue.birthDay || undefined,
       employeeNumber: formValue.employeeNumber || undefined,
+      emergencyPhoneNumber: formValue.emergencyPhoneNumber || undefined, // 👈 Enviado en el payload
       hireDate: formValue.hireDate,
       shift: formValue.shift,
       salary: Number(formValue.salary)

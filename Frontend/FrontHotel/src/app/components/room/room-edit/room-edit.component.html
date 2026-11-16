@@ -2,7 +2,7 @@
 
   <!-- Sección de Encabezado -->
   <div class="header-section">
-    <h2><i class="fa-solid fa-pen-to-square"></i> Editar Habitación</h2>
+    <h2><i class="fa-solid fa-pen-to-square header-icon"></i> Editar Habitación</h2>
     <a routerLink="/dashboard/room-list" class="btn-secondary-action">
       <i class="fa-solid fa-arrow-left"></i> Volver al listado
     </a>
@@ -12,24 +12,24 @@
 
   @if (loading()) {
     <div class="alert alert-info">
-      <i class="fa-solid fa-spinner fa-spin"></i> Cargando datos de la habitación...
+      <i class="fa-solid fa-spinner fa-spin alert-icon"></i> Cargando datos de la habitación...
     </div>
   } @else {
 
     @if (errorMessage()) {
       <div class="alert alert-danger">
-        <i class="fa-solid fa-triangle-exclamation"></i> {{ errorMessage() }}
+        <i class="fa-solid fa-triangle-exclamation alert-icon"></i> {{ errorMessage() }}
       </div>
     }
 
     <!-- Tarjeta contenedora del formulario -->
     <div class="form-card-wrapper">
-      <form [formGroup]="roomForm" (ngSubmit)="updateRoom()" class="form-layout">
+      <form [formGroup]="roomForm" class="form-layout">
 
         <!-- Número de habitación -->
         <div class="form-group">
           <label for="number" class="form-label">
-            <i class="fa-solid fa-hashtag"></i> Número de habitación
+            <i class="fa-solid fa-hashtag label-icon"></i> Número de habitación
           </label>
           <input
             id="number"
@@ -42,12 +42,12 @@
 
           @if (roomForm.controls.number.touched && roomForm.controls.number.hasError('required')) {
             <p class="error-text">
-              <i class="fa-solid fa-circle-exclamation"></i> El número de habitación es obligatorio.
+              <i class="fa-solid fa-circle-exclamation error-icon"></i> El número de habitación es obligatorio.
             </p>
           }
           @if (roomForm.controls.number.touched && roomForm.controls.number.hasError('min')) {
             <p class="error-text">
-              <i class="fa-solid fa-circle-exclamation"></i> El número debe ser mayor a 0.
+              <i class="fa-solid fa-circle-exclamation error-icon"></i> El número debe ser mayor a 0.
             </p>
           }
         </div>
@@ -55,19 +55,19 @@
         <!-- Tipo de habitación -->
         <div class="form-group">
           <label for="roomTypeId" class="form-label">
-            <i class="fa-solid fa-layer-group"></i> Tipo de habitación
+            <i class="fa-solid fa-layer-group label-icon"></i> Tipo de habitación
           </label>
           <select
             id="roomTypeId"
             formControlName="roomTypeId"
             class="form-control"
           >
-            <option [ngValue]="0" disabled>
+            <option [value]="0" disabled>
               Seleccione un tipo de habitación
             </option>
 
             @for (type of roomTypes(); track type.id) {
-              <option [ngValue]="type.id">
+              <option [value]="type.id">
                 {{ type.name }} (${{ type.pricePerNight }} - Cap. {{ type.capacity }})
               </option>
             }
@@ -75,7 +75,7 @@
 
           @if (roomForm.controls.roomTypeId.touched && roomForm.controls.roomTypeId.invalid) {
             <p class="error-text">
-              <i class="fa-solid fa-circle-exclamation"></i> Debe seleccionar un tipo de habitación.
+              <i class="fa-solid fa-circle-exclamation error-icon"></i> Debe seleccionar un tipo de habitación.
             </p>
           }
         </div>
@@ -83,11 +83,11 @@
         <!-- Gestión de Imágenes Actuales -->
         <div class="form-group">
           <label class="form-label">
-            <i class="fa-solid fa-images"></i> Imágenes actuales
+            <i class="fa-solid fa-images label-icon"></i> Imágenes actuales
           </label>
 
           @if (loadingImages()) {
-            <p class="subtitle"><i class="fa-solid fa-spinner fa-spin"></i> Cargando imágenes...</p>
+            <p class="subtitle"><i class="fa-solid fa-spinner fa-spin alert-icon"></i> Cargando imágenes...</p>
           } @else if (existingImages().length === 0) {
             <p class="subtitle">Esta habitación no tiene imágenes cargadas.</p>
           } @else {
@@ -112,20 +112,20 @@
         <!-- Añadir Nuevas Imágenes -->
         <div class="form-group">
           <label for="newImages" class="form-label">
-            <i class="fa-solid fa-plus"></i> Agregar nuevas imágenes
+            <i class="fa-solid fa-plus label-icon"></i> Agregar nuevas imágenes
           </label>
           <input
             id="newImages"
             type="file"
             accept="image/*"
             multiple
-            class="form-control"
+            class="form-control file-input-custom"
             (change)="onImagesSelected($event)"
           >
 
           @if (selectedImages().length > 0) {
             <p class="subtitle file-count-text">
-              <i class="fa-solid fa-file-image"></i> Nuevas imágenes seleccionadas: {{ selectedImages().length }}
+              <i class="fa-solid fa-file-image alert-icon"></i> Nuevas imágenes seleccionadas: {{ selectedImages().length }}
             </p>
 
             <!-- Cuadrícula de vistas previas de las nuevas imágenes -->
@@ -146,9 +146,10 @@
           </a>
 
           <button
-            type="submit"
+            type="button"
             class="btn-primary"
             [disabled]="roomForm.invalid || saving() || loading()"
+            (click)="updateRoom()"
           >
             @if (saving()) {
               <i class="fa-solid fa-spinner fa-spin"></i> Guardando cambios...

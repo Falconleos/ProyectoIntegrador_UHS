@@ -1,7 +1,7 @@
 <div class="container">
   <!-- Encabezado -->
   <div class="header-section">
-    <h2><i class="bi bi-door-open icon-title"></i> Gestión de Check-Ins y Estadías</h2>
+    <h2>Gestión de Check-Ins y Estadías</h2>
     <p class="subtitle">Administre las reservas del día y controle las estadías activas del hotel.</p>
   </div>
 
@@ -13,9 +13,8 @@
     <div class="card-box">
       <div class="qr-upload-layout">
         <div class="qr-upload-info">
-          <label for="qrFile" class="form-label">📷 Adjuntar Imagen PNG de Código QR para Check-In</label>
+          <label for="qrFile" class="form-label">Adjuntar Imagen PNG de Código QR para Check-In</label>
           <div class="input-wrapper">
-            <span class="input-icon"><i class="bi bi-qr-code-scan"></i></span>
             <input 
               type="file" 
               id="qrFile" 
@@ -27,10 +26,10 @@
         </div>
         <div class="qr-upload-alerts">
           @if (qrError()) {
-            <div class="alert alert-danger">{{ qrError() }}</div>
+            <div class="alert alert-danger" role="alert">{{ qrError() }}</div>
           }
           @if (qrSuccess()) {
-            <div class="alert alert-success">{{ qrSuccess() }}</div>
+            <div class="alert alert-success" role="status">{{ qrSuccess() }}</div>
           }
         </div>
       </div>
@@ -41,7 +40,7 @@
       <div class="alert alert-info">Cargando información...</div>
     }
     @if (errorMessage()) {
-      <div class="alert alert-danger">{{ errorMessage() }}</div>
+      <div class="alert alert-danger" role="alert">{{ errorMessage() }}</div>
     }
 
     <!-- Sección de reservas pendientes para hoy -->
@@ -81,8 +80,9 @@
                 </div>
               }
 
+              <!-- Botón Realizar Check-In sin icono -->
               <button class="btn-primary btn-full" (click)="goToCreateCheckIn(booking)">
-                <i class="bi bi-check2-circle icon-margin"></i> Realizar Check-In
+                Realizar Check-In
               </button>
             </div>
           </div>
@@ -100,7 +100,8 @@
     }
 
     @if (checkedInBookings().length > 0) {
-      <div class="table-wrapper">
+      <!-- Contenedor en Tabla (Visible en Desktop) -->
+      <div class="table-wrapper desktop-only">
         <table class="table">
           <thead>
             <tr>
@@ -120,15 +121,18 @@
                 <td class="subtitle">{{ b.checkIn }} al {{ b.checkOut }}</td>
                 <td class="col-actions">
                   <div class="table-actions">
+                    <!-- Botón Servicios sin icono -->
                     <button class="btn-secondary-action" (click)="servicesPlaceholder(b.id)" title="Servicios">
-                      <i class="bi bi-bag-plus"></i>
+                      Servicios
                     </button>
+                    <!-- Botón Cuenta sin icono -->
                     <button class="btn-secondary-action" (click)="viewAccountPlaceholder(b.id)" title="Cuenta">
-                      <i class="bi bi-wallet2"></i>
+                      Cuenta
                     </button>
                     @if (canModify()) {
+                      <!-- Botón Interrumpir sin icono -->
                       <button class="btn-danger" (click)="interruptStay(b.id)" title="Interrumpir">
-                        <i class="bi bi-x-lg"></i>
+                        Interrumpir
                       </button>
                     }
                   </div>
@@ -137,6 +141,38 @@
             }
           </tbody>
         </table>
+      </div>
+
+      <!-- Contenedor en Cards (Visible en Móvil) -->
+      <div class="active-stays-cards mobile-only">
+        @for (b of checkedInBookings(); track b.id) {
+          <div class="stay-mobile-card">
+            <div class="card-header-row">
+              <span class="badge badge-secondary">Estadía #{{ b.id }}</span>
+              <span class="badge badge-primary">Hab. #{{ b.roomNumber }}</span>
+            </div>
+
+            <h5 class="card-title">{{ getGuestDisplayName(b) }}</h5>
+
+            <div class="card-info">
+              <p><strong>Fechas:</strong> {{ b.checkIn }} al {{ b.checkOut }}</p>
+            </div>
+
+            <div class="mobile-card-actions">
+              <button class="btn-secondary-action" (click)="servicesPlaceholder(b.id)">
+                Servicios
+              </button>
+              <button class="btn-secondary-action" (click)="viewAccountPlaceholder(b.id)">
+                Cuenta
+              </button>
+              @if (canModify()) {
+                <button class="btn-danger" (click)="interruptStay(b.id)">
+                  Interrumpir
+                </button>
+              }
+            </div>
+          </div>
+        }
       </div>
     }
   </section>
@@ -147,7 +183,7 @@
       <div class="modal-card" (click)="$event.stopPropagation()">
         
         <button type="button" class="btn-close" aria-label="Cerrar modal" (click)="selectedBookingForCheckIn.set(null)">
-          <i class="bi bi-x-lg"></i>
+          ✕
         </button>
 
         <div class="modal-header-profile">
@@ -156,7 +192,7 @@
 
         <div class="modal-body-content">
           @if (checkInSuccess()) {
-            <div class="alert alert-success">{{ checkInSuccess() }}</div>
+            <div class="alert alert-success" role="status">{{ checkInSuccess() }}</div>
           }
 
           @if (showUserSelector() && !showNewUserForm() && !checkInSuccess()) {
@@ -165,7 +201,6 @@
               
               <div class="form-group">
                 <label class="form-label">Usuario del Sistema:</label>
-                <!-- Reemplazo de ngModel en select -->
                 <select class="form-control" [value]="selectedUserId()" (change)="onUserSelectChange($event)">
                     <option [value]="null" disabled>-- Seleccione un usuario --</option>
                     @for (u of users(); track u.id) {
@@ -176,6 +211,7 @@
                 </select>
               </div>
 
+              <!-- Botón Asociar sin icono -->
               <button class="btn-primary btn-full" [disabled]="!selectedUserId()" (click)="assignAndCheckIn()">
                 Asociar y Registrar Check-In
               </button>
@@ -189,7 +225,6 @@
           @if (showNewUserForm()) {
             <div class="form-section">
               <h6 class="modal-warning-title">Usuario no encontrado. Complete los datos:</h6>
-              <!-- Reemplazos de ngModel en inputs mediante eventos (input) y [value] -->
               <div class="form-group"><input type="text" class="form-control" [value]="newUser().username" (input)="updateNewUserField('username', $event)" placeholder="Username"></div>
               <div class="form-group"><input type="email" class="form-control" [value]="newUser().email" (input)="updateNewUserField('email', $event)" placeholder="Email"></div>
               <div class="form-group"><input type="password" class="form-control" [value]="newUser().password" (input)="updateNewUserField('password', $event)" placeholder="Password"></div>
@@ -198,7 +233,10 @@
               <div class="form-group"><input type="text" class="form-control" [value]="newUser().dni" (input)="updateNewUserField('dni', $event)" placeholder="DNI"></div>
               <div class="form-group"><input type="text" class="form-control" [value]="newUser().phoneNumber" (input)="updateNewUserField('phoneNumber', $event)" placeholder="Teléfono"></div>
               
-              <button class="btn-primary btn-full" (click)="createNewUserAndProceed()">Crear Usuario y Hacer Check-In</button>
+              <!-- Botón Crear Usuario sin icono -->
+              <button class="btn-primary btn-full" (click)="createNewUserAndProceed()">
+                Crear Usuario y Hacer Check-In
+              </button>
             </div>
           }
         </div>
@@ -212,7 +250,7 @@
     <div class="modal-backdrop" (click)="checkInError.set('')">
       <div class="modal-card modal-card-sm" (click)="$event.stopPropagation()">
         <div class="modal-header-profile error-header">
-          <h3><i class="bi bi-exclamation-triangle icon-margin"></i> Aviso de Check-In</h3>
+          <h3>Aviso de Check-In</h3>
         </div>
         <p class="subtitle text-light">{{ checkInError() }}</p>
         <button class="btn-primary btn-full" (click)="checkInError.set('')">Aceptar</button>

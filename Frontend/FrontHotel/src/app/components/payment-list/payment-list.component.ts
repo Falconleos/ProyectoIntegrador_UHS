@@ -45,6 +45,10 @@ export class PaymentListComponent implements OnInit {
       next: (data: PaymentDTOResponse[]) => {
         // 3. Procesamos la respuesta asegurando que sea un arreglo válido
         const rawPayments: PaymentWithGuest[] = Array.isArray(data) ? [...data] : [];
+        
+        // Ordenamos para que el más reciente (ID mayor) quede arriba
+        rawPayments.sort((a, b) => (b.id ?? 0) - (a.id ?? 0));
+
         this.payments.set(rawPayments);
         this.loading.set(false);
 

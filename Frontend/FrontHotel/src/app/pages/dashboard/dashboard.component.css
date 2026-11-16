@@ -1,11 +1,11 @@
 /* --- Layout General del Dashboard (Grid Responsivo) --- */
 .dashboard {
   min-height: 100vh;
-  /* Reducimos el ancho del aside un 20% (de 260px a 210px) para optimizar el espacio horizontal */
   display: grid;
   grid-template-columns: 210px 1fr;
   background-color: var(--bg-main);
   background-image: var(--bg-gradient-1), var(--bg-gradient-2);
+  position: relative;
 }
 
 /* --- Barra Lateral (Sidebar / Aside) --- */
@@ -19,18 +19,20 @@
   position: sticky;
   top: 0;
   overflow-y: auto;
-  z-index: 10;
+  z-index: 100;
+  transition: transform 0.3s ease-in-out;
 }
 
 .sidebar-header {
-  /* Reducimos el padding un 20% para ajustarlo al nuevo ancho */
   padding: 1.2rem 0.8rem;
   border-bottom: var(--border-glass);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 }
 
 .sidebar-header h2 {
   color: var(--color-text-main);
-  /* Escalamos ligeramente la tipografía un 20% menor visualmente */
   font-size: calc(var(--font-size-sm) * 0.9);
   display: flex;
   align-items: center;
@@ -46,6 +48,16 @@
   font-size: calc(var(--font-size-md) * 0.9);
 }
 
+/* Botón de cierre para móvil */
+.close-sidebar-btn {
+  display: none;
+  background: transparent;
+  border: none;
+  color: var(--color-text-muted);
+  font-size: 1.25rem;
+  cursor: pointer;
+}
+
 /* --- Navegación del Sidebar --- */
 .sidebar-nav {
   padding: 0.8rem 0.6rem;
@@ -59,7 +71,6 @@
   display: flex;
   align-items: center;
   gap: 10px;
-  /* Reducimos padding y tamaño de fuente proporcionalmente */
   padding: 8px 10px;
   color: var(--color-text-muted);
   text-decoration: none;
@@ -116,7 +127,7 @@
 .main-content {
   display: flex;
   flex-direction: column;
-  min-width: 0; /* Evita que desborde el grid */
+  min-width: 0;
 }
 
 .top-bar {
@@ -131,6 +142,12 @@
   position: sticky;
   top: 0;
   z-index: 9;
+}
+
+.top-bar-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
 }
 
 .top-bar h3 {
@@ -167,6 +184,11 @@
 .icon-btn:hover {
   color: var(--color-primary-hover);
   background: var(--bg-btn-secondary-hover);
+}
+
+/* Botón de hamburguesa oculto en desktop */
+.menu-toggle-btn {
+  display: none;
 }
 
 .divider {
@@ -231,7 +253,7 @@
   position: absolute;
   top: -4px;
   right: -4px;
-  background-color: #ef4444; /* Rojo alerta */
+  background-color: #ef4444;
   color: #ffffff;
   font-size: 0.7rem;
   font-weight: 700;
@@ -242,14 +264,47 @@
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
+/* --- Overlay móvil --- */
+.sidebar-backdrop {
+  display: none;
+}
+
 /* --- Responsividad (Móviles y Tablets) --- */
 @media (max-width: 768px) {
   .dashboard {
-    grid-template-columns: 1fr; /* Oculta o estira la barra lateral según diseño móvil */
+    grid-template-columns: 1fr;
   }
   
+  .menu-toggle-btn {
+    display: flex;
+  }
+
+  .close-sidebar-btn {
+    display: block;
+  }
+
   .sidebar {
-    display: none; /* Puedes cambiar esto si prefieres un menú hamburguesa */
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 260px;
+    height: 100%;
+    transform: translateX(-100%);
+    box-shadow: 5px 0 15px rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+  }
+
+  .sidebar.open {
+    transform: translateX(0);
+  }
+
+  .sidebar-backdrop {
+    display: block;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(3px);
+    z-index: 999;
   }
 
   .top-bar {
@@ -257,6 +312,10 @@
   }
 
   .user-info {
-    display: none; /* Oculta el texto del usuario en pantallas muy pequeñas para ahorrar espacio */
+    display: none;
+  }
+
+  .content-area {
+    padding: 1rem;
   }
 }

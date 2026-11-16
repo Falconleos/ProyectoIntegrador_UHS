@@ -21,43 +21,43 @@
   color: var(--color-text-muted);
 }
 
-/* Grilla de KPIs (5 columnas arriba) */
+/* Grilla de KPIs (Forzamos 5 columnas en pantallas grandes) */
 .kpi-grid {
   display: grid;
-  grid-template-columns: repeat(5, minmax(110px, 1fr));
-  gap: 0.6rem;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 0.5rem;
 }
 
-@media (max-width: 1400px) {
+@media (max-width: 1200px) {
   .kpi-grid {
-    grid-template-columns: repeat(3, minmax(130px, 1fr));
+    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 }
 
-@media (max-width: 900px) {
+@media (max-width: 800px) {
   .kpi-grid {
-    grid-template-columns: repeat(2, minmax(130px, 1fr));
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 
-@media (max-width: 600px) {
+@media (max-width: 500px) {
   .kpi-grid {
     grid-template-columns: 1fr;
   }
 }
 
-/* Tarjeta Estilo Glassmorphism */
+/* Tarjeta Estilo Glassmorphism (Más compacta) */
 .kpi-card {
   background: var(--bg-secondary);
   backdrop-filter: var(--backdrop-blur);
   -webkit-backdrop-filter: var(--backdrop-blur);
   border: var(--border-glass);
   box-shadow: var(--shadow-main);
-  border-radius: var(--radius-lg);
-  padding: 0.75rem;
+  border-radius: var(--radius-md);
+  padding: 0.5rem 0.65rem;
   display: flex;
   flex-direction: column;
-  gap: 0.4rem;
+  gap: 0.25rem;
   transition: transform 0.2s ease, border-color 0.2s ease;
 }
 
@@ -70,38 +70,40 @@
 .kpi-info {
   display: flex;
   flex-direction: column;
-  gap: 0.1rem;
+  gap: 0.05rem;
   width: 100%;
 }
 
 .kpi-info span {
-  font-size: 0.55rem;
+  font-size: .7rem;
   color: var(--color-text-muted);
   text-transform: uppercase;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.03em;
   font-weight: 600;
-  white-space: normal;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
   line-height: 1.1;
 }
 
 .kpi-info h3 {
-  font-size: 0.95rem;
+  font-size: 0.85rem;
   font-weight: 700;
   color: var(--color-text-main);
   margin: 0;
 }
 
-/* Iconos */
+/* Iconos (Más pequeños) */
 .kpi-icon {
-  width: 26px;
-  height: 26px;
-  border-radius: var(--radius-md);
+  width: 22px;
+  height: 22px;
+  border-radius: var(--radius-sm);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 0.75rem;
+  font-size: 0.65rem;
   color: var(--color-text-main);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
 }
 
 .kpi-icon.rooms { background: linear-gradient(135deg, #6366f1, #4f46e5); }

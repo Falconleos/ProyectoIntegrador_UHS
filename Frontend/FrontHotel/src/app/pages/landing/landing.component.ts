@@ -4,6 +4,8 @@ import { Router, RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { CommentService } from '../../core/services/comment.service';
 import { UserService } from '../../core/services/user.service';
+import { forkJoin, of } from 'rxjs';
+import { catchError, map } from 'rxjs/operators';
 
 @Component({
   selector: 'app-landing',
@@ -26,6 +28,9 @@ export class LandingComponent implements OnInit {
   userId = signal<number | null>(null);
   avatarUrl = signal<string | null>(null);
 
+  // --- Estado del Menú Móvil (Hamburguesa) ---
+  mobileMenuOpen = false;
+
   // --- Estado del Carrusel de Comentarios ---
   fiveStarComments = signal<any[]>([]);
   currentCommentIndex = signal<number>(0);
@@ -33,6 +38,15 @@ export class LandingComponent implements OnInit {
   ngOnInit(): void {
     this.checkAuthStatus();
     this.loadVisibleComments();
+  }
+
+  // Métodos para controlar el menú lateral en dispositivos móviles
+  toggleMobileMenu(): void {
+    this.mobileMenuOpen = !this.mobileMenuOpen;
+  }
+
+  closeMobileMenu(): void {
+    this.mobileMenuOpen = false;
   }
 
   // Verifica el estado de autenticación del usuario leyendo el almacenamiento local y decodificando el JWT
@@ -68,8 +82,7 @@ export class LandingComponent implements OnInit {
         const objectURL = URL.createObjectURL(blob);
         this.avatarUrl.set(objectURL);
       },
-      error: (err) => {
-        console.error('Error al cargar la foto de perfil en la landing', err);
+      error: () => {
         this.avatarUrl.set(null);
       }
     });
@@ -91,7 +104,7 @@ export class LandingComponent implements OnInit {
     this.router.navigate(['/']);
   }
 
-  // Carga los comentarios visibles y asigna la URL pública del avatar utilizando el username del autor
+  // Carga los comentarios visibles y descarga la foto de perfil de cada autor como Blob de forma asíncrona
   loadVisibleComments(): void {
     this.commentService.getVisibleComments().subscribe({
       next: (comments) => {
@@ -102,22 +115,33 @@ export class LandingComponent implements OnInit {
           return;
         }
 
-        // Mapeamos cada comentario para asignarle la URL pública del endpoint de tu PublicController
-        const processedComments = commentList.map((c: any) => {
+        const commentsWithAvatarObservables = commentList.map((c: any) => {
           const authorUsername = c.username || c.nombreUsuario;
-          const timestamp = new Date().getTime();
           
-          const avatar = authorUsername
-            ? `http://localhost:8080/public/users/username/${authorUsername}/profile-picture?t=${timestamp}`
-            : null;
+          if (!authorUsername) {
+            return of({ ...c, authorAvatar: null });
+          }
 
-          return {
-            ...c,
-            authorAvatar: avatar
-          };
+          return this.userService.getProfilePictureByUsername(authorUsername).pipe(
+            map((blob: Blob) => {
+              const objectURL = URL.createObjectURL(blob);
+              return { ...c, authorAvatar: objectURL };
+            }),
+            catchError(() => {
+              return of({ ...c, authorAvatar: null });
+            })
+          );
         });
 
-        this.fiveStarComments.set(processedComments);
+        forkJoin(commentsWithAvatarObservables).subscribe({
+          next: (processedComments) => {
+            this.fiveStarComments.set(processedComments);
+          },
+          error: (err) => {
+            console.error('Error al procesar avatares de comentarios:', err);
+            this.fiveStarComments.set(commentList);
+          }
+        });
       },
       error: (err) => {
         console.error('Error al cargar comentarios visibles:', err);

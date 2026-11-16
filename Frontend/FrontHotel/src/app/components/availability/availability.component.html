@@ -2,9 +2,9 @@
 
   <!-- Sección de Encabezado -->
   <div class="header-section">
-    <h2><i class="fa-solid fa-search"></i> Consultar Disponibilidad de Habitaciones</h2>
+    <h2>Consultar Disponibilidad de Habitaciones</h2>
     <a class="btn-secondary-action" routerLink="/dashboard/booking-list">
-      <i class="fa-solid fa-arrow-left"></i> Volver a Reservas
+      Volver a Reservas
     </a>
   </div>
 
@@ -15,13 +15,13 @@
   <!-- Mensajes de Error o Carga -->
   @if (errorMessage()) {
     <div class="alert alert-danger">
-      <i class="fa-solid fa-triangle-exclamation"></i> {{ errorMessage() }}
+      {{ errorMessage() }}
     </div>
   }
   
   @if (loading()) {
     <div class="alert alert-info">
-      <i class="fa-solid fa-spinner fa-spin"></i> Buscando habitaciones disponibles...
+      Buscando habitaciones disponibles...
     </div>
   }
 
@@ -72,7 +72,6 @@
           Volver a Reservas
         </button>
         <button type="submit" class="btn-primary" [disabled]="loading()">
-          <i class="fa-solid" [class.fa-spinner]="loading()" [class.fa-spin]="loading()" [class.fa-magnifying-glass]="!loading()"></i> 
           {{ loading() ? 'Consultando...' : 'Consultar Disponibilidad' }}
         </button>
       </div>
@@ -90,7 +89,9 @@
     </div>
     
     @if (availableRooms().length > 0) {
-      <div class="table-wrapper">
+      
+      <!-- 1. TABLA TRADICIONAL (Visible en Escritorio) -->
+      <div class="table-wrapper desktop-table">
         <table class="table">
           <thead>
             <tr>
@@ -116,9 +117,40 @@
           </tbody>
         </table>
       </div>
+
+      <!-- 2. VISTA DE TARJETAS (Visible en Dispositivos Móviles) -->
+      <div class="mobile-cards-container">
+        @for (room of availableRooms(); track room.id) {
+          <div class="mobile-room-card" (click)="selectRoomAndRedirect(room)">
+            <div class="mobile-card-top">
+              <div>
+                <span class="col-id subtitle">Habitación #{{ room.id }}</span>
+                <h4 class="mobile-room-num">Nro. #{{ room.number }}</h4>
+              </div>
+              <span class="badge badge-secondary">{{ room.roomTypeDTOResponse?.capacity || room.capacity || 0 }} pers.</span>
+            </div>
+
+            <div class="mobile-card-details">
+              <div class="mobile-card-row">
+                <span class="detail-label">Tipo:</span>
+                <span>{{ room.roomTypeDTOResponse?.name || room.roomTypeName || 'N/D' }}</span>
+              </div>
+              <div class="mobile-card-row">
+                <span class="detail-label">Precio por noche:</span>
+                <span>${{ getRoomPrice(room) | number:'1.2-2' }}</span>
+              </div>
+              <div class="mobile-card-row mobile-card-total-row">
+                <span class="detail-label">Total Est. ({{ calculateDays() }} noches):</span>
+                <strong class="room-number mobile-total-price">${{ calculateTotalPrice(room) | number:'1.2-2' }}</strong>
+              </div>
+            </div>
+          </div>
+        }
+      </div>
+
     } @else {
       <div class="alert alert-warning alert-center">
-        <i class="fa-solid fa-circle-exclamation"></i> No hay habitaciones disponibles para los criterios seleccionados.
+        No hay habitaciones disponibles para los criterios seleccionados.
       </div>
     }
   }

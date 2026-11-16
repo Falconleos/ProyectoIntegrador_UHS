@@ -1,0 +1,34 @@
+/* --- Ajustes específicos para formularios de edición/creación en móvil --- */
+@media (max-width: 768px) {
+  .container {
+    padding: 1rem;
+  }
+
+  .card-form {
+    padding: 1.25rem;
+  }
+
+  /* Asegura que los campos se apilen en una sola columna en pantallas móviles */
+  .form-grid {
+    grid-template-columns: 1fr;
+    gap: 0.875rem;
+  }
+  
+  .field.full-width {
+    grid-column: span 1;
+  }
+
+  /* Botones de acción apilados y con mayor área táctil en móviles */
+  .form-actions {
+    flex-direction: column-reverse;
+    gap: 0.75rem;
+    margin-top: 1.5rem;
+  }
+
+  .form-actions button,
+  .form-actions .btn-secondary {
+    width: 100%;
+    justify-content: center;
+    padding: 12px 16px;
+  }
+}

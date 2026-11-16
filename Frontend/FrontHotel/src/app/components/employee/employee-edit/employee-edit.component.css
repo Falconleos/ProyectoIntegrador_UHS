@@ -152,6 +152,10 @@
   gap: 6px;
 }
 
+.form-group.full-width {
+  grid-column: 1 / -1;
+}
+
 .form-group label {
   color: var(--color-text-muted);
   font-size: 0.75rem;
@@ -173,6 +177,11 @@
 
 .form-control:focus {
   border-color: var(--color-primary);
+}
+
+.file-input {
+  cursor: pointer;
+  padding: 8px;
 }
 
 /* --- Textos de error pequeños --- */

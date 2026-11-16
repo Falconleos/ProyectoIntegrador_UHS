@@ -1,6 +1,6 @@
 import { Component, ChangeDetectorRef, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
+import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../core/services/auth.service';
 import { finalize } from 'rxjs';
@@ -8,7 +8,7 @@ import { finalize } from 'rxjs';
 @Component({
   selector: 'app-register',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink],
+  imports: [CommonModule, ReactiveFormsModule, RouterLink],
   templateUrl: './register.component.html',
   styleUrls: ['./register.component.css']
 })
@@ -16,51 +16,51 @@ export class RegisterComponent {
   private authService = inject(AuthService);
   private router = inject(Router);
   private cdr = inject(ChangeDetectorRef);
+  private fb = inject(FormBuilder);
 
   errorMessage: string = '';
   loading: boolean = false;
+  selectedFile: File | undefined = undefined;
 
-  formData = {
-    username: '',
-    password: '',
-    name: '',
-    surname: '',
-    dni: '',
-    gender: '',
-    email: '',
-    phoneNumber: '',
-    address: '',
-    birthDay: '',
-    profilePictureFile: undefined as File | undefined
-  };
+  registerForm: FormGroup = this.fb.group({
+    username: ['', [Validators.required, Validators.minLength(3)]],
+    password: ['', [Validators.required]],
+    name: ['', [Validators.required]],
+    surname: ['', [Validators.required]],
+    dni: ['', [Validators.required]],
+    gender: [''],
+    email: ['', [Validators.required, Validators.email]],
+    phoneNumber: ['', [Validators.required]],
+    address: [''],
+    birthDay: ['']
+  });
 
   onFileSelected(event: any): void {
     const file: File = event.target.files[0];
     if (file) {
-      this.formData.profilePictureFile = file;
+      this.selectedFile = file;
     }
   }
 
   onSubmit(): void {
+    if (this.registerForm.invalid) {
+      this.registerForm.markAllAsTouched();
+      return;
+    }
+
     console.log('--- Intentando registrar ---');
-    console.log('Valores del formulario:', this.formData);
+    const formValues = this.registerForm.value;
+    console.log('Valores del formulario:', formValues);
 
     this.loading = true;
     this.errorMessage = '';
 
-    // Aseguramos que birthDay sea un string vacío si no se selecciona para cumplir con el tipo
     const payload = {
-      username: this.formData.username,
-      password: this.formData.password,
-      name: this.formData.name,
-      surname: this.formData.surname,
-      dni: this.formData.dni,
-      gender: this.formData.gender || '',
-      email: this.formData.email,
-      phoneNumber: this.formData.phoneNumber,
-      address: this.formData.address || '',
-      birthDay: this.formData.birthDay ? this.formData.birthDay : '',
-      profilePictureFile: this.formData.profilePictureFile
+      ...formValues,
+      gender: formValues.gender || '',
+      address: formValues.address || '',
+      birthDay: formValues.birthDay ? formValues.birthDay : '',
+      profilePictureFile: this.selectedFile
     };
 
     this.authService.register(payload as any).pipe(
@@ -76,7 +76,7 @@ export class RegisterComponent {
           localStorage.setItem('authToken', token);
         }
 
-        const username = this.formData.username;
+        const username = formValues.username;
         localStorage.setItem('username', username);
 
         try {

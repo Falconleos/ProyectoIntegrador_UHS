@@ -1,63 +1,66 @@
-<div class="room-form-container">
+<div class="container">
+  <!-- Encabezado -->
+  <div class="header-section">
+    <h2>
+      <i class="fa-solid fa-door-open icon-title"></i> Crear Nueva Habitación
+    </h2>
+    <p class="subtitle">Complete los datos de la habitación y seleccione el tipo y estado correspondiente.</p>
+  </div>
 
-  <!-- Título Principal -->
-  <h1>
-    <i class="bi bi-plus-square"></i> Crear nueva habitación
-  </h1>
+  <hr class="divider" />
 
   <!-- Mensaje de Error General -->
   @if (errorMessage()) {
-    <p class="error-message" role="alert">
-      <i class="bi bi-exclamation-triangle"></i> {{ errorMessage() }}
-    </p>
+    <div class="alert alert-danger">
+      <i class="fa-solid fa-triangle-exclamation icon-alert"></i> {{ errorMessage() }}
+    </div>
   }
 
-  <form [formGroup]="roomForm" (ngSubmit)="createRoom()">
+  <form [formGroup]="roomForm" (ngSubmit)="createRoom()" class="card-form">
 
     <!-- Número de habitación -->
-    <div class="form-group">
-      <label for="number">Número de habitación *</label>
-
+    <div class="field">
+      <label for="number" class="label">Número de habitación *</label>
       <input
         id="number"
         type="number"
         formControlName="number"
+        class="input-field"
         min="1"
         placeholder="Ej. 101"
       >
-
       @if (roomForm.controls.number.touched && roomForm.controls.number.hasError('required')) {
-        <p class="error-message">
-          <i class="bi bi-info-circle"></i> El número de habitación es obligatorio.
-        </p>
+        <span class="error-text">
+          <i class="fa-solid fa-circle-info icon-badge"></i> El número de habitación es obligatorio.
+        </span>
       }
-
       @if (roomForm.controls.number.touched && roomForm.controls.number.hasError('min')) {
-        <p class="error-message">
-          <i class="bi bi-info-circle"></i> El número debe ser mayor a 0.
-        </p>
+        <span class="error-text">
+          <i class="fa-solid fa-circle-info icon-badge"></i> El número debe ser mayor a 0.
+        </span>
       }
     </div>
 
     <!-- Tipo de habitación -->
-    <div class="form-group">
-      <label for="roomTypeId">Tipo de habitación *</label>
+    <div class="field">
+      <label for="roomTypeId" class="label">Tipo de habitación *</label>
 
       @if (loadingTypes()) {
-        <p class="loading-text">
-          <i class="bi bi-arrow-repeat spin"></i> Cargando tipos de habitación...
-        </p>
+        <div class="loading-box">
+          <i class="fa-solid fa-rotate spin icon-alert"></i> Cargando tipos de habitación...
+        </div>
       } @else {
         <select
           id="roomTypeId"
           formControlName="roomTypeId"
+          class="input-field"
         >
-          <option [ngValue]="0" disabled>
+          <option [value]="0" disabled>
             Seleccione un tipo de habitación
           </option>
 
           @for (type of roomTypes(); track type.id) {
-            <option [ngValue]="type.id">
+            <option [value]="type.id">
               {{ type.name }} (${{ type.pricePerNight }} - Cap. {{ type.capacity }})
             </option>
           }
@@ -65,19 +68,19 @@
       }
 
       @if (roomForm.controls.roomTypeId.touched && roomForm.controls.roomTypeId.invalid) {
-        <p class="error-message">
-          <i class="bi bi-info-circle"></i> Debe seleccionar un tipo de habitación.
-        </p>
+        <span class="error-text">
+          <i class="fa-solid fa-circle-info icon-badge"></i> Debe seleccionar un tipo de habitación.
+        </span>
       }
     </div>
 
     <!-- Estado -->
-    <div class="form-group">
-      <label for="state">Estado inicial *</label>
-
+    <div class="field">
+      <label for="state" class="label">Estado inicial *</label>
       <select
         id="state"
         formControlName="state"
+        class="input-field"
       >
         <option value="AVAILABLE">Disponible</option>
         <option value="OCCUPIED">Ocupada</option>
@@ -86,19 +89,19 @@
       </select>
 
       @if (roomForm.controls.state.touched && roomForm.controls.state.hasError('required')) {
-        <p class="error-message">
-          <i class="bi bi-info-circle"></i> Debe seleccionar un estado.
-        </p>
+        <span class="error-text">
+          <i class="fa-solid fa-circle-info icon-badge"></i> Debe seleccionar un estado.
+        </span>
       }
     </div>
 
     <!-- Imágenes con previsualización en miniatura -->
-    <div class="form-group">
-      <label for="images">Imágenes de la habitación (Opcional)</label>
-
+    <div class="field full-width">
+      <label for="images" class="label">Imágenes de la habitación (Opcional)</label>
       <input
         id="images"
         type="file"
+        class="input-field file-input"
         accept="image/*"
         multiple
         (change)="onImagesSelected($event)"
@@ -106,14 +109,14 @@
 
       @if (selectedImages().length > 0) {
         <p class="file-count-text">
-          <i class="bi bi-file-earmark-image"></i> Imágenes seleccionadas: {{ selectedImages().length }}
+          <i class="fa-solid fa-image icon-badge"></i> Imágenes seleccionadas: {{ selectedImages().length }}
         </p>
 
         <!-- Cuadrícula de miniaturas -->
         <div class="preview-images-grid">
           @for (previewUrl of imagePreviews(); track $index) {
             <div class="image-thumbnail-card">
-              <img [src]="previewUrl" alt="Vista previa de imagen">
+              <img [src]="previewUrl" alt="Vista previa de imagen" class="thumbnail-img">
             </div>
           }
         </div>
@@ -122,22 +125,22 @@
 
     <!-- Acciones -->
     <div class="form-actions">
-      <a routerLink="/dashboard/room-list">
+      <a routerLink="/dashboard/room-list" class="btn-secondary-action">
         Cancelar
       </a>
 
       <button
         type="submit"
+        class="btn-primary-action"
         [disabled]="roomForm.invalid || saving() || loadingTypes()"
       >
         @if (saving()) {
-          <i class="bi bi-arrow-repeat spin"></i> Guardando...
+          <i class="fa-solid fa-rotate spin icon-badge"></i> Guardando...
         } @else {
-          <i class="bi bi-check-lg"></i> Crear habitación
+          <i class="fa-solid fa-check icon-badge"></i> Crear habitación
         }
       </button>
     </div>
 
   </form>
-
 </div>

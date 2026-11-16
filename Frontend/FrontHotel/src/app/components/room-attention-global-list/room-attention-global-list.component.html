@@ -2,7 +2,7 @@
   <!-- Encabezado -->
   <div class="header-section">
     <h2>
-      <i class="fa-solid fa-bell-concierge" style="margin-right: 0.5rem;"></i> Servicio al Cuarto (Gestión Global)
+      <i class="fa-solid fa-bell-concierge icon-title"></i> Servicio al Cuarto (Gestión Global)
     </h2>
   </div>
 
@@ -11,23 +11,23 @@
   <!-- Mensaje de Error -->
   @if (errorMessage()) {
     <div class="alert alert-danger">
-      <i class="fa-solid fa-triangle-exclamation" style="margin-right: 0.5rem;"></i> {{ errorMessage() }}
+      <i class="fa-solid fa-triangle-exclamation icon-alert"></i> {{ errorMessage() }}
     </div>
   }
 
   <!-- Estado de Carga -->
   @if (loading()) {
     <div class="alert alert-info">
-      <i class="fa-solid fa-rotate spin" style="margin-right: 0.5rem;"></i> Cargando solicitudes de servicio al cuarto...
+      <i class="fa-solid fa-rotate spin icon-alert"></i> Cargando solicitudes de servicio al cuarto...
     </div>
   } @else {
     @if (attentions().length === 0) {
       <div class="alert alert-info">
-        <i class="fa-solid fa-circle-info" style="margin-right: 0.5rem;"></i> No hay solicitudes de servicio al cuarto registradas en el sistema.
+        <i class="fa-solid fa-circle-info icon-alert"></i> No hay solicitudes de servicio al cuarto registradas en el sistema.
       </div>
     } @else {
-      <!-- Contenedor con Estilo Glass para la Tabla -->
-      <div class="glass-table-container">
+      <!-- Contenedor con Estilo Glass para la Tabla (Visible en Escritorio) -->
+      <div class="glass-table-container desktop-only">
         <div class="table-responsive">
           <table class="table-glass">
             <thead>
@@ -40,7 +40,7 @@
                 <th>Registrado por</th>
                 <th>Fecha / Hora</th>
                 <th>Estado</th>
-                <th style="text-align: right;">Acciones</th>
+                <th class="th-actions">Acciones</th>
               </tr>
             </thead>
             <tbody>
@@ -48,15 +48,15 @@
                 <tr [class.row-pending]="!item.delivered" [class.row-delivered]="item.delivered">
                   <td><strong class="text-subtitle">#{{ item.id }}</strong></td>
                   <td>
-                    <div style="display: flex; flex-direction: column; gap: 0.25rem;">
-                      <span class="badge" style="background: rgba(129, 140, 248, 0.2); color: #818cf8; font-weight: 600;">
-                        <i class="fa-solid fa-door-open" style="margin-right: 0.25rem;"></i> Hab. {{ item.roomNumber || $any(item).bookingEntity?.room?.number || $any(item).room || 'N/A' }}
+                    <div class="room-cell-wrapper">
+                      <span class="badge badge-room">
+                        <i class="fa-solid fa-door-open icon-badge"></i> Hab. {{ item.roomNumber || $any(item).bookingEntity?.room?.number || $any(item).room || 'N/A' }}
                       </span>
-                      <span class="text-subtitle" style="font-size: 0.75rem;">Reserva #{{ item.bookingId }}</span>
+                      <span class="text-subtitle booking-id-text">Reserva #{{ item.bookingId }}</span>
                     </div>
                   </td>
                   <td>
-                    <div class="text-main" style="font-weight: 500;">
+                    <div class="text-main item-description">
                       {{ item.itemDTOResponse.description || 'Consumo #' + item.id }}
                     </div>
                   </td>
@@ -64,38 +64,38 @@
                     <span class="text-main">{{ item.quantity }}</span>
                   </td>
                   <td>
-                    <span class="text-main" style="font-weight: bold; color: #4ade80;">${{ item.subtotal | number:'1.2-2' }}</span>
+                    <span class="text-main subtotal-price">${{ item.subtotal | number:'1.2-2' }}</span>
                   </td>
                   <td>
-                    <span class="badge badge-secondary" style="font-size: 0.8rem;">
-                      <i class="fa-solid fa-user" style="margin-right: 0.25rem;"></i> {{ item.employeeUsername || 'Sistema' }}
+                    <span class="badge badge-secondary employee-badge">
+                      <i class="fa-solid fa-user icon-badge"></i> {{ item.employeeUsername || 'Sistema' }}
                     </span>
                   </td>
                   <td>
-                    <span class="text-subtitle" style="font-size: 0.85rem;">{{ item.createdAt || 'N/A' }}</span>
+                    <span class="text-subtitle date-text">{{ item.createdAt || 'N/A' }}</span>
                   </td>
                   <td>
                     @if (item.delivered) {
                       <span class="badge badge-success-glass">
-                        <i class="fa-solid fa-circle-check" style="margin-right: 0.25rem;"></i> Entregado
+                        <i class="fa-solid fa-circle-check icon-badge"></i> Entregado
                       </span>
                     } @else {
-                      <span class="badge badge-warning-glass" style="background: rgba(251, 191, 36, 0.2); color: #fbbf24;">
-                        <i class="fa-solid fa-clock" style="margin-right: 0.25rem;"></i> Pendiente
+                      <span class="badge badge-warning-glass">
+                        <i class="fa-solid fa-clock icon-badge"></i> Pendiente
                       </span>
                     }
                   </td>
                   
                   <!-- Acciones de Entregar / Eliminar -->
-                  <td style="text-align: right;">
-                    <div style="display: flex; justify-content: flex-end; gap: 0.5rem;">
+                  <td class="td-actions">
+                    <div class="action-buttons-wrapper">
                       @if (!item.delivered) {
                         <button 
                           type="button"
                           class="btn-secondary-action" 
                           [disabled]="deliveringId() === item.id"
                           (click)="markAsDelivered(item.id)">
-                          <i class="fa-solid fa-check-double" style="margin-right: 0.25rem;"></i> Entregar
+                          <i class="fa-solid fa-check-double icon-badge"></i> Entregar
                         </button>
                       }
                       <button 
@@ -103,7 +103,7 @@
                         class="btn-danger-action" 
                         [disabled]="deletingId() === item.id"
                         (click)="deleteAttention(item.id)">
-                          <i class="fa-solid fa-trash" style="margin-right: 0.25rem;"></i> Eliminar
+                          <i class="fa-solid fa-trash icon-badge"></i> Eliminar
                       </button>
                     </div>
                   </td>
@@ -113,13 +113,71 @@
           </table>
         </div>
       </div>
+
+      <!-- Contenedor de Tarjetas (Visible en Móvil) -->
+      <div class="service-mobile-cards mobile-only">
+        @for (item of attentions(); track item.id) {
+          <div class="service-mobile-card" [class.card-pending]="!item.delivered" [class.card-delivered]="item.delivered">
+            <div class="mobile-card-header">
+              <span class="badge badge-room">
+                <i class="fa-solid fa-door-open icon-badge"></i> Hab. {{ item.roomNumber || $any(item).bookingEntity?.room?.number || $any(item).room || 'N/A' }}
+              </span>
+              @if (item.delivered) {
+                <span class="badge badge-success-glass">
+                  <i class="fa-solid fa-circle-check icon-badge"></i> Entregado
+                </span>
+              } @else {
+                <span class="badge badge-warning-glass">
+                  <i class="fa-solid fa-clock icon-badge"></i> Pendiente
+                </span>
+              }
+            </div>
+
+            <div class="mobile-card-body">
+              <div class="service-title-row">
+                <strong class="text-subtitle">#{{ item.id }}</strong>
+                <h5 class="text-main item-description text-zero-margin">
+                  {{ item.itemDTOResponse.description || 'Consumo #' + item.id }}
+                </h5>
+              </div>
+
+              <div class="mobile-info-grid">
+                <p><strong>Reserva:</strong> <span class="text-subtitle">#{{ item.bookingId }}</span></p>
+                <p><strong>Cantidad:</strong> <span class="text-main">{{ item.quantity }}</span></p>
+                <p><strong>Subtotal:</strong> <span class="subtotal-price">${{ item.subtotal | number:'1.2-2' }}</span></p>
+                <p><strong>Registrado por:</strong> <span class="text-subtitle">{{ item.employeeUsername || 'Sistema' }}</span></p>
+                <p class="full-width"><strong>Fecha/Hora:</strong> <span class="text-subtitle">{{ item.createdAt || 'N/A' }}</span></p>
+              </div>
+            </div>
+
+            <div class="mobile-card-actions">
+              @if (!item.delivered) {
+                <button 
+                  type="button"
+                  class="btn-secondary-action" 
+                  [disabled]="deliveringId() === item.id"
+                  (click)="markAsDelivered(item.id)">
+                  <i class="fa-solid fa-check-double icon-badge"></i> Entregar
+                </button>
+              }
+              <button 
+                type="button"
+                class="btn-danger-action" 
+                [disabled]="deletingId() === item.id"
+                (click)="deleteAttention(item.id)">
+                  <i class="fa-solid fa-trash icon-badge"></i> Eliminar
+              </button>
+            </div>
+          </div>
+        }
+      </div>
     }
   }
 
   <!-- Botón Volver -->
-  <div style="margin-top: 1.5rem;">
+  <div class="back-button-container">
     <a routerLink="/dashboard" class="btn-secondary-action">
-      <i class="fa-solid fa-arrow-left" style="margin-right: 0.25rem;"></i> Volver al Inicio
+      <i class="fa-solid fa-arrow-left icon-badge"></i> Volver al Inicio
     </a>
   </div>
 </div>

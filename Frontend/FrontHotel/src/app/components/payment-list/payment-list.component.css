@@ -19,6 +19,14 @@
   margin-bottom: 0.5rem;
 }
 
+.icon-title {
+  margin-right: 0.5rem;
+}
+
+.icon-margin {
+  margin-right: 0.5rem;
+}
+
 .subtitle {
   font-size: var(--font-size-sm);
   color: var(--color-text-muted);
@@ -67,6 +75,19 @@
   background: rgba(255, 255, 255, 0.02);
 }
 
+/* Clases auxiliares para alineación de columnas */
+.col-first {
+  padding-left: 16px;
+}
+
+.col-end {
+  text-align: right;
+}
+
+.col-last {
+  padding-right: 16px;
+}
+
 /* Insignias y destacados */
 .badge {
   display: inline-flex;
@@ -93,6 +114,8 @@
   border-radius: var(--radius-sm);
   font-size: var(--font-size-sm);
   margin-bottom: 1.5rem;
+  display: flex;
+  align-items: center;
 }
 
 .alert-info {
@@ -111,4 +134,14 @@
   background: rgba(245, 158, 11, 0.15);
   border: 1px solid rgba(245, 158, 11, 0.3);
   color: #fde68a;
+}
+
+/* Animación de carga para iconos rotatorios */
+.spin {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
 }

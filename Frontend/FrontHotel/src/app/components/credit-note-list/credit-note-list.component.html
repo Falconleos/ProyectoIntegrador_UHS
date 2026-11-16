@@ -10,11 +10,11 @@
   <!-- Alertas de Carga o Error -->
   @if (loading()) {
     <div class="alert alert-info">
-      <i class="bi bi-arrow-repeat spin"></i> Cargando notas de crédito...
+      <span class="spin icon-margin"></span> Cargando notas de crédito...
     </div>
   } @else if (errorMessage()) {
-    <div class="alert alert-danger">
-      <i class="bi bi-exclamation-triangle"></i> {{ errorMessage() }}
+    <div class="alert alert-danger" role="alert">
+      {{ errorMessage() }}
     </div>
   } @else {
     @if (creditNotes().length > 0) {
@@ -84,7 +84,7 @@
         <div class="modal-header">
           <h3>Detalle de Nota de Crédito #{{ selectedCreditNote()?.id }}</h3>
           <button type="button" class="btn-close-modal" (click)="closeModal()">
-            <i class="bi bi-x-lg"></i>
+            ✕
           </button>
         </div>
 
@@ -94,11 +94,11 @@
         <div class="modal-body">
           @if (loadingDetail()) {
             <div class="alert alert-info">
-              <i class="bi bi-arrow-repeat spin"></i> Cargando detalles...
+              <span class="spin icon-margin"></span> Cargando detalles...
             </div>
           } @else if (detailError()) {
-            <div class="alert alert-danger">
-              <i class="bi bi-exclamation-triangle"></i> {{ detailError() }}
+            <div class="alert alert-danger" role="alert">
+              {{ detailError() }}
             </div>
           } @else if (selectedCreditNote()) {
             <div class="detail-content-grid">

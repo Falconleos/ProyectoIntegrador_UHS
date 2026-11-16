@@ -2,10 +2,10 @@
   <!-- Encabezado -->
   <div class="header-section">
     <h2>
-      <i class="bi bi-box-seam"></i> Productos y Servicios
+      <i class="fa-solid fa-boxes-stacked icon-title"></i> Productos y Servicios
     </h2>
     <a routerLink="/dashboard/item-create" class="btn-primary-action">
-      <i class="bi bi-plus-lg"></i> Agregar ítem
+      <i class="fa-solid fa-plus icon-margin"></i> Agregar ítem
     </a>
   </div>
 
@@ -14,19 +14,19 @@
   <!-- Mensaje de Error -->
   @if (errorMessage()) {
     <div class="alert alert-danger">
-      <i class="bi bi-exclamation-triangle"></i> {{ errorMessage() }}
+      <i class="fa-solid fa-triangle-exclamation icon-margin"></i> {{ errorMessage() }}
     </div>
   }
 
   <!-- Estado de Carga -->
   @if (loading()) {
     <div class="alert alert-info">
-      <i class="bi bi-arrow-repeat spin"></i> Cargando productos y servicios...
+      <i class="fa-solid fa-rotate spin icon-margin"></i> Cargando productos y servicios...
     </div>
   } @else {
     @if (items().length === 0) {
       <div class="alert alert-info">
-        <i class="bi bi-info-circle"></i> No hay productos ni servicios registrados.
+        <i class="fa-solid fa-circle-info icon-margin"></i> No hay productos ni servicios registrados.
       </div>
     } @else {
       <!-- Grilla de Tarjetas -->
@@ -39,7 +39,7 @@
                 <img [src]="item.imageUrl" [alt]="item.description" class="item-img" />
               } @else {
                 <div class="item-no-image">
-                  <i class="bi bi-image"></i>
+                  <i class="fa-solid fa-image"></i>
                   <span>Sin imagen</span>
                 </div>
               }
@@ -71,7 +71,7 @@
               <!-- Acciones -->
               <div class="item-actions">
                 <a [routerLink]="['/dashboard/item-edit', item.id]" class="btn-secondary-action">
-                  <i class="bi bi-pencil"></i> Editar
+                  <i class="fa-solid fa-pen icon-margin"></i> Editar
                 </a>
 
                 <button
@@ -81,9 +81,9 @@
                   (click)="deleteItem(item.id)"
                 >
                   @if (deletingId() === item.id) {
-                    <i class="bi bi-arrow-repeat spin"></i> Eliminando...
+                    <i class="fa-solid fa-rotate spin icon-margin"></i> Eliminando...
                   } @else {
-                    <i class="bi bi-trash"></i> Eliminar
+                    <i class="fa-solid fa-trash icon-margin"></i> Eliminar
                   }
                 </button>
               </div>

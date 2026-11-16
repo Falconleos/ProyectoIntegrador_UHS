@@ -1,5 +1,3 @@
-@import "bootstrap-icons/font/bootstrap-icons.css";
-
 .container {
   max-width: 1300px;
   margin: 2.5rem auto;
@@ -31,6 +29,14 @@
 
 .header-section h2 i {
   color: var(--color-primary);
+}
+
+.icon-title {
+  margin-right: 0.5rem;
+}
+
+.icon-margin {
+  margin-right: 0.4rem;
 }
 
 .subtitle {

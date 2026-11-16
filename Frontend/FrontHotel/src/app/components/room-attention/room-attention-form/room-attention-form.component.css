@@ -1,6 +1,6 @@
 .room-attention-form {
   max-width: 600px;
-  margin: 2rem auto;
+  margin: 2.5rem auto;
   padding: 2.5rem;
   background: var(--bg-secondary);
   backdrop-filter: var(--backdrop-blur);
@@ -9,18 +9,18 @@
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-main);
   color: var(--color-text-main);
-  font-family: var(--font-family);
+  box-sizing: border-box;
 }
 
 .room-attention-form h2 {
-  font-size: var(--font-size-title-fluid);
-  font-weight: 600;
+  font-size: var(--font-size-lg);
+  font-weight: 700;
   color: var(--color-text-main);
   margin-bottom: 0.5rem;
-  letter-spacing: -0.025em;
 }
 
-.room-attention-form p {
+.room-attention-form > p,
+.subtitle {
   color: var(--color-text-muted);
   font-size: var(--font-size-sm);
   margin-bottom: 1.5rem;
@@ -28,7 +28,7 @@
 
 /* Alertas */
 .alert {
-  padding: 1rem;
+  padding: 0.85rem 1.15rem;
   border-radius: var(--radius-sm);
   margin-bottom: 1.5rem;
   font-size: var(--font-size-sm);
@@ -43,34 +43,36 @@
 /* Grupos de formularios */
 .form-group {
   margin-bottom: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
 }
 
-.form-group label {
+.form-label {
   display: block;
   font-size: var(--font-size-sm);
-  font-weight: 500;
+  font-weight: 600;
   color: var(--color-text-main);
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.35rem;
 }
 
-.form-group select,
-.form-group input {
+.form-control,
+select.form-control {
   width: 100%;
-  padding: 0.75rem 1rem;
-  background-color: var(--bg-input-icon);
+  padding: 12px 14px;
+  background: var(--bg-secondary);
   border: var(--border-input);
   border-radius: var(--radius-sm);
   color: var(--color-text-main);
-  font-size: var(--font-size-md);
-  font-family: var(--font-family);
-  transition: all 0.2s ease-in-out;
+  font-size: var(--font-size-sm);
   outline: none;
+  transition: border-color 0.2s;
+  appearance: auto;
+  box-sizing: border-box;
 }
 
-.form-group select:focus,
-.form-group input:focus {
+.form-control:focus {
   border-color: var(--color-primary);
-  box-shadow: 0 0 0 3px rgba(129, 140, 248, 0.15);
 }
 
 /* Textos de error pequeños */
@@ -83,22 +85,27 @@
 
 /* Caja de Subtotal Estimado */
 .subtotal-info {
-  background: rgba(2, 6, 23, 0.4);
+  background: rgba(2, 6, 23, 0.5);
   border: var(--border-input);
   border-radius: var(--radius-sm);
   padding: 1.25rem;
   margin-bottom: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
 }
 
 .subtotal-info p {
-  margin-bottom: 0.5rem;
+  margin-bottom: 0;
   color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
 }
 
-.subtotal-info p:last-child {
-  margin-bottom: 0;
-  font-size: var(--font-size-md);
-  color: var(--color-text-main);
+.subtotal-highlight {
+  font-size: 1rem !important;
+  font-weight: 700;
+  color: #4ade80 !important;
+  margin-top: 0.25rem;
 }
 
 /* Acciones y Botón de Envío */
@@ -106,28 +113,41 @@
   margin-top: 2rem;
 }
 
-.form-actions button {
+.w-100 {
   width: 100%;
-  padding: 0.875rem 1.5rem;
-  background-color: var(--color-primary);
-  color: #0f172a;
-  font-weight: 600;
-  font-size: var(--font-size-md);
-  font-family: var(--font-family);
+}
+
+.btn-primary {
+  background: var(--color-primary);
+  color: #000;
   border: none;
+  padding: 12px 16px;
   border-radius: var(--radius-sm);
+  font-weight: 600;
   cursor: pointer;
-  transition: all 0.2s ease-in-out;
-  box-shadow: 0 4px 12px rgba(129, 140, 248, 0.25);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  transition: opacity 0.2s;
+  font-size: var(--font-size-sm);
 }
 
-.form-actions button:hover:not(:disabled) {
-  background-color: var(--color-primary-hover);
-  transform: translateY(-1px);
+.btn-primary:hover:not(:disabled) {
+  opacity: 0.9;
 }
 
-.form-actions button:disabled {
+.btn-primary:disabled {
   opacity: 0.5;
   cursor: not-allowed;
-  box-shadow: none;
+}
+
+/* ========================================================
+    RESPONSIVIDAD MÓVIL
+   ======================================================== */
+@media (max-width: 768px) {
+  .room-attention-form {
+    padding: 1.25rem;
+    margin: 1rem auto;
+  }
 }

@@ -2,12 +2,12 @@
   <!-- Encabezado -->
   <div class="header-section">
     <h2>
-      <i class="bi bi-chat-square-text icon-title"></i> Listado de Comentarios
+      Listado de Comentarios
     </h2>
     
     @if (canCreate()) {
       <a routerLink="/dashboard/comment-create" class="btn-primary-action">
-        <i class="bi bi-plus-lg icon-margin"></i> Nuevo comentario
+        Nuevo comentario
       </a>
     }
   </div>
@@ -16,20 +16,20 @@
 
   <!-- Mensaje de Error -->
   @if (errorMessage()) {
-    <div class="alert alert-danger">
-      <i class="bi bi-exclamation-triangle icon-margin"></i> {{ errorMessage() }}
+    <div class="alert alert-danger" role="alert">
+      {{ errorMessage() }}
     </div>
   }
 
   <!-- Estado de Carga -->
   @if (loading()) {
     <div class="alert alert-info">
-      <i class="bi bi-arrow-repeat spin icon-margin"></i> Cargando comentarios...
+      <span class="spin icon-margin"></span> Cargando comentarios...
     </div>
   } @else {
     @if (comments().length === 0) {
       <div class="alert alert-info">
-        <i class="bi bi-info-circle icon-margin"></i> No hay comentarios disponibles.
+        No hay comentarios disponibles.
       </div>
     } @else {
       <!-- Grilla de Tarjetas de Comentarios -->
@@ -47,7 +47,7 @@
                        class="avatar-img" />
                 } @else {
                   <div class="avatar-placeholder">
-                    <i class="bi bi-person-fill"></i>
+                    <span>👤</span>
                   </div>
                 }
               </div>
@@ -60,7 +60,7 @@
               <!-- Valoración con Estrellas -->
               <div class="comment-rating" [title]="'Valoración: ' + comment.rating + ' de 5'">
                 @for (star of [1, 2, 3, 4, 5]; track star) {
-                  <i class="bi" [class.bi-star-fill]="star <= comment.rating" [class.bi-star]="star > comment.rating"></i>
+                  <span>{{ star <= comment.rating ? '★' : '☆' }}</span>
                 }
               </div>
             </div>
@@ -96,7 +96,7 @@
             <!-- Pie de tarjeta (Fecha y Acciones) -->
             <div class="comment-footer">
               <span class="comment-date">
-                <i class="bi bi-clock icon-margin"></i> {{ comment.createdAt }}
+                {{ comment.createdAt | date:'dd/MM/yyyy HH:mm' }}
               </span>
 
               <div class="comment-actions">
@@ -108,9 +108,9 @@
                     (click)="deleteComment(comment.id)"
                   >
                     @if (deletingId() === comment.id) {
-                      <i class="bi bi-arrow-repeat spin icon-margin"></i> Eliminando...
+                      <span class="spin icon-margin"></span> Eliminando...
                     } @else {
-                      <i class="bi bi-trash icon-margin"></i> Eliminar
+                      Eliminar
                     }
                   </button>
                 }

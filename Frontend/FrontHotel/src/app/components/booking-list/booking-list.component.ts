@@ -158,6 +158,9 @@ export class BookingListComponent implements OnInit {
           ? allBookings 
           : allBookings.filter((b) => b.state === 'PENDING' || b.state === 'CONFIRMED' || b.state === 'NO_SHOW');
         
+        // Ordenar de más reciente a más antigua (por ID descendente)
+        filtered.sort((a, b) => b.id - a.id);
+
         this.bookings.set(filtered);
         this.loading.set(false);
 

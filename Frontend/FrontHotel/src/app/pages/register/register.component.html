@@ -9,8 +9,8 @@
       </div>
     }
 
-    <!-- Agregamos #registerForm="ngForm" para rastrear el estado -->
-    <form (ngSubmit)="onSubmit()" #registerForm="ngForm">
+    <!-- Vinculamos el FormGroup reactivo -->
+    <form [formGroup]="registerForm" (ngSubmit)="onSubmit()">
       
       <!-- Sección de Datos de Cuenta -->
       <h4 class="section-title">Datos de la Cuenta</h4>
@@ -20,11 +20,7 @@
           <input 
             id="username"
             type="text" 
-            name="username"
-            [(ngModel)]="formData.username"
-            required
-            minlength="3"
-            #username="ngModel"
+            formControlName="username"
             placeholder="usuario123" 
           />
         </div>
@@ -33,10 +29,7 @@
           <input 
             id="password"
             type="password" 
-            name="password"
-            [(ngModel)]="formData.password"
-            required
-            #password="ngModel"
+            formControlName="password"
             placeholder="••••••••" 
           />
         </div>
@@ -50,10 +43,7 @@
           <input 
             id="name"
             type="text" 
-            name="name"
-            [(ngModel)]="formData.name"
-            required
-            #name="ngModel"
+            formControlName="name"
             placeholder="Juan" 
           />
         </div>
@@ -62,10 +52,7 @@
           <input 
             id="surname"
             type="text" 
-            name="surname"
-            [(ngModel)]="formData.surname"
-            required
-            #surname="ngModel"
+            formControlName="surname"
             placeholder="Pérez" 
           />
         </div>
@@ -77,16 +64,13 @@
           <input 
             id="dni"
             type="text" 
-            name="dni"
-            [(ngModel)]="formData.dni"
-            required
-            #dni="ngModel"
+            formControlName="dni"
             placeholder="12345678" 
           />
         </div>
         <div class="form-group">
           <label for="gender">Género</label>
-          <select id="gender" name="gender" [(ngModel)]="formData.gender">
+          <select id="gender" formControlName="gender">
             <option value="">Seleccione género</option>
             <option value="MASCULINO">Masculino</option>
             <option value="FEMENINO">Femenino</option>
@@ -103,11 +87,7 @@
           <input 
             id="email"
             type="email" 
-            name="email"
-            [(ngModel)]="formData.email"
-            required
-            email
-            #email="ngModel"
+            formControlName="email"
             placeholder="correo@example.com" 
           />
         </div>
@@ -116,10 +96,7 @@
           <input 
             id="phoneNumber"
             type="text" 
-            name="phoneNumber"
-            [(ngModel)]="formData.phoneNumber"
-            required
-            #phoneNumber="ngModel"
+            formControlName="phoneNumber"
             placeholder="+54 9 11..." 
           />
         </div>
@@ -131,8 +108,7 @@
           <input 
             id="address"
             type="text" 
-            name="address"
-            [(ngModel)]="formData.address"
+            formControlName="address"
             placeholder="Calle Falsa 123" 
           />
         </div>
@@ -141,8 +117,7 @@
           <input 
             id="birthDay"
             type="date" 
-            name="birthDay"
-            [(ngModel)]="formData.birthDay"
+            formControlName="birthDay"
           />
         </div>
       </div>

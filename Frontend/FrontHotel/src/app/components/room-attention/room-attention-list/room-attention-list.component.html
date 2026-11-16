@@ -2,7 +2,7 @@
   <!-- Encabezado -->
   <div class="header-section">
     <h2>
-      <i class="fa-solid fa-basket-shopping" style="margin-right: 0.5rem;"></i> Consumos y Servicios de la Reserva
+      <i class="fa-solid fa-basket-shopping icon-title"></i> Consumos y Servicios de la Reserva
     </h2>
     
     <!-- Botón visible para Admin, Recepción y Huéspedes -->
@@ -10,7 +10,7 @@
       type="button"
       class="btn-primary-action" 
       [routerLink]="['/dashboard/bookings', bookingId(), 'agregar-servicio']">
-      <i class="fa-solid fa-plus" style="margin-right: 0.25rem;"></i> Agregar Consumo
+      <i class="fa-solid fa-plus icon-badge"></i> Agregar Consumo
     </button>
   </div>
 
@@ -19,23 +19,23 @@
   <!-- Mensaje de Error -->
   @if (errorMessage()) {
     <div class="alert alert-danger">
-      <i class="fa-solid fa-triangle-exclamation" style="margin-right: 0.5rem;"></i> {{ errorMessage() }}
+      <i class="fa-solid fa-triangle-exclamation icon-alert"></i> {{ errorMessage() }}
     </div>
   }
 
   <!-- Estado de Carga -->
   @if (loading()) {
     <div class="alert alert-info">
-      <i class="fa-solid fa-rotate spin" style="margin-right: 0.5rem;"></i> Cargando consumos...
+      <i class="fa-solid fa-rotate spin icon-alert"></i> Cargando consumos...
     </div>
   } @else {
     @if (attentions().length === 0) {
       <div class="alert alert-info">
-        <i class="fa-solid fa-circle-info" style="margin-right: 0.5rem;"></i> No hay consumos ni servicios registrados para esta reserva.
+        <i class="fa-solid fa-circle-info icon-alert"></i> No hay consumos ni servicios registrados para esta reserva.
       </div>
     } @else {
-      <!-- Contenedor con Estilo Glass para la Tabla -->
-      <div class="glass-table-container">
+      <!-- Contenedor Tabla (Visible en Escritorio) -->
+      <div class="glass-table-container desktop-only">
         <div class="table-responsive">
           <table class="table-glass">
             <thead>
@@ -48,7 +48,7 @@
                 <th>Registrado por</th>
                 <th>Estado</th>
                 @if (canModify()) {
-                  <th style="text-align: right;">Acciones</th>
+                  <th class="th-actions">Acciones</th>
                 }
               </tr>
             </thead>
@@ -57,7 +57,7 @@
                 <tr>
                   <td><strong class="text-subtitle">#{{ item.id }}</strong></td>
                   <td>
-                    <div class="text-main" style="font-weight: 500;">
+                    <div class="text-main item-description">
                       {{ item.itemDTOResponse.description || $any(item).description || 'Consumo #' + item.id }}
                     </div>
                   </td>
@@ -68,36 +68,35 @@
                     <span class="text-main">${{ item.unitPrice | number:'1.2-2' }}</span>
                   </td>
                   <td>
-                    <span class="text-main" style="font-weight: bold; color: #4ade80;">${{ item.subtotal | number:'1.2-2' }}</span>
+                    <span class="text-main subtotal-price">${{ item.subtotal | number:'1.2-2' }}</span>
                   </td>
                   <td>
-                    <span class="badge badge-secondary" style="font-size: 0.8rem;">
-                      <i class="fa-solid fa-user" style="margin-right: 0.25rem;"></i> {{ item.employeeUsername || 'Sistema' }}
+                    <span class="badge badge-secondary employee-badge">
+                      <i class="fa-solid fa-user icon-badge"></i> {{ item.employeeUsername || 'Sistema' }}
                     </span>
                   </td>
                   <td>
                     @if (item.delivered) {
                       <span class="badge badge-success-glass">
-                        <i class="fa-solid fa-circle-check" style="margin-right: 0.25rem;"></i> Entregado
+                        <i class="fa-solid fa-circle-check icon-badge"></i> Entregado
                       </span>
                     } @else {
                       <span class="badge badge-warning-glass">
-                        <i class="fa-solid fa-clock" style="margin-right: 0.25rem;"></i> Pendiente
+                        <i class="fa-solid fa-clock icon-badge"></i> Pendiente
                       </span>
                     }
                   </td>
                   
-                  <!-- Acciones restringidas exclusivamente al Staff (Admin / Recepción) -->
                   @if (canModify()) {
-                    <td style="text-align: right;">
-                      <div style="display: flex; justify-content: flex-end; gap: 0.5rem;">
+                    <td class="td-actions">
+                      <div class="action-buttons-wrapper">
                         @if (!item.delivered) {
                           <button 
                             type="button"
                             class="btn-secondary-action" 
                             [disabled]="deliveringId() === item.id"
                             (click)="markAsDelivered(item.id)">
-                            <i class="fa-solid fa-check-double" style="margin-right: 0.25rem;"></i> Entregar
+                            <i class="fa-solid fa-check-double icon-badge"></i> Entregar
                           </button>
                         }
                         <button 
@@ -105,7 +104,7 @@
                           class="btn-danger-action" 
                           [disabled]="deletingId() === item.id"
                           (click)="deleteAttention(item.id)">
-                            <i class="fa-solid fa-trash" style="margin-right: 0.25rem;"></i> Eliminar
+                          <i class="fa-solid fa-trash icon-badge"></i> Eliminar
                         </button>
                       </div>
                     </td>
@@ -117,17 +116,70 @@
         </div>
       </div>
 
+      <!-- Contenedor Cards (Visible en Móvil) -->
+      <div class="consumptions-mobile-cards mobile-only">
+        @for (item of attentions(); track item.id) {
+          <div class="consumption-mobile-card">
+            <div class="mobile-card-header">
+              <span class="badge badge-secondary"><strong class="text-subtitle">#{{ item.id }}</strong></span>
+              @if (item.delivered) {
+                <span class="badge badge-success-glass">
+                  <i class="fa-solid fa-circle-check icon-badge"></i> Entregado
+                </span>
+              } @else {
+                <span class="badge badge-warning-glass">
+                  <i class="fa-solid fa-clock icon-badge"></i> Pendiente
+                </span>
+              }
+            </div>
+
+            <div class="mobile-card-body">
+              <h5 class="text-main item-description">
+                {{ item.itemDTOResponse.description || $any(item).description || 'Consumo #' + item.id }}
+              </h5>
+              <div class="mobile-info-grid">
+                <p><strong>Cantidad:</strong> <span class="text-main">{{ item.quantity }}</span></p>
+                <p><strong>P. Unitario:</strong> <span class="text-main">${{ item.unitPrice | number:'1.2-2' }}</span></p>
+                <p><strong>Subtotal:</strong> <span class="text-main subtotal-price">${{ item.subtotal | number:'1.2-2' }}</span></p>
+                <p><strong>Registrado por:</strong> <span class="text-subtitle">{{ item.employeeUsername || 'Sistema' }}</span></p>
+              </div>
+            </div>
+
+            @if (canModify()) {
+              <div class="mobile-card-actions">
+                @if (!item.delivered) {
+                  <button 
+                    type="button"
+                    class="btn-secondary-action" 
+                    [disabled]="deliveringId() === item.id"
+                    (click)="markAsDelivered(item.id)">
+                    <i class="fa-solid fa-check-double icon-badge"></i> Entregar
+                  </button>
+                }
+                <button 
+                  type="button"
+                  class="btn-danger-action" 
+                  [disabled]="deletingId() === item.id"
+                  (click)="deleteAttention(item.id)">
+                  <i class="fa-solid fa-trash icon-badge"></i> Eliminar
+                </button>
+              </div>
+            }
+          </div>
+        }
+      </div>
+
       <!-- Resumen de Total -->
-      <div class="total-section" style="margin-top: 1.5rem; text-align: right;">
-        <h3 style="font-size: 1.2rem; color: var(--color-text-main);">Total consumos: <span style="color: #4ade80; font-weight: bold;">${{ total() | number:'1.2-2' }}</span></h3>
+      <div class="total-section">
+        <h3 class="total-title">Total consumos: <span class="total-amount">${{ total() | number:'1.2-2' }}</span></h3>
       </div>
     }
   }
 
   <!-- Botón Volver -->
-  <div style="margin-top: 1.5rem;">
+  <div class="back-button-container">
     <a routerLink="/dashboard/check-in-list" class="btn-secondary-action">
-      <i class="fa-solid fa-arrow-left" style="margin-right: 0.25rem;"></i> Volver a Check-ins
+      <i class="fa-solid fa-arrow-left icon-badge"></i> Volver a Check-ins
     </a>
   </div>
 </div>

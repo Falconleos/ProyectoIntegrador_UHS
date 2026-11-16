@@ -2,7 +2,6 @@
   <!-- Encabezado dinámico -->
   <div class="header-section">
     <h2>
-      <i class="bi icon-title" [class.bi-pencil-square]="isEditMode()" [class.bi-chat-left-text]="!isEditMode()"></i> 
       {{ isEditMode() ? 'Editar Comentario' : 'Nuevo Comentario' }}
     </h2>
   </div>
@@ -11,15 +10,15 @@
 
   <!-- Mensaje de Error General -->
   @if (errorMessage()) {
-    <div class="alert alert-danger">
-      <i class="bi bi-exclamation-triangle icon-margin"></i> {{ errorMessage() }}
+    <div class="alert alert-danger" role="alert">
+      {{ errorMessage() }}
     </div>
   }
 
   <!-- Estado de Carga -->
   @if (loading()) {
     <div class="alert alert-info">
-      <i class="bi bi-arrow-repeat spin icon-margin"></i> Cargando comentario...
+      <span class="spin icon-margin"></span> Cargando comentario...
     </div>
   } @else {
     <form [formGroup]="commentForm" (ngSubmit)="saveComment()" class="form-grid">
@@ -28,7 +27,6 @@
       <div class="form-group">
         <label class="form-label" for="content">Comentario *</label>
         <div class="input-wrapper textarea-wrapper">
-          <span class="input-icon-prefix textarea-icon"><i class="bi bi-chat-text"></i></span>
           <textarea
             id="content"
             class="form-control"
@@ -56,7 +54,6 @@
       <div class="form-group">
         <label class="form-label" for="rating">Valoración (1 a 5) *</label>
         <div class="input-wrapper">
-          <span class="input-icon-prefix"><i class="bi bi-star-fill rating-star-icon"></i></span>
           <input
             id="rating"
             type="number"
@@ -90,11 +87,11 @@
           [disabled]="saving() || loading() || commentForm.invalid"
         >
           @if (saving()) {
-            <i class="bi bi-arrow-repeat spin icon-margin"></i> Guardando...
+            <span class="spin icon-margin"></span> Guardando...
           } @else if (isEditMode()) {
-            <i class="bi bi-check-lg icon-margin"></i> Actualizar comentario
+            Actualizar comentario
           } @else {
-            <i class="bi bi-check-lg icon-margin"></i> Crear comentario
+            Crear comentario
           }
         </button>
 

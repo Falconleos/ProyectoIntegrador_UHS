@@ -169,6 +169,6 @@ export class CommentFormComponent implements OnInit {
 
   // Volver al listado
   goBack(): void {
-    this.router.navigate(['/dashboard/comments']);
+    this.router.navigate(['/dashboard/comment-list']);
   }
 }

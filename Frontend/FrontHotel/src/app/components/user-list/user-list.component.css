@@ -1,5 +1,5 @@
 /* --- Contenedor Principal --- */
-.container {
+.user-management-container {
   width: 100%;
   max-width: 1200px;
   margin: 0 auto;
@@ -34,8 +34,8 @@
   margin-bottom: 1.5rem;
 }
 
-/* --- Alertas --- */
-.alert {
+/* --- Notificaciones / Alertas --- */
+.notification-box {
   padding: 12px 16px;
   border-radius: var(--radius-sm);
   font-size: var(--font-size-xs);
@@ -45,26 +45,26 @@
   gap: 10px;
 }
 
-.alert-info {
+.notification-info {
   background: rgba(129, 140, 248, 0.15);
   border: 1px solid rgba(129, 140, 248, 0.3);
   color: var(--color-primary);
 }
 
-.alert-danger {
+.notification-danger {
   background: rgba(239, 68, 68, 0.15);
   border: 1px solid rgba(239, 68, 68, 0.3);
   color: #fca5a5;
 }
 
-.alert-warning {
+.notification-warning {
   background: rgba(245, 158, 11, 0.15);
   border: 1px solid rgba(245, 158, 11, 0.3);
   color: #fcd34d;
 }
 
-/* --- Tabla de Datos --- */
-.table-wrapper {
+/* --- Tabla de Datos Glassmorphism --- */
+.glass-table-wrapper {
   background: var(--bg-secondary);
   backdrop-filter: var(--backdrop-blur);
   border-radius: var(--radius-lg);
@@ -73,7 +73,7 @@
   overflow-x: auto;
 }
 
-.table {
+.glass-table {
   width: 100%;
   border-collapse: collapse;
   text-align: left;
@@ -81,7 +81,7 @@
   color: var(--color-text-main);
 }
 
-.table th {
+.glass-table th {
   background: rgba(15, 23, 42, 0.8);
   color: var(--color-text-muted);
   font-weight: 600;
@@ -90,7 +90,7 @@
   white-space: nowrap;
 }
 
-.table td {
+.glass-table td {
   padding: 12px 16px;
   border-bottom: var(--border-glass);
   vertical-align: middle;
@@ -212,8 +212,8 @@
   font-weight: 500;
 }
 
-/* --- Badges --- */
-.badge {
+/* --- Badges de Estado --- */
+.status-badge {
   display: inline-block;
   padding: 3px 8px;
   border-radius: var(--radius-sm);
@@ -315,5 +315,106 @@
   
   .detail-grid {
     grid-template-columns: 1fr;
+  }
+}
+
+/* --- Estilos Responsivos para Listado Móvil --- */
+
+/* Por defecto, las tarjetas móviles están ocultas en pantallas grandes */
+.mobile-cards-container {
+  display: none;
+}
+
+/* Reglas generales para la adaptación en pantallas menores a 768px */
+@media (max-width: 768px) {
+  /* Ocultamos la tabla tradicional en móviles */
+  .desktop-table {
+    display: none;
+  }
+
+  /* Mostramos el contenedor de tarjetas móviles */
+  .mobile-cards-container {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  /* Diseño de cada tarjeta de usuario en móvil */
+  .mobile-user-card {
+    background: var(--bg-secondary);
+    backdrop-filter: var(--backdrop-blur);
+    border: var(--border-glass);
+    border-radius: var(--radius-lg);
+    padding: 1rem;
+    box-shadow: var(--shadow-main);
+    cursor: pointer;
+    transition: transform 0.2s ease, background 0.2s ease;
+  }
+
+  .mobile-user-card:active {
+    transform: scale(0.98);
+    background: var(--bg-btn-secondary-hover);
+  }
+
+  .mobile-card-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 0.75rem;
+    padding-bottom: 0.75rem;
+    border-bottom: var(--border-glass);
+  }
+
+  .mobile-user-titles {
+    display: flex;
+    flex-direction: column;
+    color: var(--color-text-main);
+    font-size: var(--font-size-xs);
+  }
+
+  .mobile-card-body {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .mobile-card-info {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.75rem;
+    color: var(--color-text-muted);
+  }
+
+  .mobile-card-info span:last-child {
+    color: var(--color-text-main);
+    font-weight: 500;
+  }
+
+  /* Ajustes adicionales generales para móviles */
+  .user-management-container {
+    padding: 1rem;
+  }
+
+  .header-section {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .header-section .btn-primary {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .modal-card {
+    padding: 1.25rem;
+  }
+
+  .modal-actions {
+    flex-direction: column;
+  }
+
+  .modal-actions button {
+    width: 100%;
+    justify-content: center;
   }
 }

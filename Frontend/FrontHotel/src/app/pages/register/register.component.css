@@ -184,3 +184,29 @@ h4{
     transform: translateY(0);
   }
 }
+
+/* --- Ajustes Responsivos Avanzados para Móviles --- */
+@media (max-width: 576px) {
+  .register-container {
+    padding: 1rem 0.5rem; /* Reduce el margen exterior para aprovechar el ancho de la pantalla */
+    align-items: flex-start; /* Evita recortes si el teclado virtual se despliega */
+  }
+
+  .register-card {
+    padding: 1.5rem 1rem; /* Reduce el padding interno de la tarjeta */
+    border-radius: var(--radius-md);
+  }
+
+  .register-card h2 {
+    font-size: 1.25rem; /* Ajusta el tamaño del título principal para que no se desborde */
+  }
+
+  .form-row {
+    grid-template-columns: 1fr; /* Asegura el apilamiento de campos dobles */
+    gap: 1rem;
+  }
+
+  .submit-btn {
+    padding: 12px; /* Mayor área táctil (touch target) para facilitar la pulsación con el dedo */
+  }
+}

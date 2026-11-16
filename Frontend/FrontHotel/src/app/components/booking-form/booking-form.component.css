@@ -16,12 +16,23 @@
   color: var(--color-text-main);
   display: flex;
   align-items: center;
+  gap: 10px;
   margin-bottom: 0.5rem;
+  margin-top: 0;
+}
+
+.header-title-icon {
+  width: 20px;
+  height: 20px;
+  color: var(--color-primary);
+  stroke-width: 2.25;
+  flex-shrink: 0;
 }
 
 .subtitle {
   font-size: var(--font-size-sm);
   color: var(--color-text-muted);
+  margin: 0;
 }
 
 .divider {
@@ -29,19 +40,6 @@
   height: 1px;
   background: rgba(255, 255, 255, 0.08);
   margin: 1.5rem 0;
-}
-
-/* Clases auxiliares para iconos y textos */
-.icon-spacing {
-  margin-right: 0.5rem;
-}
-
-.icon-spacing-left {
-  margin-right: 0.25rem;
-}
-
-.color-primary {
-  color: var(--color-primary);
 }
 
 /* Tarjeta de Resumen */
@@ -69,14 +67,19 @@
   align-items: center;
   justify-content: center;
   border-radius: var(--radius-sm);
-  font-size: 1.25rem;
+}
+
+.summary-svg {
+  width: 20px;
+  height: 20px;
+  stroke-width: 2;
 }
 
 .summary-title {
   font-size: var(--font-size-md);
   font-weight: 600;
   color: var(--color-text-main);
-  margin: 0;
+  margin: 0 0 2px 0;
 }
 
 .summary-details {
@@ -93,6 +96,14 @@
   gap: 0.50rem;
   font-size: var(--font-size-sm);
   color: var(--color-text-muted);
+}
+
+.summary-item-icon {
+  width: 16px;
+  height: 16px;
+  color: var(--color-primary);
+  flex-shrink: 0;
+  stroke-width: 2;
 }
 
 .summary-item strong {
@@ -115,7 +126,7 @@
 }
 
 .switch-input {
-  width: 2.25rem;
+  width: 1.25rem;
   height: 1.25rem;
   accent-color: var(--color-primary);
   cursor: pointer;
@@ -130,6 +141,7 @@
   font-weight: 600;
   color: var(--color-text-main);
   cursor: pointer;
+  font-size: var(--font-size-sm);
 }
 
 /* Secciones del Formulario */
@@ -139,6 +151,7 @@
   letter-spacing: 0.05em;
   color: var(--color-primary);
   margin-bottom: 1rem;
+  margin-top: 0;
 }
 
 .form-group {
@@ -163,6 +176,14 @@
   left: 12px;
   color: var(--color-text-muted);
   pointer-events: none;
+  display: flex;
+  align-items: center;
+}
+
+.input-svg-icon {
+  width: 16px;
+  height: 16px;
+  stroke-width: 2;
 }
 
 .form-control {
@@ -175,6 +196,7 @@
   font-size: var(--font-size-sm);
   outline: none;
   transition: border-color 0.2s;
+  box-sizing: border-box;
 }
 
 .form-control:focus {
@@ -207,7 +229,7 @@ select.form-control {
 
 .btn-primary {
   background: var(--color-primary);
-  color: #000;
+  color: #ffffff;
   border: none;
   padding: 10px 20px;
   border-radius: var(--radius-sm);
@@ -216,6 +238,7 @@ select.form-control {
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
+  font-size: var(--font-size-sm);
   transition: opacity 0.2s;
 }
 
@@ -239,11 +262,19 @@ select.form-control {
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
+  font-size: var(--font-size-sm);
   transition: background 0.2s;
 }
 
 .btn-secondary-action:hover {
   background: var(--bg-btn-secondary-hover);
+}
+
+.btn-icon-sm {
+  width: 16px;
+  height: 16px;
+  stroke-width: 2.25;
+  flex-shrink: 0;
 }
 
 /* Alertas */
@@ -252,10 +283,20 @@ select.form-control {
   border-radius: var(--radius-sm);
   font-size: var(--font-size-sm);
   margin-bottom: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 
 .alert-danger {
   background: rgba(239, 68, 68, 0.15);
   border: 1px solid rgba(239, 68, 68, 0.3);
   color: #fca5a5;
+}
+
+.alert-icon {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+  stroke-width: 2;
 }

@@ -2,7 +2,7 @@
   <!-- Encabezado -->
   <div class="header-section">
     <h2>
-      <i class="bi bi-pencil-square"></i> Editar Producto o Servicio
+      Editar Producto o Servicio
     </h2>
   </div>
 
@@ -11,23 +11,22 @@
   <!-- Mensaje de Error General -->
   @if (errorMessage()) {
     <div class="alert alert-danger">
-      <i class="bi bi-exclamation-triangle"></i> {{ errorMessage() }}
+      {{ errorMessage() }}
     </div>
   }
 
   <!-- Estado de Carga -->
   @if (loading()) {
     <div class="alert alert-info">
-      <i class="bi bi-arrow-repeat spin"></i> Cargando datos del ítem...
+      <span class="spin icon-margin"></span> Cargando datos del ítem...
     </div>
   } @else if (itemLoaded()) {
-    <form [formGroup]="itemForm" (ngSubmit)="onSubmit()" class="form-grid">
+    <form [formGroup]="itemForm" (submit)="$event.preventDefault(); onSubmit()" class="form-grid">
 
       <!-- Descripción -->
       <div class="form-group">
         <label class="form-label" for="description">Descripción *</label>
         <div class="input-wrapper">
-          <span class="input-icon-prefix"><i class="bi bi-card-text"></i></span>
           <input
             id="description"
             type="text"
@@ -38,7 +37,7 @@
         </div>
         @if (itemForm.controls.description.touched && itemForm.controls.description.hasError('required')) {
           <small class="error-text">
-            <i class="bi bi-info-circle"></i> La descripción es obligatoria.
+            La descripción es obligatoria.
           </small>
         }
       </div>
@@ -48,7 +47,6 @@
         <div class="form-group">
           <label class="form-label" for="quantity">Cantidad *</label>
           <div class="input-wrapper">
-            <span class="input-icon-prefix"><i class="bi bi-123"></i></span>
             <input
               id="quantity"
               type="number"
@@ -71,7 +69,6 @@
         <div class="form-group">
           <label class="form-label" for="unitPrice">Precio unitario ($) *</label>
           <div class="input-wrapper">
-            <span class="input-icon-prefix"><i class="bi bi-currency-dollar"></i></span>
             <input
               id="unitPrice"
               type="number"
@@ -110,7 +107,7 @@
       <div class="form-group">
         <label class="form-label">Imagen actual</label>
         @if (loadingImage()) {
-          <p class="subtitle"><i class="bi bi-arrow-repeat spin"></i> Cargando imagen...</p>
+          <p class="subtitle"><span class="spin icon-margin"></span> Cargando imagen...</p>
         } @else if (existingImageUrl()) {
           <div class="image-thumbnail-card">
             <img [src]="existingImageUrl()" alt="Imagen actual del ítem">
@@ -120,7 +117,7 @@
               (click)="removeExistingImage()"
               title="Eliminar imagen actual"
             >
-              <i class="bi bi-trash"></i>
+              ✕
             </button>
           </div>
         } @else {
@@ -145,7 +142,7 @@
         @if (selectedImagePreview()) {
           <div class="preview-container">
             <p class="subtitle text-success preview-title">
-              <i class="bi bi-eye"></i> Vista previa de la nueva imagen:
+              Vista previa de la nueva imagen:
             </p>
             <div class="image-thumbnail-card">
               <img [src]="selectedImagePreview()" alt="Vista previa de nueva imagen">
@@ -155,7 +152,7 @@
 
         @if (selectedImage()) {
           <small class="subtitle file-feedback text-success">
-            <i class="bi bi-file-earmark-image"></i> Nueva imagen seleccionada: <strong>{{ selectedImage()?.name }}</strong>
+            Nueva imagen seleccionada: <strong>{{ selectedImage()?.name }}</strong>
           </small>
         }
       </div>
@@ -163,14 +160,15 @@
       <!-- Acciones -->
       <div class="form-actions">
         <button
-          type="submit"
+          type="button"
           class="btn-primary-action"
           [disabled]="saving() || loading()"
+          (click)="onSubmit()"
         >
           @if (saving()) {
-            <i class="bi bi-arrow-repeat spin"></i> Guardando cambios...
+            <span class="spin icon-margin"></span> Guardando cambios...
           } @else {
-            <i class="bi bi-check-lg"></i> Guardar cambios
+            Guardar cambios
           }
         </button>
 

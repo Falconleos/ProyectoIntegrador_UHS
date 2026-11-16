@@ -162,3 +162,29 @@ h2 i {
   opacity: 0.5;
   cursor: not-allowed;
 }
+
+/* --- Responsividad para Dispositivos Móviles --- */
+@media (max-width: 480px) {
+  .container {
+    padding: 0.75rem;
+    align-items: flex-start; /* Evita que la tarjeta se comprima verticalmente si aparece el teclado */
+    padding-top: 2rem;
+  }
+
+  .card {
+    padding: 1.5rem; /* Reduce el margen interno de la tarjeta en pantallas pequeñas */
+    border-radius: var(--radius-md);
+  }
+
+  h2 {
+    font-size: 1.15rem; /* Ajusta ligeramente el tamaño del título */
+  }
+
+  .subtitle {
+    margin-bottom: 1.5rem;
+  }
+
+  .btn-primary {
+    padding: 14px; /* Aumenta el área táctil del botón principal para mayor comodidad en mobile */
+  }
+}

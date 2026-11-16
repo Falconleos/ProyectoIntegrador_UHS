@@ -29,7 +29,7 @@ export class ItemEditComponent implements OnInit, OnDestroy {
   errorMessage = signal('');
   
   selectedImage = signal<File | null>(null);
-  existingImageUrl = signal<string | null>(null); // URL temporal de la foto actual
+  existingImageUrl = signal<string | null>(null);
   itemId = signal<number | null>(null);
   itemLoaded = signal(false);
   selectedImagePreview = signal<string | null>(null);
@@ -68,7 +68,6 @@ export class ItemEditComponent implements OnInit, OnDestroy {
           isService: data.isService ?? false
         });
 
-        // Cargamos la imagen actual si el ítem la posee
         this.loadExistingImage(id);
 
         this.loading.set(false);
@@ -81,7 +80,6 @@ export class ItemEditComponent implements OnInit, OnDestroy {
     });
   }
 
-  // Descarga la imagen en binario y crea una URL temporal de visualización
   loadExistingImage(id: number): void {
     this.loadingImage.set(true);
     this.itemService.getItemImage(id).subscribe({
@@ -98,7 +96,6 @@ export class ItemEditComponent implements OnInit, OnDestroy {
     });
   }
 
-  // Elimina la imagen actual llamando al endpoint DELETE del backend
   removeExistingImage(): void {
     if (!window.confirm('¿Estás seguro de eliminar la imagen actual?')) return;
 
@@ -119,7 +116,6 @@ export class ItemEditComponent implements OnInit, OnDestroy {
     const input = event.target as HTMLInputElement;
     const file = input.files?.[0] ?? null;
 
-    // Liberamos la URL anterior si existía para evitar fugas de memoria
     const currentPreview = this.selectedImagePreview();
     if (currentPreview) {
       URL.revokeObjectURL(currentPreview);
@@ -127,7 +123,6 @@ export class ItemEditComponent implements OnInit, OnDestroy {
 
     if (file) {
       this.selectedImage.set(file);
-      // Generamos una URL temporal para previsualizar la foto seleccionada
       const previewUrl = URL.createObjectURL(file);
       this.selectedImagePreview.set(previewUrl);
     } else {
@@ -137,7 +132,6 @@ export class ItemEditComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    // Limpiamos ambas URLs al destruir el componente
     const url = this.existingImageUrl();
     if (url) URL.revokeObjectURL(url);
 

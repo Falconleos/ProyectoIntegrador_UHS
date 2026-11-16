@@ -1,67 +1,77 @@
 <div class="dashboard">
-  <!-- Barra Lateral (Sidebar) -->
-  <aside class="sidebar">
+  
+  <!-- Overlay oscuro para cerrar el menú móvil al hacer clic fuera -->
+  @if (sidebarOpen) {
+    <div class="sidebar-backdrop" (click)="closeSidebar()"></div>
+  }
+
+  <!-- Barra Lateral (Sidebar) con clase dinámica para deslizarse en móvil -->
+  <aside class="sidebar" [class.open]="sidebarOpen">
     <div class="sidebar-header">
-      <a routerLink="/landing" routerLinkActive="active">
+      <a routerLink="/landing" routerLinkActive="active" (click)="closeSidebar()">
         <h2><span>Ultimate Hotel Software</span></h2>
       </a>
+      <!-- Botón X para cerrar menú en móvil -->
+      <button class="close-sidebar-btn" (click)="closeSidebar()">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
     </div>
     
     <nav class="sidebar-nav">
       @if (userRole.toLowerCase() === 'guest') {
-        <!-- Menú para Huéspedes (Guest): Reservas, Estadías y Comentarios -->
-        <a routerLink="/dashboard/booking-list" routerLinkActive="active">
+        <!-- Menú para Huéspedes (Guest) -->
+        <a routerLink="/dashboard/booking-list" routerLinkActive="active" (click)="closeSidebar()">
           <i class="fa-solid fa-calendar-days"></i> Mis Reservas
         </a>
-        <a routerLink="/dashboard/check-in-list" routerLinkActive="active">
+        <a routerLink="/dashboard/check-in-list" routerLinkActive="active" (click)="closeSidebar()">
           <i class="fa-solid fa-circle-check"></i> Estadías
         </a>
-        <a routerLink="/dashboard/comment-list" routerLinkActive="active">
+        <a routerLink="/dashboard/comment-list" routerLinkActive="active" (click)="closeSidebar()">
           <i class="fa-solid fa-comments"></i> Comentarios
         </a>
       } @else {
-        <!-- Menú completo para Administradores, Recepcionistas u otros roles -->
-        <a routerLink="/dashboard" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">
+        <!-- Menú completo para Admins y Recepcionistas -->
+        <a routerLink="/dashboard" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}" (click)="closeSidebar()">
           <i class="fa-solid fa-table-cells-large"></i> Inicio
         </a> 
-        <a routerLink="/dashboard/booking-list" routerLinkActive="active">
+        <a routerLink="/dashboard/booking-list" routerLinkActive="active" (click)="closeSidebar()">
           <i class="fa-solid fa-calendar-days"></i> Reservas
         </a>
-        <a routerLink="/dashboard/check-in-list" routerLinkActive="active">
+        <a routerLink="/dashboard/check-in-list" routerLinkActive="active" (click)="closeSidebar()">
           <i class="fa-solid fa-circle-check"></i> Estadías
         </a>
-        <a routerLink="/dashboard/room-list" routerLinkActive="active">
+        <a routerLink="/dashboard/room-list" routerLinkActive="active" (click)="closeSidebar()">
           <i class="fa-solid fa-bed"></i> Habitaciones
         </a>
-        <a routerLink="/dashboard/item-list" routerLinkActive="active">
+        <a routerLink="/dashboard/item-list" routerLinkActive="active" (click)="closeSidebar()">
           <i class="fa-solid fa-box-archive"></i> Items
         </a>
-        <a routerLink="/dashboard/room-attentions" routerLinkActive="active">
+        <a routerLink="/dashboard/room-attentions" routerLinkActive="active" (click)="closeSidebar()">
           <i class="fa-solid fa-bell-concierge"></i> Servicio al cuarto
         </a>
-        <a routerLink="/dashboard/comment-list" routerLinkActive="active">
+        <a routerLink="/dashboard/comment-list" routerLinkActive="active" (click)="closeSidebar()">
           <i class="fa-solid fa-comments"></i> Comentarios
         </a>
-        <a routerLink="/dashboard/payment-list" routerLinkActive="active">
+        <a routerLink="/dashboard/payment-list" routerLinkActive="active" (click)="closeSidebar()">
           <i class="fa-solid fa-wallet"></i> Pagos
         </a>
-        <a routerLink="/dashboard/account-list" routerLinkActive="active">
+        <a routerLink="/dashboard/account-list" routerLinkActive="active" (click)="closeSidebar()">
           <i class="fa-solid fa-file-invoice-dollar"></i> Cuentas
         </a>
-        <a routerLink="/dashboard/credit-notes" routerLinkActive="active">
+        <a routerLink="/dashboard/credit-notes" routerLinkActive="active" (click)="closeSidebar()">
           <i class="fa-solid fa-file-invoice"></i> Notas de Crédito
         </a>
-        <a routerLink="/dashboard/usuarios" routerLinkActive="active">
+        <a routerLink="/dashboard/usuarios" routerLinkActive="active" (click)="closeSidebar()">
           <i class="fa-solid fa-users"></i> Usuarios
         </a>
-        <a routerLink="/dashboard/employee-list" routerLinkActive="active">
+        <a routerLink="/dashboard/employee-list" routerLinkActive="active" (click)="closeSidebar()">
           <i class="fa-solid fa-id-badge"></i> Empleados
         </a>
       }
     </nav>
 
     <div class="sidebar-footer">
-      <button (click)="logout()" class="logout-btn">
+      <button (click)="logout(); closeSidebar()" class="logout-btn">
         <i class="fa-solid fa-right-from-bracket"></i> Cerrar Sesión
       </button>
     </div>
@@ -70,17 +80,22 @@
   <!-- Contenido Principal -->
   <main class="main-content">
     <header class="top-bar">
-      <h3>
-        @if (userRole.toLowerCase() === 'guest') {
-          Panel de Huésped
-        } @else {
-          Panel de Administración
-        }
-      </h3>
+      <div class="top-bar-left">
+        <!-- Botón Hamburguesa móvil -->
+        <button class="icon-btn menu-toggle-btn" (click)="toggleSidebar()" title="Abrir Menú">
+          <i class="fa-solid fa-bars"></i>
+        </button>
+        <h3>
+          @if (userRole.toLowerCase() === 'guest') {
+            Panel de Huésped
+          } @else {
+            Panel de Administración
+          }
+        </h3>
+      </div>
       
       <div class="top-bar-right">
         <div class="top-actions">
-          <!-- Botón de Notificaciones con Badge de Pendientes -->
           <button 
             class="icon-btn notification-btn" 
             title="Servicio al Cuarto Pendientes"
@@ -91,22 +106,17 @@
             }
           </button>
   
-          <button class="icon-btn" title="Cambiar contraseña"
-          routerLink="/dashboard/change-password">
+          <button class="icon-btn" title="Cambiar contraseña" routerLink="/dashboard/change-password">
             <i class="fa-solid fa-gear"></i>
           </button>
         </div>
         
         <div class="divider"></div>
         
-        <!-- Perfil de usuario en la barra superior -->
         <div class="user-profile">
           <div class="user-avatar-wrapper">
             @if (avatarUrl) {
-              <img [src]="avatarUrl" 
-                   (error)="onAvatarError()" 
-                   alt="Avatar" 
-                   class="user-avatar">
+              <img [src]="avatarUrl" (error)="onAvatarError()" alt="Avatar" class="user-avatar">
             } @else {
               <div class="user-default-icon">
                 <i class="fa-solid fa-user"></i>
