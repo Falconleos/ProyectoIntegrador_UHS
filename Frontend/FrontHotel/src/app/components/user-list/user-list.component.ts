@@ -1,4 +1,4 @@
-import { Component, OnInit, ChangeDetectorRef, signal, computed, ChangeDetectionStrategy } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef, signal, computed, ChangeDetectionStrategy, inject } from '@angular/core';
 
 import { Router, RouterLink } from '@angular/router';
 import { UserService } from '../../core/services/user.service';
@@ -20,45 +20,15 @@ export class UserListComponent implements OnInit {
   userAvatars: { [key: number]: string } = {};
   selectedUser: UserDtoResponse | null = null;
 
-  // ==========================================
-  // FILTRO SENCILLO (Texto de búsqueda)
-  // ==========================================
-  searchText = signal('');
+  private userService = inject(UserService);
+  private authService = inject(AuthService);
+  private router = inject(Router);
+  private cdr = inject(ChangeDetectorRef);
 
-  filteredUsers = computed(() => {
-    const list = this.users;
-    const search = this.searchText().toLowerCase().trim();
-
-    if (!search) return list;
-
-    return list.filter(user => {
-      // Unimos nombre, apellido, username y DNI en una sola cadena para buscar en todos
-      const name = user.name || '';
-      const surname = user.surname || '';
-      const username = user.username || '';
-      const dni = user.dni || '';
-
-      const searchString = `${name} ${surname} ${username} ${dni}`.toLowerCase();
-      return searchString.includes(search);
-    });
-  });
-
-  onSearchInput(event: Event): void {
-    const input = event.target as HTMLInputElement;
-    this.searchText.set(input.value);
-  }
-  // ==========================================
-
-  constructor(
-    private userService: UserService,
-    private authService: AuthService,
-    private router: Router,
-    private cdr: ChangeDetectorRef
-  ) {}
-
+  
   ngOnInit(): void {
-    this.checkUserRole();
-    this.loadUsers();
+    this.checkUserRole(); //Comprueba rol del usuario
+    this.loadUsers(); //Carga lista de huéspedes
   }
 
   // Valido el rol almacenado en el localStorage para definir permisos de modificación
@@ -69,8 +39,8 @@ export class UserListComponent implements OnInit {
       return;
     }
 
-    try {
-      const roles = JSON.parse(storedRoles);
+    try { //seteo canModify a true si el usuario tiene rol ADMIN o RECEPCIONIST
+      const roles = JSON.parse(storedRoles); // Puede ser un array o un string
       const rolesArray = Array.isArray(roles) ? roles : [roles];
       
       this.canModify = rolesArray.some((r: any) => {
@@ -87,16 +57,16 @@ export class UserListComponent implements OnInit {
     this.loading = true;
     this.errorMessage = '';
     
-    this.userService.getByRole('GUEST').subscribe({
+    this.userService.getByRole('GUEST').subscribe({ //solicita lista huespedes
       next: (data) => {
-        this.users = Array.isArray(data) ? data : [];
+        this.users = Array.isArray(data) ? data : []; //verifica existencia de arreglo
         this.loading = false;
         
-        this.users.forEach(user => {
+        this.users.forEach(user => { //solicita imagen de erfil para cada huesped
           this.loadUserAvatar(user);
         });
 
-        this.cdr.markForCheck();
+        this.cdr.markForCheck(); //avisa a Angular que se han producido cambios en el estado y que debe actualizar la vista
       },
       error: (err) => {
         this.errorMessage = 'No se pudieron cargar los huéspedes.';
@@ -137,6 +107,8 @@ export class UserListComponent implements OnInit {
     }
   }
 
+  //apertura y cierre de modal de detalles de usuario
+
   openUserDetail(user: UserDtoResponse): void {
     this.selectedUser = user;
     this.loadUserAvatar(user);
@@ -156,10 +128,10 @@ export class UserListComponent implements OnInit {
     if (!user || !user.id) return;
     if (this.userAvatars[user.id]) return;
 
-    this.userService.getProfilePicture(user.id).subscribe({
-      next: (blob) => {
-        const objectURL = URL.createObjectURL(blob);
-        this.userAvatars[user.id] = objectURL;
+    this.userService.getProfilePicture(user.id).subscribe({ //solicita imagen de perfil de usuario al servicio
+      next: (blob) => { //datos binarios de la imagen
+        const objectURL = URL.createObjectURL(blob); //crea url local de los datos recibidos
+        this.userAvatars[user.id] = objectURL; //guarda url con avatar
         this.cdr.markForCheck();
       },
       error: (err) => {
@@ -170,10 +142,40 @@ export class UserListComponent implements OnInit {
     });
   }
 
-  getUserAvatarUrl(user: UserDtoResponse | null): string {
+  getUserAvatarUrl(user: UserDtoResponse | null): string { //obtiene url del avatar
     if (!user || !user.id) {
       return 'assets/default-avatar.png';
     }
     return this.userAvatars[user.id] || 'assets/default-avatar.png';
   }
+
+  // ==========================================
+  // FILTRO SENCILLO (Texto de búsqueda)
+  // ==========================================
+  searchText = signal('');
+
+  filteredUsers = computed(() => {
+    const list = this.users;
+    const search = this.searchText().toLowerCase().trim();
+
+    if (!search) return list;
+
+    return list.filter(user => {
+      // Unimos nombre, apellido, username y DNI en una sola cadena para buscar en todos
+      const name = user.name || '';
+      const surname = user.surname || '';
+      const username = user.username || '';
+      const dni = user.dni || '';
+
+      const searchString = `${name} ${surname} ${username} ${dni}`.toLowerCase();
+      return searchString.includes(search);
+    });
+  });
+
+  onSearchInput(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    this.searchText.set(input.value);
+  }
+  // ==========================================
+
 }
