@@ -11,12 +11,11 @@ import { BookingDtoResponse } from '../../models/Booking-model';
 import { UserService } from '../../core/services/user.service';
 
 @Component({
-  selector: 'app-booking-form',
-  standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RouterLink],
-  templateUrl: './booking-form.component.html',
-  styleUrls: ['./booking-form.component.css'],
-  changeDetection: ChangeDetectionStrategy.OnPush
+    selector: 'app-booking-form',
+    imports: [CommonModule, ReactiveFormsModule, RouterLink],
+    templateUrl: './booking-form.component.html',
+    styleUrls: ['./booking-form.component.css'],
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class BookingFormComponent implements OnInit {
   bookingForm!: FormGroup;

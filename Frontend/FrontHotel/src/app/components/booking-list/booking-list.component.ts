@@ -16,12 +16,11 @@ export interface BookingWithAccount extends BookingDtoResponse {
 }
 
 @Component({
-  selector: 'app-booking-list',
-  standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, FormsModule, RouterLink], // <-- Añadir FormsModule aquí
-  templateUrl: './booking-list.component.html',
-  styleUrls: ['./booking-list.component.css'],
-  changeDetection: ChangeDetectionStrategy.OnPush
+    selector: 'app-booking-list',
+    imports: [CommonModule, ReactiveFormsModule, FormsModule, RouterLink], // <-- Añadir FormsModule aquí
+    templateUrl: './booking-list.component.html',
+    styleUrls: ['./booking-list.component.css'],
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class BookingListComponent implements OnInit {
   

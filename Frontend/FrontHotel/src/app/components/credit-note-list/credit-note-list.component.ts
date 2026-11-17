@@ -9,12 +9,11 @@ import { BookingCancellationDtoResponse } from '../../models/Booking-model';
 import { BookingService } from '../../core/services/booking.service';
 
 @Component({
-  selector: 'app-credit-note-list',
-  standalone: true,
-  imports: [CommonModule, FormsModule],
-  templateUrl: './credit-note-list.component.html',
-  styleUrls: ['./credit-note-list.component.css'],
-  changeDetection: ChangeDetectionStrategy.OnPush
+    selector: 'app-credit-note-list',
+    imports: [CommonModule, FormsModule],
+    templateUrl: './credit-note-list.component.html',
+    styleUrls: ['./credit-note-list.component.css'],
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class CreditNoteListComponent implements OnInit {
 

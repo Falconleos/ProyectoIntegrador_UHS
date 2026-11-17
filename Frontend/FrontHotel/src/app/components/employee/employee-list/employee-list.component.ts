@@ -14,11 +14,10 @@ import { EmployeeDtoResponse, ShiftType } from '../../../models/Employee-model';
 import { UserDtoResponse } from '../../../models/User-model';
 
 @Component({
-  selector: 'app-employee-list',
-  standalone: true,
-  imports: [RouterLink, DecimalPipe, ReactiveFormsModule],
-  templateUrl: './employee-list.component.html',
-  styleUrl: './employee-list.component.css'
+    selector: 'app-employee-list',
+    imports: [RouterLink, DecimalPipe, ReactiveFormsModule],
+    templateUrl: './employee-list.component.html',
+    styleUrl: './employee-list.component.css'
 })
 export class EmployeeListComponent implements OnInit, OnDestroy {
 

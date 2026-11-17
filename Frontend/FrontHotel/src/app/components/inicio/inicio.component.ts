@@ -7,11 +7,10 @@ import { PaymentService } from '../../core/services/payment.service';
 import { RoomAttentionService } from '../../core/services/room-attention.service';
 
 @Component({
-  selector: 'app-inicio',
-  standalone: true,
-  imports: [CommonModule],
-  templateUrl: './inicio.component.html',
-  styleUrl: './inicio.component.css'
+    selector: 'app-inicio',
+    imports: [CommonModule],
+    templateUrl: './inicio.component.html',
+    styleUrl: './inicio.component.css'
 })
 export class InicioComponent implements OnInit {
 

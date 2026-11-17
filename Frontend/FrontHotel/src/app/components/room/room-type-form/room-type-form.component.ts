@@ -7,11 +7,10 @@ import { RoomTypeService } from '../../../core/services/room-type.service';
 import { RoomTypeDTORequest } from '../../../models/RoomType-model';
 
 @Component({
-  selector: 'app-room-type-form',
-  standalone: true,
-  imports: [ReactiveFormsModule, RouterLink],
-  templateUrl: './room-type-form.component.html',
-  styleUrl: './room-type-form.component.css'
+    selector: 'app-room-type-form',
+    imports: [ReactiveFormsModule, RouterLink],
+    templateUrl: './room-type-form.component.html',
+    styleUrl: './room-type-form.component.css'
 })
 export class RoomTypeFormComponent implements OnInit {
 

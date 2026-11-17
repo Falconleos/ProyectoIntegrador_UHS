@@ -21,11 +21,10 @@ import { RoomAttentionDtoRequest } from '../../../models/RoomAttention-model';
 import { ItemDtoResponse } from '../../../models/Item-model';
 
 @Component({
-  selector: 'app-room-attention-form',
-  standalone: true,
-  imports: [ReactiveFormsModule, FormsModule],
-  templateUrl: './room-attention-form.component.html',
-  styleUrl: './room-attention-form.component.css'
+    selector: 'app-room-attention-form',
+    imports: [ReactiveFormsModule, FormsModule],
+    templateUrl: './room-attention-form.component.html',
+    styleUrl: './room-attention-form.component.css'
 })
 export class RoomAttentionFormComponent implements OnInit {
 

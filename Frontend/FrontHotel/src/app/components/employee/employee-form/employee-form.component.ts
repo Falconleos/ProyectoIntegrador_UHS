@@ -16,11 +16,10 @@ import {
 } from '../../../models/Employee-model';
 
 @Component({
-  selector: 'app-employee-form',
-  standalone: true,
-  imports: [ReactiveFormsModule, RouterLink],
-  templateUrl: './employee-form.component.html',
-  styleUrl: './employee-form.component.css'
+    selector: 'app-employee-form',
+    imports: [ReactiveFormsModule, RouterLink],
+    templateUrl: './employee-form.component.html',
+    styleUrl: './employee-form.component.css'
 })
 export class EmployeeFormComponent {
 

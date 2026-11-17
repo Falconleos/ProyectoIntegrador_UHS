@@ -6,11 +6,10 @@ import { UserDtoResponse } from '../../models/User-model';
 import { AuthService } from '../../core/services/auth.service';
 
 @Component({
-  selector: 'app-user-list',
-  standalone: true,
-  imports: [CommonModule, RouterLink],
-  templateUrl: './user-list.component.html',
-  styleUrls: ['./user-list.component.css']
+    selector: 'app-user-list',
+    imports: [CommonModule, RouterLink],
+    templateUrl: './user-list.component.html',
+    styleUrls: ['./user-list.component.css']
 })
 export class UserListComponent implements OnInit {
   users: UserDtoResponse[] = [];

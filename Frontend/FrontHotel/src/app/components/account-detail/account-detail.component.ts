@@ -8,12 +8,11 @@ import { RoomAttentionService } from '../../core/services/room-attention.service
 import { AccountDTOResponse } from '../../models/Account-model';
 
 @Component({
-  selector: 'app-account-detail',
-  standalone: true,
-  imports: [CommonModule, FormsModule],
-  templateUrl: './account-detail.component.html',
-  styleUrls: ['./account-detail.component.css'],
-  changeDetection: ChangeDetectionStrategy.OnPush
+    selector: 'app-account-detail',
+    imports: [CommonModule, FormsModule],
+    templateUrl: './account-detail.component.html',
+    styleUrls: ['./account-detail.component.css'],
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class AccountDetailComponent implements OnInit {
   // --- Estados con Signals ---

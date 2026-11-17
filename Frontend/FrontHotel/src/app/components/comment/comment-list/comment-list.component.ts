@@ -6,11 +6,10 @@ import { CommentService } from '../../../core/services/comment.service';
 import { CommentDtoResponse } from '../../../models/Comment-model';
 
 @Component({
-  selector: 'app-comment-list',
-  standalone: true,
-  imports: [RouterLink, CommonModule],
-  templateUrl: './comment-list.component.html',
-  styleUrl: './comment-list.component.css'
+    selector: 'app-comment-list',
+    imports: [RouterLink, CommonModule],
+    templateUrl: './comment-list.component.html',
+    styleUrl: './comment-list.component.css'
 })
 export class CommentListComponent implements OnInit {
 

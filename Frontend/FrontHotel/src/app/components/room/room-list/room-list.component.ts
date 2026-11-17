@@ -8,11 +8,10 @@ import { RoomDtoResponse } from '../../../models/Room-model';
 import { RoomTypeDTOResponse } from '../../../models/RoomType-model';
 
 @Component({
-  selector: 'app-room-list',
-  standalone: true,
-  imports: [RouterLink],
-  templateUrl: './room-list.component.html',
-  styleUrl: './room-list.component.css'
+    selector: 'app-room-list',
+    imports: [RouterLink],
+    templateUrl: './room-list.component.html',
+    styleUrl: './room-list.component.css'
 })
 export class RoomListComponent implements OnInit, OnDestroy {
 

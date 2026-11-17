@@ -6,11 +6,10 @@ import { AuthService } from '../../core/services/auth.service';
 import { finalize } from 'rxjs';
 
 @Component({
-  selector: 'app-register',
-  standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RouterLink],
-  templateUrl: './register.component.html',
-  styleUrls: ['./register.component.css']
+    selector: 'app-register',
+    imports: [CommonModule, ReactiveFormsModule, RouterLink],
+    templateUrl: './register.component.html',
+    styleUrls: ['./register.component.css']
 })
 export class RegisterComponent {
   private authService = inject(AuthService);

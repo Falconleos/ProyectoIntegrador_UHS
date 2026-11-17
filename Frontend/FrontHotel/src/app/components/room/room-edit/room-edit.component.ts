@@ -12,11 +12,10 @@ import { RoomTypeDTOResponse } from '../../../models/RoomType-model';
 import { RoomDtoResponse } from '../../../models/Room-model';
 
 @Component({
-  selector: 'app-room-edit',
-  standalone: true,
-  imports: [ReactiveFormsModule, RouterLink],
-  templateUrl: './room-edit.component.html',
-  styleUrl: './room-edit.component.css'
+    selector: 'app-room-edit',
+    imports: [ReactiveFormsModule, RouterLink],
+    templateUrl: './room-edit.component.html',
+    styleUrl: './room-edit.component.css'
 })
 export class RoomEditComponent implements OnInit, OnDestroy {
 

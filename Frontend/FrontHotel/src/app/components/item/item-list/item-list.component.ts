@@ -11,11 +11,10 @@ interface ItemWithImage extends ItemDtoResponse {
 }
 
 @Component({
-  selector: 'app-item-list',
-  standalone: true,
-  imports: [RouterLink, CurrencyPipe],
-  templateUrl: './item-list.component.html',
-  styleUrl: './item-list.component.css'
+    selector: 'app-item-list',
+    imports: [RouterLink, CurrencyPipe],
+    templateUrl: './item-list.component.html',
+    styleUrl: './item-list.component.css'
 })
 export class ItemListComponent implements OnInit, OnDestroy {
 

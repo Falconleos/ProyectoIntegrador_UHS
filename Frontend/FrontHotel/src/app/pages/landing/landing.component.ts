@@ -8,12 +8,11 @@ import { forkJoin, of } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
 
 @Component({
-  selector: 'app-landing',
-  standalone: true,
-  imports: [CommonModule, RouterLink, FormsModule],
-  templateUrl: './landing.component.html',
-  styleUrls: ['./landing.component.css'],
-  changeDetection: ChangeDetectionStrategy.OnPush
+    selector: 'app-landing',
+    imports: [CommonModule, RouterLink, FormsModule],
+    templateUrl: './landing.component.html',
+    styleUrls: ['./landing.component.css'],
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class LandingComponent implements OnInit {
   

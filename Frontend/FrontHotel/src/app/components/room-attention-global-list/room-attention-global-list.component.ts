@@ -8,12 +8,11 @@ import { forkJoin, of } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 
 @Component({
-  selector: 'app-room-attention-global-list',
-  standalone: true,
-  imports: [CommonModule, RouterModule],
-  templateUrl: './room-attention-global-list.component.html',
-  styleUrls: ['./room-attention-global-list.component.css'],
-  changeDetection: ChangeDetectionStrategy.OnPush
+    selector: 'app-room-attention-global-list',
+    imports: [CommonModule, RouterModule],
+    templateUrl: './room-attention-global-list.component.html',
+    styleUrls: ['./room-attention-global-list.component.css'],
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class RoomAttentionGlobalListComponent implements OnInit {
   attentions = signal<(RoomAttentionDtoResponse & { roomNumber?: string; room?: string })[]>([]);

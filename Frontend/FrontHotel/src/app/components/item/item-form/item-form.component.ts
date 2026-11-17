@@ -11,11 +11,10 @@ import { ItemService } from '../../../core/services/item.service';
 import { ItemDtoRequest } from '../../../models/Item-model';
 
 @Component({
-  selector: 'app-item-form',
-  standalone: true,
-  imports: [ReactiveFormsModule, RouterLink],
-  templateUrl: './item-form.component.html',
-  styleUrl: './item-form.component.css'
+    selector: 'app-item-form',
+    imports: [ReactiveFormsModule, RouterLink],
+    templateUrl: './item-form.component.html',
+    styleUrl: './item-form.component.css'
 })
 export class ItemFormComponent {
 

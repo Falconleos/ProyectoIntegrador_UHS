@@ -7,12 +7,11 @@ import { ChangePasswordDtoRequest } from '../../models/ChangePassword-model';
 import { UserDtoRequest } from '../../models/User-model';
 
 @Component({
-  selector: 'app-change-password',
-  standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
-  templateUrl: './change-password.component.html',
-  styleUrls: ['./change-password.component.css'],
-  changeDetection: ChangeDetectionStrategy.OnPush
+    selector: 'app-change-password',
+    imports: [CommonModule, ReactiveFormsModule],
+    templateUrl: './change-password.component.html',
+    styleUrls: ['./change-password.component.css'],
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ChangePasswordComponent implements OnInit {
   private fb = inject(NonNullableFormBuilder);

@@ -5,12 +5,11 @@ import { AccountService } from '../../core/services/account.service';
 import { AccountDTOResponse } from '../../models/Account-model';
 
 @Component({
-  selector: 'app-account-list',
-  standalone: true,
-  imports: [CommonModule, RouterModule],
-  templateUrl: './account-list.component.html',
-  styleUrls: ['./account-list.component.css'],
-  changeDetection: ChangeDetectionStrategy.OnPush
+    selector: 'app-account-list',
+    imports: [CommonModule, RouterModule],
+    templateUrl: './account-list.component.html',
+    styleUrls: ['./account-list.component.css'],
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class AccountListComponent implements OnInit {
   accounts = signal<AccountDTOResponse[]>([]);

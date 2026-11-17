@@ -6,12 +6,11 @@ import { UserService } from '../../core/services/user.service';
 import { RoleType } from '../../models/User-model';
 
 @Component({
-  selector: 'app-user-edit',
-  standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RouterLink],
-  templateUrl: './user-edit.component.html',
-  styleUrls: ['../user-form/user-form.component.css'],
-  changeDetection: ChangeDetectionStrategy.OnPush
+    selector: 'app-user-edit',
+    imports: [CommonModule, ReactiveFormsModule, RouterLink],
+    templateUrl: './user-edit.component.html',
+    styleUrls: ['../user-form/user-form.component.css'],
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class UserEditComponent implements OnInit {
   private fb = inject(NonNullableFormBuilder);

@@ -17,11 +17,10 @@ import {
 } from '../../../models/Employee-model';
 
 @Component({
-  selector: 'app-employee-edit',
-  standalone: true,
-  imports: [ReactiveFormsModule, RouterLink],
-  templateUrl: './employee-edit.component.html',
-  styleUrl: './employee-edit.component.css'
+    selector: 'app-employee-edit',
+    imports: [ReactiveFormsModule, RouterLink],
+    templateUrl: './employee-edit.component.html',
+    styleUrl: './employee-edit.component.css'
 })
 export class EmployeeEditComponent implements OnInit {
 

@@ -10,11 +10,10 @@ import { ItemService } from '../../../core/services/item.service';
 import { ItemDtoRequest } from '../../../models/Item-model';
 
 @Component({
-  selector: 'app-item-edit',
-  standalone: true,
-  imports: [ReactiveFormsModule, RouterLink],
-  templateUrl: './item-edit.component.html',
-  styleUrl: './item-edit.component.css'
+    selector: 'app-item-edit',
+    imports: [ReactiveFormsModule, RouterLink],
+    templateUrl: './item-edit.component.html',
+    styleUrl: './item-edit.component.css'
 })
 export class ItemEditComponent implements OnInit, OnDestroy {
 

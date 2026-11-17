@@ -6,11 +6,10 @@ import { RoomAttentionService } from '../../../core/services/room-attention.serv
 import { RoomAttentionDtoResponse } from '../../../models/RoomAttention-model';
 
 @Component({
-  selector: 'app-room-attention-list',
-  standalone: true,
-  imports: [RouterLink, CommonModule],
-  templateUrl: './room-attention-list.component.html',
-  styleUrl: './room-attention-list.component.css'
+    selector: 'app-room-attention-list',
+    imports: [RouterLink, CommonModule],
+    templateUrl: './room-attention-list.component.html',
+    styleUrl: './room-attention-list.component.css'
 })
 export class RoomAttentionListComponent implements OnInit {
 

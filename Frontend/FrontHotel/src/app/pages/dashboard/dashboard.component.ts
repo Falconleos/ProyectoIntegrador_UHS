@@ -6,11 +6,10 @@ import { AuthService } from '../../core/services/auth.service';
 import { RoomAttentionService } from '../../core/services/room-attention.service';
 
 @Component({
-  selector: 'app-dashboard',
-  standalone: true,
-  imports: [CommonModule, RouterOutlet, RouterLink, RouterLinkActive],
-  templateUrl: './dashboard.component.html',
-  styleUrls: ['./dashboard.component.css']
+    selector: 'app-dashboard',
+    imports: [CommonModule, RouterOutlet, RouterLink, RouterLinkActive],
+    templateUrl: './dashboard.component.html',
+    styleUrls: ['./dashboard.component.css']
 })
 export class DashboardComponent implements OnInit, OnDestroy {
   

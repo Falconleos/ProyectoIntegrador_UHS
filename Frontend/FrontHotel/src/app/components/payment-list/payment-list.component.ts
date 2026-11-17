@@ -11,12 +11,11 @@ export interface PaymentWithGuest extends PaymentDTOResponse {
 }
 
 @Component({
-  selector: 'app-payment-list',
-  standalone: true,
-  imports: [CommonModule],
-  templateUrl: './payment-list.component.html',
-  styleUrls: ['./payment-list.component.css'],
-  changeDetection: ChangeDetectionStrategy.OnPush
+    selector: 'app-payment-list',
+    imports: [CommonModule],
+    templateUrl: './payment-list.component.html',
+    styleUrls: ['./payment-list.component.css'],
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class PaymentListComponent implements OnInit {
   

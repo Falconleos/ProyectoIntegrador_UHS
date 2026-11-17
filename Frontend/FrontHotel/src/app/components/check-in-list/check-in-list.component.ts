@@ -11,12 +11,11 @@ import * as QRCode from 'qrcode';
 import jsQR from 'jsqr';
 
 @Component({
-  selector: 'app-check-in-list',
-  standalone: true,
-  imports: [CommonModule],
-  templateUrl: './check-in-list.component.html',
-  styleUrls: ['./check-in-list.component.css'],
-  changeDetection: ChangeDetectionStrategy.OnPush
+    selector: 'app-check-in-list',
+    imports: [CommonModule],
+    templateUrl: './check-in-list.component.html',
+    styleUrls: ['./check-in-list.component.css'],
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class CheckInListComponent implements OnInit {
   // --- Estados con Signals ---

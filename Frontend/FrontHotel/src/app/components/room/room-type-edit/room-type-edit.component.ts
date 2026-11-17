@@ -6,12 +6,11 @@ import { RoomTypeService } from '../../../core/services/room-type.service';
 import { RoomTypeDTORequest } from '../../../models/RoomType-model';
 
 @Component({
-  selector: 'app-room-type-edit',
-  standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RouterLink],
-  templateUrl: './room-type-edit.component.html',
-  styleUrl: './room-type-edit.component.css',
-  changeDetection: ChangeDetectionStrategy.OnPush
+    selector: 'app-room-type-edit',
+    imports: [CommonModule, ReactiveFormsModule, RouterLink],
+    templateUrl: './room-type-edit.component.html',
+    styleUrl: './room-type-edit.component.css',
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class RoomTypeEditComponent implements OnInit {
   private fb = inject(FormBuilder);

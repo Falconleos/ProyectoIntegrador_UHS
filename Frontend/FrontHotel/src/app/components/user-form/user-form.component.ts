@@ -6,11 +6,10 @@ import { UserService } from '../../core/services/user.service';
 import { UserDtoRequestCreation, RoleType } from '../../models/User-model';
 
 @Component({
-  selector: 'app-user-form',
-  standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink],
-  templateUrl: './user-form.component.html',
-  styleUrls: ['./user-form.component.css']
+    selector: 'app-user-form',
+    imports: [CommonModule, FormsModule, RouterLink],
+    templateUrl: './user-form.component.html',
+    styleUrls: ['./user-form.component.css']
 })
 export class UserFormComponent {
   formData = {

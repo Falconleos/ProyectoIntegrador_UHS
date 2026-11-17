@@ -11,11 +11,10 @@ import { RoomTypeService } from '../../../core/services/room-type.service';
 import { RoomTypeDTOResponse } from '../../../models/RoomType-model';
 
 @Component({
-  selector: 'app-room-form',
-  standalone: true,
-  imports: [ReactiveFormsModule, RouterLink],
-  templateUrl: './room-form.component.html',
-  styleUrl: './room-form.component.css'
+    selector: 'app-room-form',
+    imports: [ReactiveFormsModule, RouterLink],
+    templateUrl: './room-form.component.html',
+    styleUrl: './room-form.component.css'
 })
 export class RoomFormComponent implements OnInit, OnDestroy {
 

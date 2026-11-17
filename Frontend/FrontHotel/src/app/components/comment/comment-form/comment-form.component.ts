@@ -15,11 +15,10 @@ import {
 } from '../../../models/Comment-model';
 
 @Component({
-  selector: 'app-comment-form',
-  standalone: true,
-  imports: [ReactiveFormsModule],
-  templateUrl: './comment-form.component.html',
-  styleUrl: './comment-form.component.css'
+    selector: 'app-comment-form',
+    imports: [ReactiveFormsModule],
+    templateUrl: './comment-form.component.html',
+    styleUrl: './comment-form.component.css'
 })
 export class CommentFormComponent implements OnInit {
 

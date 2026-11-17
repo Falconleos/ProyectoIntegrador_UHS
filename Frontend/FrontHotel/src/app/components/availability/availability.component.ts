@@ -9,12 +9,11 @@ import { RoomService } from '../../core/services/room.service';
 import { RoomDtoResponse } from '../../models/Room-model';
 
 @Component({
-  selector: 'app-availability',
-  standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RouterLink],
-  templateUrl: './availability.component.html',
-  styleUrls: ['./availability.component.css'],
-  changeDetection: ChangeDetectionStrategy.OnPush
+    selector: 'app-availability',
+    imports: [CommonModule, ReactiveFormsModule, RouterLink],
+    templateUrl: './availability.component.html',
+    styleUrls: ['./availability.component.css'],
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class AvailabilityComponent implements OnInit, OnDestroy {
   availabilityForm!: FormGroup;
