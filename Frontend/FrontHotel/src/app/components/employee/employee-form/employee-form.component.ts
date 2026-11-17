@@ -1,5 +1,5 @@
 
-import { Component, inject, signal } from '@angular/core';
+import { Component, inject, signal, ChangeDetectionStrategy } from '@angular/core';
 import {
   ReactiveFormsModule,
   NonNullableFormBuilder,
@@ -19,6 +19,7 @@ import {
     selector: 'app-employee-form',
     imports: [ReactiveFormsModule, RouterLink],
     templateUrl: './employee-form.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     styleUrl: './employee-form.component.css'
 })
 export class EmployeeFormComponent {

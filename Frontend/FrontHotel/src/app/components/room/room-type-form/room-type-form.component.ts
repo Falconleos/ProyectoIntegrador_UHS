@@ -1,5 +1,5 @@
 
-import { Component, inject, OnInit, signal } from '@angular/core';
+import { Component, inject, OnInit, signal, ChangeDetectionStrategy } from '@angular/core';
 import {ReactiveFormsModule, NonNullableFormBuilder, Validators} from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 
@@ -10,6 +10,7 @@ import { RoomTypeDTORequest } from '../../../models/RoomType-model';
     selector: 'app-room-type-form',
     imports: [ReactiveFormsModule, RouterLink],
     templateUrl: './room-type-form.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     styleUrl: './room-type-form.component.css'
 })
 export class RoomTypeFormComponent implements OnInit {

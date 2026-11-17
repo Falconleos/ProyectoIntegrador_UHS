@@ -1,4 +1,4 @@
-import { Component, inject, OnInit, signal } from '@angular/core';
+import { Component, inject, OnInit, signal, ChangeDetectionStrategy } from '@angular/core';
 import {
   ReactiveFormsModule,
   NonNullableFormBuilder,
@@ -18,6 +18,7 @@ import {
     selector: 'app-comment-form',
     imports: [ReactiveFormsModule],
     templateUrl: './comment-form.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     styleUrl: './comment-form.component.css'
 })
 export class CommentFormComponent implements OnInit {

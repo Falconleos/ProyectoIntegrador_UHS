@@ -1,4 +1,4 @@
-import { Component, inject, OnInit, signal } from '@angular/core';
+import { Component, inject, OnInit, signal, ChangeDetectionStrategy } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { CommonModule } from '@angular/common';
 
@@ -9,6 +9,7 @@ import { CommentDtoResponse } from '../../../models/Comment-model';
     selector: 'app-comment-list',
     imports: [RouterLink, CommonModule],
     templateUrl: './comment-list.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     styleUrl: './comment-list.component.css'
 })
 export class CommentListComponent implements OnInit {

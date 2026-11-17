@@ -2,7 +2,8 @@ import {
   Component,
   OnInit,
   inject,
-  signal
+  signal,
+  ChangeDetectionStrategy
 } from '@angular/core';
 
 import {
@@ -24,6 +25,7 @@ import { ItemDtoResponse } from '../../../models/Item-model';
     selector: 'app-room-attention-form',
     imports: [ReactiveFormsModule, FormsModule],
     templateUrl: './room-attention-form.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     styleUrl: './room-attention-form.component.css'
 })
 export class RoomAttentionFormComponent implements OnInit {

@@ -1,4 +1,4 @@
-import { Component, ChangeDetectorRef, inject } from '@angular/core';
+import { Component, ChangeDetectorRef, inject, ChangeDetectionStrategy } from '@angular/core';
 
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
@@ -9,6 +9,7 @@ import { finalize } from 'rxjs';
     selector: 'app-register',
     imports: [ReactiveFormsModule, RouterLink],
     templateUrl: './register.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     styleUrls: ['./register.component.css']
 })
 export class RegisterComponent {

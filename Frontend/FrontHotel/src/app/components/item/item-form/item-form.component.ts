@@ -1,5 +1,5 @@
 
-import { Component, inject, signal } from '@angular/core';
+import { Component, inject, signal, ChangeDetectionStrategy } from '@angular/core';
 import {
   ReactiveFormsModule,
   NonNullableFormBuilder,
@@ -14,6 +14,7 @@ import { ItemDtoRequest } from '../../../models/Item-model';
     selector: 'app-item-form',
     imports: [ReactiveFormsModule, RouterLink],
     templateUrl: './item-form.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     styleUrl: './item-form.component.css'
 })
 export class ItemFormComponent {

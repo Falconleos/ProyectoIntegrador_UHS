@@ -1,4 +1,4 @@
-import { Component, OnInit, ChangeDetectorRef, signal, computed } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef, signal, computed, ChangeDetectionStrategy } from '@angular/core';
 
 import { Router, RouterLink } from '@angular/router';
 import { UserService } from '../../core/services/user.service';
@@ -9,6 +9,7 @@ import { AuthService } from '../../core/services/auth.service';
     selector: 'app-user-list',
     imports: [RouterLink],
     templateUrl: './user-list.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     styleUrls: ['./user-list.component.css']
 })
 export class UserListComponent implements OnInit {

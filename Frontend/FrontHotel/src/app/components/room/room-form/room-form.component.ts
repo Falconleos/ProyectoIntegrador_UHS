@@ -1,4 +1,4 @@
-import { Component, inject, OnInit, signal, OnDestroy } from '@angular/core';
+import { Component, inject, OnInit, signal, OnDestroy, ChangeDetectionStrategy } from '@angular/core';
 import {
   ReactiveFormsModule,
   NonNullableFormBuilder,
@@ -14,6 +14,7 @@ import { RoomTypeDTOResponse } from '../../../models/RoomType-model';
     selector: 'app-room-form',
     imports: [ReactiveFormsModule, RouterLink],
     templateUrl: './room-form.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     styleUrl: './room-form.component.css'
 })
 export class RoomFormComponent implements OnInit, OnDestroy {

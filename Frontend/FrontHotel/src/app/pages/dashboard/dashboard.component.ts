@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, signal, inject } from '@angular/core';
+import { Component, OnInit, OnDestroy, signal, inject, ChangeDetectionStrategy } from '@angular/core';
 
 import { Router, RouterOutlet, RouterLink, RouterLinkActive } from '@angular/router';
 import { Subscription } from 'rxjs';
@@ -9,6 +9,7 @@ import { RoomAttentionService } from '../../core/services/room-attention.service
     selector: 'app-dashboard',
     imports: [RouterOutlet, RouterLink, RouterLinkActive],
     templateUrl: './dashboard.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     styleUrls: ['./dashboard.component.css']
 })
 export class DashboardComponent implements OnInit, OnDestroy {

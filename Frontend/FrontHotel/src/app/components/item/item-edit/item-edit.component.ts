@@ -1,4 +1,4 @@
-import { Component, inject, OnInit, signal, OnDestroy } from '@angular/core';
+import { Component, inject, OnInit, signal, OnDestroy, ChangeDetectionStrategy } from '@angular/core';
 import {
   ReactiveFormsModule,
   NonNullableFormBuilder,
@@ -13,6 +13,7 @@ import { ItemDtoRequest } from '../../../models/Item-model';
     selector: 'app-item-edit',
     imports: [ReactiveFormsModule, RouterLink],
     templateUrl: './item-edit.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     styleUrl: './item-edit.component.css'
 })
 export class ItemEditComponent implements OnInit, OnDestroy {

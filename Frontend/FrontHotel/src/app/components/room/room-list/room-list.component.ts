@@ -1,4 +1,4 @@
-import { Component, inject, OnInit, OnDestroy, signal } from '@angular/core';
+import { Component, inject, OnInit, OnDestroy, signal, ChangeDetectionStrategy } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { Subscription } from 'rxjs';
 
@@ -11,6 +11,7 @@ import { RoomTypeDTOResponse } from '../../../models/RoomType-model';
     selector: 'app-room-list',
     imports: [RouterLink],
     templateUrl: './room-list.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     styleUrl: './room-list.component.css'
 })
 export class RoomListComponent implements OnInit, OnDestroy {

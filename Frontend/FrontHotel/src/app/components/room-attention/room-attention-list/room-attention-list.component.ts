@@ -1,4 +1,4 @@
-import { Component, OnInit, computed, inject, signal } from '@angular/core';
+import { Component, OnInit, computed, inject, signal, ChangeDetectionStrategy } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { CommonModule } from '@angular/common';
 
@@ -9,6 +9,7 @@ import { RoomAttentionDtoResponse } from '../../../models/RoomAttention-model';
     selector: 'app-room-attention-list',
     imports: [RouterLink, CommonModule],
     templateUrl: './room-attention-list.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     styleUrl: './room-attention-list.component.css'
 })
 export class RoomAttentionListComponent implements OnInit {

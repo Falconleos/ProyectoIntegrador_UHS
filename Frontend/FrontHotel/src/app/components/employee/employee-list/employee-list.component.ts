@@ -1,4 +1,4 @@
-import { Component, inject, OnInit, OnDestroy, signal, computed } from '@angular/core';
+import { Component, inject, OnInit, OnDestroy, signal, computed, ChangeDetectionStrategy } from '@angular/core';
 import { DecimalPipe } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import {
@@ -17,6 +17,7 @@ import { UserDtoResponse } from '../../../models/User-model';
     selector: 'app-employee-list',
     imports: [RouterLink, DecimalPipe, ReactiveFormsModule],
     templateUrl: './employee-list.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     styleUrl: './employee-list.component.css'
 })
 export class EmployeeListComponent implements OnInit, OnDestroy {

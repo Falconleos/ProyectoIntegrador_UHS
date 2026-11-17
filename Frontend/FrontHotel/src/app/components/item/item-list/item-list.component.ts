@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, signal } from '@angular/core';
+import { Component, OnInit, OnDestroy, signal, ChangeDetectionStrategy } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { CurrencyPipe } from '@angular/common';
 
@@ -14,6 +14,7 @@ interface ItemWithImage extends ItemDtoResponse {
     selector: 'app-item-list',
     imports: [RouterLink, CurrencyPipe],
     templateUrl: './item-list.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     styleUrl: './item-list.component.css'
 })
 export class ItemListComponent implements OnInit, OnDestroy {

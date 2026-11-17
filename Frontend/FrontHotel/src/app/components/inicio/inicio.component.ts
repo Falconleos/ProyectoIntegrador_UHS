@@ -1,4 +1,4 @@
-import { Component, OnInit, inject, signal } from '@angular/core';
+import { Component, OnInit, inject, signal, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
 import { RoomService } from '../../core/services/room.service';
@@ -10,6 +10,7 @@ import { RoomAttentionService } from '../../core/services/room-attention.service
     selector: 'app-inicio',
     imports: [CommonModule],
     templateUrl: './inicio.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     styleUrl: './inicio.component.css'
 })
 export class InicioComponent implements OnInit {

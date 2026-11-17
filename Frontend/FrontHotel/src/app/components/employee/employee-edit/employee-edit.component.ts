@@ -1,4 +1,4 @@
-import { Component, inject, OnInit, signal } from '@angular/core';
+import { Component, inject, OnInit, signal, ChangeDetectionStrategy } from '@angular/core';
 import {
   ReactiveFormsModule,
   NonNullableFormBuilder,
@@ -20,6 +20,7 @@ import {
     selector: 'app-employee-edit',
     imports: [ReactiveFormsModule, RouterLink],
     templateUrl: './employee-edit.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     styleUrl: './employee-edit.component.css'
 })
 export class EmployeeEditComponent implements OnInit {

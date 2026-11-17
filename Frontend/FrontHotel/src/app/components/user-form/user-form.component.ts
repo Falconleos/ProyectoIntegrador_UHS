@@ -1,4 +1,4 @@
-import { Component, ChangeDetectorRef } from '@angular/core';
+import { Component, ChangeDetectorRef, ChangeDetectionStrategy } from '@angular/core';
 
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
@@ -9,6 +9,7 @@ import { UserDtoRequestCreation, RoleType } from '../../models/User-model';
     selector: 'app-user-form',
     imports: [FormsModule, RouterLink],
     templateUrl: './user-form.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     styleUrls: ['./user-form.component.css']
 })
 export class UserFormComponent {
