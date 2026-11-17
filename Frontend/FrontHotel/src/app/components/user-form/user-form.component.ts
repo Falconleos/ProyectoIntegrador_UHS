@@ -1,9 +1,10 @@
-import { Component, ChangeDetectorRef, ChangeDetectionStrategy } from '@angular/core';
+import { Component, ChangeDetectorRef, ChangeDetectionStrategy, inject } from '@angular/core';
 
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { UserService } from '../../core/services/user.service';
 import { UserDtoRequestCreation, RoleType } from '../../models/User-model';
+import { AuthService } from '../../core/services/auth.service';
 
 @Component({
     selector: 'app-user-form',
@@ -32,12 +33,11 @@ export class UserFormComponent {
   loading = false;
   errorMessage = '';
 
-  constructor(
-    private userService: UserService,
-    private router: Router,
-    private cdr: ChangeDetectorRef
-  ) {}
-
+  private userService = inject(UserService);
+  private router = inject(Router);
+  private cdr = inject(ChangeDetectorRef);
+  
+  
   // Capturo el archivo seleccionado desde el input de tipo file para la foto de perfil
   onFileSelected(event: any): void {
     const file: File = event.target.files[0];
