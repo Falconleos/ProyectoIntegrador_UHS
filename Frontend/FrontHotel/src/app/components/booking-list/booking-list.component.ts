@@ -1,6 +1,6 @@
-import { Component, OnInit, ChangeDetectionStrategy, signal, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy, signal, computed, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ReactiveFormsModule } from '@angular/forms';
+import { ReactiveFormsModule, FormsModule } from '@angular/forms'; // <-- Añadir FormsModule para ngModel
 import { Router, RouterLink } from '@angular/router';
 import { BookingService } from '../../core/services/booking.service';
 import { BookingDtoResponse } from '../../models/Booking-model';
@@ -18,7 +18,7 @@ export interface BookingWithAccount extends BookingDtoResponse {
 @Component({
   selector: 'app-booking-list',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RouterLink],
+  imports: [CommonModule, ReactiveFormsModule, FormsModule, RouterLink], // <-- Añadir FormsModule aquí
   templateUrl: './booking-list.component.html',
   styleUrls: ['./booking-list.component.css'],
   changeDetection: ChangeDetectionStrategy.OnPush
@@ -33,6 +33,31 @@ export class BookingListComponent implements OnInit {
   canModify = signal<boolean>(false);
   isGuest = signal<boolean>(false);
   cancellingIds = signal<number[]>([]);
+  
+  // --- Nuevo: Estado para el término de búsqueda ---
+  searchTerm = signal<string>('');
+
+  // --- Nuevo: Listado filtrado reactivo basado en nombre, apellido o habitación ---
+  filteredBookings = computed(() => {
+    const term = this.searchTerm().toLowerCase().trim();
+    const list = this.bookings();
+    
+    if (!term) return list;
+
+    return list.filter((booking) => {
+      const firstName = (booking.guestFirstName || '').toLowerCase();
+      const lastName = (booking.guestLastName || '').toLowerCase();
+      const fullName = `${firstName} ${lastName}`;
+      const roomNum = booking.roomNumber ? booking.roomNumber.toString() : '';
+      const idStr = booking.id.toString();
+
+      return firstName.includes(term) || 
+             lastName.includes(term) || 
+             fullName.includes(term) || 
+             roomNum.includes(term) ||
+             idStr.includes(term);
+    });
+  });
 
   constructor(
     private bookingService: BookingService,
@@ -43,19 +68,12 @@ export class BookingListComponent implements OnInit {
     private cdr: ChangeDetectorRef
   ) {}
 
-  /**
-   * Método del ciclo de vida que se ejecuta al iniciar el componente.
-   * Carga los roles del usuario, la lista de reservas y los usuarios disponibles.
-   */
   ngOnInit(): void {
     this.checkUserRole();
     this.loadBookings();
     this.loadUsers();
   }
 
-  /**
-   * Obtiene la lista completa de usuarios del sistema si el usuario actual tiene permisos de modificación.
-   */
   loadUsers(): void {
     if (!this.canModify()) return;
 
@@ -70,17 +88,11 @@ export class BookingListComponent implements OnInit {
     });
   }
 
-  /**
-   * Captura el ID seleccionado en el selector de usuarios de una reserva específica.
-   */
   onUserSelectChange(booking: BookingWithAccount, event: Event): void {
     const selectedValue = (event.target as HTMLSelectElement).value;
     booking.selectedUserId = selectedValue ? Number(selectedValue) : null;
   }
 
-  /**
-   * Asocia un usuario seleccionado como titular de una reserva en el servidor.
-   */
   assignUser(booking: BookingWithAccount): void {
     const userId = booking.selectedUserId;
     if (!userId) {
@@ -100,9 +112,6 @@ export class BookingListComponent implements OnInit {
     });
   }
 
-  /**
-   * Lee el almacenamiento local para determinar si el usuario es Administrador/Recepcionista o Huésped.
-   */
   checkUserRole(): void {
     const storedRoles = localStorage.getItem('role');
     if (!storedRoles) {
@@ -135,9 +144,6 @@ export class BookingListComponent implements OnInit {
     }
   }
 
-  /**
-   * Inicializa la carga de reservas, procesando primero los No-Shows si el usuario no es huésped.
-   */
   loadBookings(): void {
     this.loading.set(true);
     this.errorMessage.set('');
@@ -156,9 +162,6 @@ export class BookingListComponent implements OnInit {
     });
   }
 
-  /**
-   * Obtiene las reservas del servidor, las filtra por estado y busca las cuentas asociadas de cada una.
-   */
   private fetchAndFilterBookings(): void {
     const requestObservable = this.isGuest() && this.bookingService.getMyBookings 
       ? this.bookingService.getMyBookings() 
@@ -168,7 +171,6 @@ export class BookingListComponent implements OnInit {
       next: (data) => {
         const allBookings = Array.isArray(data) ? [...data] : [];
         
-        // Filtramos para mostrar únicamente reservas pendientes o confirmadas (si es admin/recepción)
         const filteredBookings: BookingWithAccount[] = this.isGuest() 
           ? allBookings 
           : allBookings.filter((b) => b.state === 'PENDING' || b.state === 'CONFIRMED');
@@ -178,7 +180,6 @@ export class BookingListComponent implements OnInit {
         this.bookings.set(filteredBookings);
         this.loading.set(false);
 
-        // Verificamos si cada reserva cuenta con una cuenta asociada en el sistema
         filteredBookings.forEach((booking) => {
           this.accountService.getAccountByBookingId(booking.id).subscribe({
             next: (account: any) => {
@@ -205,9 +206,6 @@ export class BookingListComponent implements OnInit {
     });
   }
 
-  /**
-   * Redirige al usuario hacia la vista de detalle de cuenta usando el ID de la cuenta asociada.
-   */
   goToAccountDetail(booking: BookingWithAccount): void {
     if (booking.accountId) {
       this.router.navigate(['/dashboard/account-detail', booking.accountId]);
@@ -216,16 +214,10 @@ export class BookingListComponent implements OnInit {
     }
   }
 
-  /**
-   * Comprueba si una reserva específica se encuentra actualmente en proceso de cancelación.
-   */
   isCancelling(id: number): boolean {
     return this.cancellingIds().includes(id);
   }
 
-  /**
-   * Solicita el motivo de cancelación, verifica pagos previos y procede a cancelar la reserva.
-   */
   cancelBooking(id: number): void {
     const reason = prompt('Por favor, ingrese el motivo de la cancelación:');
     if (!reason || !reason.trim()) return;
@@ -254,9 +246,6 @@ export class BookingListComponent implements OnInit {
     });
   }
 
-  /**
-   * Ejecuta la petición HTTP para cancelar una reserva y refresca el listado.
-   */
   private executeCancellation(request: any, id: number): void {
     this.bookingService.cancelBooking(request).subscribe({
       next: () => {
@@ -272,9 +261,6 @@ export class BookingListComponent implements OnInit {
     });
   }
 
-  /**
-   * Confirma una reserva pendiente en el sistema tras validar los permisos de usuario.
-   */
   confirmBooking(id: number): void {
     if (!this.canModify()) {
       alert('No tienes los permisos necesarios para realizar esta acción.');
@@ -293,9 +279,6 @@ export class BookingListComponent implements OnInit {
     });
   }
 
-  /**
-   * Genera y descarga de forma automática la imagen del código QR asociado a la reserva.
-   */
   async downloadQr(booking: BookingDtoResponse): Promise<void> {
     if (!booking.qrBooking) {
       alert('Esta reserva no cuenta con un código QR generado.');

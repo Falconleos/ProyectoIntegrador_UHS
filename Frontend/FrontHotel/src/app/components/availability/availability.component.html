@@ -84,7 +84,7 @@
     <div class="header-section results-header">
       <div>
         <h3 class="results-title">Habitaciones Disponibles</h3>
-        <p class="subtitle">Haz clic sobre la habitación que deseas reservar para avanzar.</p>
+        <p class="subtitle">Utiliza los botones para ver detalles o seleccionar la habitación.</p>
       </div>
     </div>
     
@@ -101,17 +101,40 @@
               <th>Capacidad</th>
               <th>Precio por Noche</th>
               <th class="col-total">Total Est. ({{ calculateDays() }} noches)</th>
+              <th class="text-right">Acciones</th>
             </tr>
           </thead>
           <tbody>
             @for (room of availableRooms(); track room.id) {
-              <tr class="table-row-clickable" (click)="selectRoomAndRedirect(room)" title="Haz clic para seleccionar esta habitación">
+              <tr>
                 <td class="col-id subtitle">#{{ room.id }}</td>
                 <td><strong class="room-number">#{{ room.number }}</strong></td>
                 <td class="subtitle">{{ room.roomTypeDTOResponse?.name || room.roomTypeName || 'N/D' }}</td>
                 <td><span class="badge badge-secondary">{{ room.roomTypeDTOResponse?.capacity || room.capacity || 0 }} pers.</span></td>
                 <td class="subtitle">${{ getRoomPrice(room) | number:'1.2-2' }}</td>
                 <td class="col-total"><strong class="room-number">${{ calculateTotalPrice(room) | number:'1.2-2' }}</strong></td>
+                <td>
+                  <div class="table-actions" style="display: flex; gap: 6px; justify-content: flex-end;">
+                    <!-- Botón Ver Detalle -->
+                    <button
+                      type="button"
+                      class="btn-info-action"
+                      (click)="openRoomModal(room)"
+                      title="Ver detalle e imágenes"
+                    >
+                      <i class="fa-solid fa-eye"></i> Detalle
+                    </button>
+                    <!-- Botón Seleccionar -->
+                    <button
+                      type="button"
+                      class="btn-primary"
+                      (click)="selectRoomAndRedirect(room)"
+                      title="Seleccionar habitación"
+                    >
+                      <i class="fa-solid fa-check"></i> Seleccionar
+                    </button>
+                  </div>
+                </td>
               </tr>
             }
           </tbody>
@@ -121,7 +144,7 @@
       <!-- 2. VISTA DE TARJETAS (Visible en Dispositivos Móviles) -->
       <div class="mobile-cards-container">
         @for (room of availableRooms(); track room.id) {
-          <div class="mobile-room-card" (click)="selectRoomAndRedirect(room)">
+          <div class="mobile-room-card">
             <div class="mobile-card-top">
               <div>
                 <span class="col-id subtitle">Habitación #{{ room.id }}</span>
@@ -144,6 +167,16 @@
                 <strong class="room-number mobile-total-price">${{ calculateTotalPrice(room) | number:'1.2-2' }}</strong>
               </div>
             </div>
+
+            <!-- Botones de Acción Móvil -->
+            <div class="mobile-card-actions" style="display: flex; gap: 8px; margin-top: 8px;">
+              <button type="button" class="btn-info-action" (click)="openRoomModal(room)" style="flex: 1; padding: 6px;">
+                <i class="fa-solid fa-eye"></i> Detalle
+              </button>
+              <button type="button" class="btn-primary" (click)="selectRoomAndRedirect(room)" style="flex: 1; padding: 6px;">
+                <i class="fa-solid fa-check"></i> Seleccionar
+              </button>
+            </div>
           </div>
         }
       </div>
@@ -156,3 +189,129 @@
   }
 
 </section>
+
+<!-- ========================================== -->
+<!-- MODAL DE DETALLE Y CARRUSEL DE IMÁGENES -->
+<!-- ========================================== -->
+@if (selectedRoom(); as room) {
+  <div class="modal-backdrop" (click)="closeRoomModal()">
+    <div
+      class="modal-card"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="room-modal-title"
+      (click)="$event.stopPropagation()"
+    >
+
+      <!-- Botón Cerrar -->
+      <button
+        type="button"
+        class="btn-close"
+        aria-label="Cerrar modal"
+        (click)="closeRoomModal()"
+      >
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+
+      <!-- Encabezado del Modal -->
+      <div class="modal-header-profile">
+        <h3 id="room-modal-title">
+          Habitación #{{ room.number }}
+        </h3>
+        <p class="subtitle">
+          {{ room.roomTypeDTOResponse?.name ?? room.roomTypeName ?? 'Estándar' }}
+        </p>
+      </div>
+
+      <!-- Cuadrícula de Detalles -->
+      <div class="detail-grid">
+        <div class="detail-item">
+          <span class="detail-label"><i class="fa-solid fa-circle-check"></i> Estado:</span>
+          <span class="detail-value">{{ room.state }}</span>
+        </div>
+        <div class="detail-item">
+          <span class="detail-label"><i class="fa-solid fa-user-group"></i> Capacidad:</span>
+          <span class="detail-value">
+            {{ room.roomTypeDTOResponse?.capacity ?? room.capacity ?? 'Sin datos' }} personas
+          </span>
+        </div>
+        <div class="detail-item detail-item-full">
+          <span class="detail-label"><i class="fa-solid fa-dollar-sign"></i> Precio por noche:</span>
+          <span class="detail-value">
+            ${{ getRoomPrice(room) | number:'1.2-2' }}
+          </span>
+        </div>
+      </div>
+
+      <!-- Sección de Imágenes / Carrusel -->
+      <div class="modal-gallery-section">
+        <h3><i class="fa-solid fa-images"></i> Imágenes de la habitación</h3>
+
+        @if (loadingImages()) {
+          <div class="alert alert-info modal-alert-margin">
+            <i class="fa-solid fa-spinner fa-spin"></i> Cargando imágenes...
+          </div>
+        } @else if (imageError()) {
+          <div class="alert alert-danger modal-alert-margin">
+            <i class="fa-solid fa-triangle-exclamation"></i> {{ imageError() }}
+          </div>
+        } @else if (roomImages().length === 0) {
+          <p class="subtitle modal-subtitle-margin">Esta habitación no tiene imágenes.</p>
+        } @else {
+          <div class="image-gallery">
+            <img
+              [src]="roomImages()[currentImageIndex()]"
+              [alt]="'Imagen de la habitación ' + room.number"
+              class="room-image-preview"
+            >
+
+            @if (roomImages().length > 1) {
+              <div class="gallery-controls">
+                <button
+                  type="button"
+                  class="btn-secondary-action"
+                  (click)="previousImage()"
+                  aria-label="Imagen anterior"
+                >
+                  <i class="fa-solid fa-chevron-left"></i> Anterior
+                </button>
+
+                <span>
+                  {{ currentImageIndex() + 1 }} de {{ roomImages().length }}
+                </span>
+
+                <button
+                  type="button"
+                  class="btn-secondary-action"
+                  (click)="nextImage()"
+                  aria-label="Imagen siguiente"
+                >
+                  Siguiente <i class="fa-solid fa-chevron-right"></i>
+                </button>
+              </div>
+            }
+          </div>
+        }
+      </div>
+
+      <!-- Acciones del Modal -->
+      <div class="modal-actions" style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 1rem;">
+        <button
+          type="button"
+          class="btn-secondary-action"
+          (click)="closeRoomModal()"
+        >
+          Cerrar
+        </button>
+        <button
+          type="button"
+          class="btn-primary"
+          (click)="selectRoomAndRedirect(room); closeRoomModal();"
+        >
+          Seleccionar esta habitación
+        </button>
+      </div>
+
+    </div>
+  </div>
+}

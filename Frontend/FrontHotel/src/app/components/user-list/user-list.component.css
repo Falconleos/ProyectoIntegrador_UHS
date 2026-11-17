@@ -325,6 +325,41 @@
   display: none;
 }
 
+/* --- Barra de Filtros --- */
+.filters-bar {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.filter-group {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  background: var(--bg-secondary);
+  backdrop-filter: var(--backdrop-blur);
+  border: var(--border-glass);
+  border-radius: var(--radius-sm);
+  padding: 0 12px;
+  gap: 10px;
+  color: var(--color-text-muted);
+}
+
+.filter-input {
+  width: 100%;
+  background: transparent;
+  border: none;
+  color: var(--color-text-main);
+  padding: 10px 0;
+  font-size: var(--font-size-xs);
+  outline: none;
+}
+
+.filter-input::placeholder {
+  color: var(--color-text-muted);
+  opacity: 0.7;
+}
+
 /* Reglas generales para la adaptación en pantallas menores a 768px */
 @media (max-width: 768px) {
   /* Ocultamos la tabla tradicional en móviles */

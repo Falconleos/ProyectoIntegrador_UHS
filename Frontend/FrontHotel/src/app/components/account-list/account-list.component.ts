@@ -1,4 +1,4 @@
-import { Component, OnInit, ChangeDetectionStrategy, signal } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Router } from '@angular/router';
 import { AccountService } from '../../core/services/account.service';
@@ -17,6 +17,36 @@ export class AccountListComponent implements OnInit {
   loading = signal<boolean>(true);
   errorMessage = signal<string>('');
 
+  // SEÑALES PARA LOS FILTROS
+  searchTerm = signal<string>('');
+  paymentFilter = signal<string>('ALL'); // 'ALL' | 'PAID' | 'UNPAID'
+
+  // SEÑAL COMPUTADA QUE FILTRA LA LISTA AUTOMÁTICAMENTE
+  filteredAccounts = computed(() => {
+    const term = this.searchTerm().toLowerCase().trim();
+    const filter = this.paymentFilter();
+
+    return this.accounts().filter(account => {
+      // 1. Filtro por Nombre / Apellido del huésped
+      const guestName = account.user?.name ? account.user.name.toLowerCase() : '';
+      const guestSurname = account.user?.surname ? account.user.surname.toLowerCase() : '';
+      const fullName = `${guestName} ${guestSurname}`;
+      const matchesSearch = fullName.includes(term);
+
+      // 2. Filtro por Pago / Impago (basado en el saldo pendiente)
+      let matchesPayment = true;
+      const remaining = account.remainingBalance || 0;
+
+      if (filter === 'PAID') {
+        matchesPayment = remaining === 0;
+      } else if (filter === 'UNPAID') {
+        matchesPayment = remaining > 0;
+      }
+
+      return matchesSearch && matchesPayment;
+    });
+  });
+
   constructor(
     private accountService: AccountService,
     private router: Router
@@ -33,7 +63,6 @@ export class AccountListComponent implements OnInit {
 
     this.accountService.getAllAccounts().subscribe({
       next: (data: AccountDTOResponse[]) => {
-        // Procesamos cada cuenta para calcular totales y saldos antes de actualizar el estado
         const processedAccounts = Array.isArray(data) 
           ? data.map(account => this.calculateAccountTotals(account)) 
           : [];

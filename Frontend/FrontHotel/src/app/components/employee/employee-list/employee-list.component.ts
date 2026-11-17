@@ -1,4 +1,4 @@
-import { Component, inject, OnInit, OnDestroy, signal } from '@angular/core';
+import { Component, inject, OnInit, OnDestroy, signal, computed } from '@angular/core';
 import { DecimalPipe } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import {
@@ -59,6 +59,39 @@ export class EmployeeListComponent implements OnInit, OnDestroy {
       Validators.required
     ])
   });
+
+  // ==========================================================
+  // FILTROS (Búsqueda por Nombre, Apellido, Username y Turno)
+  // ==========================================================
+  searchText = signal('');
+  selectedShiftFilter = signal('');
+
+  filteredEmployees = computed(() => {
+    const list = this.employees();
+    const search = this.searchText().toLowerCase().trim();
+    const shiftFilter = this.selectedShiftFilter();
+
+    return list.filter(emp => {
+      // Unimos nombre, apellido y username en una sola cadena para buscar en los tres
+      const searchString = `${emp.name} ${emp.surname} ${emp.username}`.toLowerCase();
+      
+      const matchesSearch = searchString.includes(search);
+      const matchesShift = shiftFilter === '' || emp.shift === shiftFilter;
+
+      return matchesSearch && matchesShift;
+    });
+  });
+
+  onSearchInput(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    this.searchText.set(input.value);
+  }
+
+  onShiftFilterChange(event: Event): void {
+    const select = event.target as HTMLSelectElement;
+    this.selectedShiftFilter.set(select.value);
+  }
+  // ==========================================================
 
   ngOnInit(): void {
     this.checkUserRole();

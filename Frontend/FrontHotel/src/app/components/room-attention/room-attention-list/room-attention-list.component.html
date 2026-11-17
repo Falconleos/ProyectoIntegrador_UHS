@@ -5,7 +5,6 @@
       <i class="fa-solid fa-basket-shopping icon-title"></i> Consumos y Servicios de la Reserva
     </h2>
     
-    <!-- Botón visible para Admin, Recepción y Huéspedes -->
     <button 
       type="button"
       class="btn-primary-action" 
@@ -42,8 +41,8 @@
               <tr>
                 <th>ID</th>
                 <th>Descripción</th>
-                <th>Cantidad</th>
-                <th>Precio Unitario</th>
+                <th>Cant.</th>
+                <th>P. Unitario</th>
                 <th>Subtotal</th>
                 <th>Registrado por</th>
                 <th>Estado</th>
@@ -61,15 +60,9 @@
                       {{ item.itemDTOResponse.description || $any(item).description || 'Consumo #' + item.id }}
                     </div>
                   </td>
-                  <td>
-                    <span class="text-main">{{ item.quantity }}</span>
-                  </td>
-                  <td>
-                    <span class="text-main">${{ item.unitPrice | number:'1.2-2' }}</span>
-                  </td>
-                  <td>
-                    <span class="text-main subtotal-price">${{ item.subtotal | number:'1.2-2' }}</span>
-                  </td>
+                  <td><span class="text-main">{{ item.quantity }}</span></td>
+                  <td><span class="text-main">${{ item.unitPrice | number:'1.2-2' }}</span></td>
+                  <td><span class="text-main subtotal-price">${{ item.subtotal | number:'1.2-2' }}</span></td>
                   <td>
                     <span class="badge badge-secondary employee-badge">
                       <i class="fa-solid fa-user icon-badge"></i> {{ item.employeeUsername || 'Sistema' }}
@@ -138,10 +131,10 @@
                 {{ item.itemDTOResponse.description || $any(item).description || 'Consumo #' + item.id }}
               </h5>
               <div class="mobile-info-grid">
-                <p><strong>Cantidad:</strong> <span class="text-main">{{ item.quantity }}</span></p>
-                <p><strong>P. Unitario:</strong> <span class="text-main">${{ item.unitPrice | number:'1.2-2' }}</span></p>
+                <p><strong>Cant:</strong> <span class="text-main">{{ item.quantity }}</span></p>
+                <p><strong>P. Unit:</strong> <span class="text-main">${{ item.unitPrice | number:'1.2-2' }}</span></p>
                 <p><strong>Subtotal:</strong> <span class="text-main subtotal-price">${{ item.subtotal | number:'1.2-2' }}</span></p>
-                <p><strong>Registrado por:</strong> <span class="text-subtitle">{{ item.employeeUsername || 'Sistema' }}</span></p>
+                <p><strong>Por:</strong> <span class="text-subtitle">{{ item.employeeUsername || 'Sistema' }}</span></p>
               </div>
             </div>
 
@@ -169,17 +162,18 @@
         }
       </div>
 
-      <!-- Resumen de Total -->
-      <div class="total-section">
-        <h3 class="total-title">Total consumos: <span class="total-amount">${{ total() | number:'1.2-2' }}</span></h3>
+      <!-- Resumen de Total e Inferior -->
+      <div class="footer-summary-row">
+        <div class="back-button-container">
+          <a routerLink="/dashboard/check-in-list" class="btn-secondary-action">
+            <i class="fa-solid fa-arrow-left icon-badge"></i> Volver a Check-ins
+          </a>
+        </div>
+        
+        <div class="total-section">
+          <h3 class="total-title">Total consumos: <span class="total-amount">${{ total() | number:'1.2-2' }}</span></h3>
+        </div>
       </div>
     }
   }
-
-  <!-- Botón Volver -->
-  <div class="back-button-container">
-    <a routerLink="/dashboard/check-in-list" class="btn-secondary-action">
-      <i class="fa-solid fa-arrow-left icon-badge"></i> Volver a Check-ins
-    </a>
-  </div>
 </div>

@@ -1,4 +1,4 @@
-import { Component, OnInit, ChangeDetectionStrategy, signal } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { CheckInService } from '../../core/services/check-in.service';
@@ -13,7 +13,7 @@ import jsQR from 'jsqr';
 @Component({
   selector: 'app-check-in-list',
   standalone: true,
-  imports: [CommonModule], // Ya no requerimos FormsModule
+  imports: [CommonModule],
   templateUrl: './check-in-list.component.html',
   styleUrls: ['./check-in-list.component.css'],
   changeDetection: ChangeDetectionStrategy.OnPush
@@ -51,6 +51,41 @@ export class CheckInListComponent implements OnInit {
   // Mapa interno para almacenar las URLs de las miniaturas de QR por ID de reserva
   qrDataUrls = signal<{ [key: number]: string }>({});
 
+  // --- FILTRADO REACTIVO ---
+  searchTerm = signal<string>('');
+
+  filteredPendingBookings = computed(() => {
+    const term = this.searchTerm().toLowerCase().trim();
+    const list = this.pendingBookingsToday();
+    if (!term) return list;
+
+    return list.filter(b => {
+      const name = (b.name || b.guestFirstName || '').toLowerCase();
+      const surname = (b.surname || b.guestLastName || '').toLowerCase();
+      const fullName = `${name} ${surname}`;
+      const room = b.roomNumber ? b.roomNumber.toString() : '';
+      const id = b.id.toString();
+
+      return name.includes(term) || surname.includes(term) || fullName.includes(term) || room.includes(term) || id.includes(term);
+    });
+  });
+
+  filteredCheckedInBookings = computed(() => {
+    const term = this.searchTerm().toLowerCase().trim();
+    const list = this.checkedInBookings();
+    if (!term) return list;
+
+    return list.filter(b => {
+      const name = (b.name || b.guestFirstName || '').toLowerCase();
+      const surname = (b.surname || b.guestLastName || '').toLowerCase();
+      const fullName = `${name} ${surname}`;
+      const room = b.roomNumber ? b.roomNumber.toString() : '';
+      const id = b.id.toString();
+
+      return name.includes(term) || surname.includes(term) || fullName.includes(term) || room.includes(term) || id.includes(term);
+    });
+  });
+
   constructor(
     private checkInService: CheckInService,
     private authService: AuthService,
@@ -60,13 +95,11 @@ export class CheckInListComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    // Inicialización del componente: validamos los permisos del usuario y cargamos los datos iniciales
     this.checkUserRole();
     this.loadData();
     this.loadUsers();
   }
 
-  // --- FUNCIÓN AUXILIAR PARA MOSTRAR EL NOMBRE CORRECTO ---
   getGuestDisplayName(booking: BookingDtoResponse): string {
     if (booking.name || booking.surname) {
       return `${booking.name || ''} ${booking.surname || ''}`.trim();
@@ -90,7 +123,6 @@ export class CheckInListComponent implements OnInit {
   }
 
   loadData(): void {
-    // Activamos el estado de carga y solicitamos al servicio las reservas previstas para hoy
     this.loading.set(true);
     this.errorMessage.set('');
 
@@ -100,7 +132,6 @@ export class CheckInListComponent implements OnInit {
           ? todayBookings.filter(b => b.state === 'CONFIRMED' || b.state === 'PENDING') 
           : [];
         
-        // Ordenar de más reciente a más antigua (por ID descendente)
         filtered.sort((a, b) => b.id - a.id);
         
         this.pendingBookingsToday.set(filtered);
@@ -116,7 +147,6 @@ export class CheckInListComponent implements OnInit {
     });
   }
 
-  // Genera las miniaturas de QR en base64 para cada tarjeta
   private async generateQrThumbnails(bookings: BookingDtoResponse[]): Promise<void> {
     const map: { [key: number]: string } = {};
     for (const b of bookings) {
@@ -132,7 +162,6 @@ export class CheckInListComponent implements OnInit {
   }
 
   loadCheckedInBookings(): void {
-    // Obtenemos el listado de estadías activas con estado CHECKED_IN y finalizamos el indicador de carga
     this.checkInService.getBookingsByState('CHECKED_IN').subscribe({
       next: (bookings) => {
         const list = Array.isArray(bookings) ? [...bookings] : [];
@@ -148,7 +177,6 @@ export class CheckInListComponent implements OnInit {
   }
 
   loadUsers(): void {
-    // Obtenemos la lista general de usuarios para la asignación manual en caso de requerirse
     this.userService.getAll().subscribe({
       next: (data) => { 
         this.users.set(Array.isArray(data) ? data : []); 
@@ -157,7 +185,6 @@ export class CheckInListComponent implements OnInit {
     });
   }
 
-  // --- GESTIÓN DE LECTURA QR MEDIANTE ADJUNTO DE IMAGEN PNG ---
   onQrFileSelected(event: any): void {
     const file = event.target.files[0];
     if (!file) return;
@@ -238,7 +265,6 @@ export class CheckInListComponent implements OnInit {
   }
 
   executeCheckInDirectly(bookingId: number): void {
-    // Invocamos al servicio de check-in y actualizamos el estado local removiendo la reserva procesada
     this.checkInService.checkInBooking(bookingId).subscribe({
       next: () => {
         this.checkInSuccess.set('¡Check-in realizado con éxito!');
@@ -267,7 +293,6 @@ export class CheckInListComponent implements OnInit {
     }
 
     const bId = booking.id;
-    // Paso secuencial: Primero asociamos el usuario a la reserva y luego ejecutamos el check-in
     this.checkInService.assignUserToBooking(bId, userId).subscribe({
       next: () => {
         this.checkInService.checkInBooking(bId).subscribe({
@@ -298,7 +323,6 @@ export class CheckInListComponent implements OnInit {
     if (!booking) return;
     const bId = booking.id;
 
-    // Enviamos la petición de check-in utilizando el DNI provisto por el usuario
     this.checkInService.checkInBooking(bId, this.inputDni()).subscribe({
       next: () => {
         this.checkInSuccess.set('¡Check-in realizado con éxito!');
@@ -326,7 +350,6 @@ export class CheckInListComponent implements OnInit {
     if (!booking) return;
     const bId = booking.id;
 
-    // Secuencia completa: creamos el usuario, lo asociamos a la reserva y ejecutamos el check-in
     this.checkInService.createUser(this.newUser()).subscribe({
       next: (createdUser) => {
         this.checkInService.assignUserToBooking(bId, createdUser.id).subscribe({
@@ -353,7 +376,6 @@ export class CheckInListComponent implements OnInit {
     });
   }
 
-  // --- MÉTODOS NATIVOS PARA REEMPLAZAR NGMODEL ---
   onUserSelectChange(event: Event): void {
     const value = (event.target as HTMLSelectElement).value;
     this.selectedUserId.set(value ? Number(value) : null);
@@ -364,14 +386,12 @@ export class CheckInListComponent implements OnInit {
     this.newUser.update(u => ({ ...u, [field]: value }));
   }
 
-  // --- INTERRUPCIÓN DE ESTADÍA SIMPLIFICADA (SIN NOTA DE CRÉDITO) ---
   interruptStay(id: number): void {
     const reason = prompt('Motivo de interrupción de estadía:');
     if (!reason || !reason.trim()) {
       return;
     }
 
-    // Paso 1: Consultamos la cuenta financiera para comprobar si el saldo se encuentra totalmente pagado
     this.accountService.getAccountByBookingId(id).subscribe({
       next: (account: any) => {
         if (!account || !account.isPaid) {
@@ -382,10 +402,9 @@ export class CheckInListComponent implements OnInit {
         const requestPayload = {
           bookingId: id,
           reason: reason.trim(),
-          issueCreditNote: false // Ya no aplica para interrupciones
+          issueCreditNote: false
         };
 
-        // Paso 2: Si la cuenta está saldada, ejecutamos la interrupción de la estadía
         this.checkInService.interruptStay(requestPayload).subscribe({
           next: () => {
             alert('Estadía interrumpida con éxito.');

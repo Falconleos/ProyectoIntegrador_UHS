@@ -4,9 +4,42 @@
     <h2>
       <i class="fa-solid fa-bell-concierge icon-title"></i> Servicio al Cuarto (Gestión Global)
     </h2>
+    <a routerLink="/dashboard" class="btn-secondary-action">
+      <i class="fa-solid fa-arrow-left icon-badge"></i> Volver al Inicio
+    </a>
   </div>
 
   <hr class="divider" />
+
+  <!-- SECCIÓN DE FILTROS BÁSICOS -->
+  @if (!loading() && !errorMessage() && attentions().length > 0) {
+    <div class="filters-container">
+      <!-- Filtro por Número de Habitación -->
+      <div class="filter-group">
+        <label class="filter-label"><i class="fa-solid fa-door-open"></i> Filtrar por Habitación:</label>
+        <input 
+          type="text" 
+          class="form-control" 
+          [value]="roomFilter()" 
+          (input)="roomFilter.set($any($event.target).value)" 
+          placeholder="Ej: 101..."
+        />
+      </div>
+
+      <!-- Filtro por Estado (Pendiente / Entregado) -->
+      <div class="filter-group">
+        <label class="filter-label"><i class="fa-solid fa-filter"></i> Estado de entrega:</label>
+        <select 
+          class="form-control" 
+          [value]="statusFilter()" 
+          (change)="statusFilter.set($any($event.target).value)">
+          <option value="ALL">Todos los estados</option>
+          <option value="PENDING">Pendientes</option>
+          <option value="DELIVERED">Entregados</option>
+        </select>
+      </div>
+    </div>
+  }
 
   <!-- Mensaje de Error -->
   @if (errorMessage()) {
@@ -26,158 +59,157 @@
         <i class="fa-solid fa-circle-info icon-alert"></i> No hay solicitudes de servicio al cuarto registradas en el sistema.
       </div>
     } @else {
-      <!-- Contenedor con Estilo Glass para la Tabla (Visible en Escritorio) -->
-      <div class="glass-table-container desktop-only">
-        <div class="table-responsive">
-          <table class="table-glass">
-            <thead>
-              <tr>
-                <th>ID</th>
-                <th>Habitación / Reserva</th>
-                <th>Descripción</th>
-                <th>Cant.</th>
-                <th>Subtotal</th>
-                <th>Registrado por</th>
-                <th>Fecha / Hora</th>
-                <th>Estado</th>
-                <th class="th-actions">Acciones</th>
-              </tr>
-            </thead>
-            <tbody>
-              @for (item of attentions(); track item.id) {
-                <tr [class.row-pending]="!item.delivered" [class.row-delivered]="item.delivered">
-                  <td><strong class="text-subtitle">#{{ item.id }}</strong></td>
-                  <td>
-                    <div class="room-cell-wrapper">
-                      <span class="badge badge-room">
-                        <i class="fa-solid fa-door-open icon-badge"></i> Hab. {{ item.roomNumber || $any(item).bookingEntity?.room?.number || $any(item).room || 'N/A' }}
+      @if (filteredAttentions().length === 0) {
+        <div class="alert alert-info">
+          <i class="fa-solid fa-circle-info icon-alert"></i> No se encontraron solicitudes que coincidan con los filtros aplicados.
+        </div>
+      } @else {
+        <!-- Contenedor con Estilo Glass para la Tabla (Visible en Escritorio) -->
+        <div class="glass-table-container desktop-only">
+          <div class="table-responsive">
+            <table class="table-glass">
+              <thead>
+                <tr>
+                  <th class="col-id">ID</th>
+                  <th>Hab. / Reserva</th>
+                  <th>Descripción</th>
+                  <th>Cant.</th>
+                  <th>Subtotal</th>
+                  <th>Registrado por</th>
+                  <th>Fecha / Hora</th>
+                  <th>Estado</th>
+                  <th class="th-actions">Acciones</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (item of filteredAttentions(); track item.id) {
+                  <tr [class.row-pending]="!item.delivered" [class.row-delivered]="item.delivered">
+                    <td class="col-id"><strong class="text-subtitle">#{{ item.id }}</strong></td>
+                    <td>
+                      <div class="room-cell-wrapper">
+                        <span class="badge badge-room">
+                          <i class="fa-solid fa-door-open icon-badge"></i> Hab. {{ item.roomNumber || $any(item).bookingEntity?.room?.number || $any(item).room || 'N/A' }}
+                        </span>
+                        <span class="text-subtitle booking-id-text">Reserva #{{ item.bookingId }}</span>
+                      </div>
+                    </td>
+                    <td>
+                      <div class="text-main item-description">
+                        {{ item.itemDTOResponse.description || 'Consumo #' + item.id }}
+                      </div>
+                    </td>
+                    <td>
+                      <span class="text-main">{{ item.quantity }}</span>
+                    </td>
+                    <td>
+                      <span class="text-main subtotal-price">${{ item.subtotal | number:'1.2-2' }}</span>
+                    </td>
+                    <td>
+                      <span class="badge badge-secondary employee-badge">
+                        <i class="fa-solid fa-user icon-badge"></i> {{ item.employeeUsername || 'Sistema' }}
                       </span>
-                      <span class="text-subtitle booking-id-text">Reserva #{{ item.bookingId }}</span>
-                    </div>
-                  </td>
-                  <td>
-                    <div class="text-main item-description">
-                      {{ item.itemDTOResponse.description || 'Consumo #' + item.id }}
-                    </div>
-                  </td>
-                  <td>
-                    <span class="text-main">{{ item.quantity }}</span>
-                  </td>
-                  <td>
-                    <span class="text-main subtotal-price">${{ item.subtotal | number:'1.2-2' }}</span>
-                  </td>
-                  <td>
-                    <span class="badge badge-secondary employee-badge">
-                      <i class="fa-solid fa-user icon-badge"></i> {{ item.employeeUsername || 'Sistema' }}
-                    </span>
-                  </td>
-                  <td>
-                    <span class="text-subtitle date-text">{{ item.createdAt || 'N/A' }}</span>
-                  </td>
-                  <td>
-                    @if (item.delivered) {
-                      <span class="badge badge-success-glass">
-                        <i class="fa-solid fa-circle-check icon-badge"></i> Entregado
-                      </span>
-                    } @else {
-                      <span class="badge badge-warning-glass">
-                        <i class="fa-solid fa-clock icon-badge"></i> Pendiente
-                      </span>
-                    }
-                  </td>
-                  
-                  <!-- Acciones de Entregar / Eliminar -->
-                  <td class="td-actions">
-                    <div class="action-buttons-wrapper">
-                      @if (!item.delivered) {
+                    </td>
+                    <td>
+                      <span class="text-subtitle date-text">{{ item.createdAt || 'N/A' }}</span>
+                    </td>
+                    <td>
+                      @if (item.delivered) {
+                        <span class="badge badge-success-glass">
+                          <i class="fa-solid fa-circle-check icon-badge"></i> Entregado
+                        </span>
+                      } @else {
+                        <span class="badge badge-warning-glass">
+                          <i class="fa-solid fa-clock icon-badge"></i> Pendiente
+                        </span>
+                      }
+                    </td>
+                    
+                    <!-- Acciones de Entregar / Eliminar -->
+                    <td class="td-actions">
+                      <div class="action-buttons-wrapper">
+                        @if (!item.delivered) {
+                          <button 
+                            type="button"
+                            class="btn-secondary-action" 
+                            [disabled]="deliveringId() === item.id"
+                            (click)="markAsDelivered(item.id)">
+                            <i class="fa-solid fa-check-double icon-badge"></i> Entregar
+                          </button>
+                        }
                         <button 
                           type="button"
-                          class="btn-secondary-action" 
-                          [disabled]="deliveringId() === item.id"
-                          (click)="markAsDelivered(item.id)">
-                          <i class="fa-solid fa-check-double icon-badge"></i> Entregar
+                          class="btn-danger-action" 
+                          [disabled]="deletingId() === item.id"
+                          (click)="deleteAttention(item.id)">
+                            <i class="fa-solid fa-trash icon-badge"></i> Eliminar
                         </button>
-                      }
-                      <button 
-                        type="button"
-                        class="btn-danger-action" 
-                        [disabled]="deletingId() === item.id"
-                        (click)="deleteAttention(item.id)">
-                          <i class="fa-solid fa-trash icon-badge"></i> Eliminar
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              }
-            </tbody>
-          </table>
+                      </div>
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
         </div>
-      </div>
 
-      <!-- Contenedor de Tarjetas (Visible en Móvil) -->
-      <div class="service-mobile-cards mobile-only">
-        @for (item of attentions(); track item.id) {
-          <div class="service-mobile-card" [class.card-pending]="!item.delivered" [class.card-delivered]="item.delivered">
-            <div class="mobile-card-header">
-              <span class="badge badge-room">
-                <i class="fa-solid fa-door-open icon-badge"></i> Hab. {{ item.roomNumber || $any(item).bookingEntity?.room?.number || $any(item).room || 'N/A' }}
-              </span>
-              @if (item.delivered) {
-                <span class="badge badge-success-glass">
-                  <i class="fa-solid fa-circle-check icon-badge"></i> Entregado
+        <!-- Contenedor de Tarjetas (Visible en Móvil) -->
+        <div class="service-mobile-cards mobile-only">
+          @for (item of filteredAttentions(); track item.id) {
+            <div class="service-mobile-card" [class.card-pending]="!item.delivered" [class.card-delivered]="item.delivered">
+              <div class="mobile-card-header">
+                <span class="badge badge-room">
+                  <i class="fa-solid fa-door-open icon-badge"></i> Hab. {{ item.roomNumber || $any(item).bookingEntity?.room?.number || $any(item).room || 'N/A' }}
                 </span>
-              } @else {
-                <span class="badge badge-warning-glass">
-                  <i class="fa-solid fa-clock icon-badge"></i> Pendiente
-                </span>
-              }
-            </div>
-
-            <div class="mobile-card-body">
-              <div class="service-title-row">
-                <strong class="text-subtitle">#{{ item.id }}</strong>
-                <h5 class="text-main item-description text-zero-margin">
-                  {{ item.itemDTOResponse.description || 'Consumo #' + item.id }}
-                </h5>
+                @if (item.delivered) {
+                  <span class="badge badge-success-glass">
+                    <i class="fa-solid fa-circle-check icon-badge"></i> Entregado
+                  </span>
+                } @else {
+                  <span class="badge badge-warning-glass">
+                    <i class="fa-solid fa-clock icon-badge"></i> Pendiente
+                  </span>
+                }
               </div>
 
-              <div class="mobile-info-grid">
-                <p><strong>Reserva:</strong> <span class="text-subtitle">#{{ item.bookingId }}</span></p>
-                <p><strong>Cantidad:</strong> <span class="text-main">{{ item.quantity }}</span></p>
-                <p><strong>Subtotal:</strong> <span class="subtotal-price">${{ item.subtotal | number:'1.2-2' }}</span></p>
-                <p><strong>Registrado por:</strong> <span class="text-subtitle">{{ item.employeeUsername || 'Sistema' }}</span></p>
-                <p class="full-width"><strong>Fecha/Hora:</strong> <span class="text-subtitle">{{ item.createdAt || 'N/A' }}</span></p>
-              </div>
-            </div>
+              <div class="mobile-card-body">
+                <div class="service-title-row">
+                  <strong class="text-subtitle">#{{ item.id }}</strong>
+                  <h5 class="text-main item-description text-zero-margin">
+                    {{ item.itemDTOResponse.description || 'Consumo #' + item.id }}
+                  </h5>
+                </div>
 
-            <div class="mobile-card-actions">
-              @if (!item.delivered) {
+                <div class="mobile-info-grid">
+                  <p><strong>Reserva:</strong> <span class="text-subtitle">#{{ item.bookingId }}</span></p>
+                  <p><strong>Cantidad:</strong> <span class="text-main">{{ item.quantity }}</span></p>
+                  <p><strong>Subtotal:</strong> <span class="subtotal-price">${{ item.subtotal | number:'1.2-2' }}</span></p>
+                  <p><strong>Registrado por:</strong> <span class="text-subtitle">{{ item.employeeUsername || 'Sistema' }}</span></p>
+                  <p class="full-width"><strong>Fecha/Hora:</strong> <span class="text-subtitle">{{ item.createdAt || 'N/A' }}</span></p>
+                </div>
+              </div>
+
+              <div class="mobile-card-actions">
+                @if (!item.delivered) {
+                  <button 
+                    type="button"
+                    class="btn-secondary-action" 
+                    [disabled]="deliveringId() === item.id"
+                    (click)="markAsDelivered(item.id)">
+                    <i class="fa-solid fa-check-double icon-badge"></i> Entregar
+                  </button>
+                }
                 <button 
                   type="button"
-                  class="btn-secondary-action" 
-                  [disabled]="deliveringId() === item.id"
-                  (click)="markAsDelivered(item.id)">
-                  <i class="fa-solid fa-check-double icon-badge"></i> Entregar
+                  class="btn-danger-action" 
+                  [disabled]="deletingId() === item.id"
+                  (click)="deleteAttention(item.id)">
+                    <i class="fa-solid fa-trash icon-badge"></i> Eliminar
                 </button>
-              }
-              <button 
-                type="button"
-                class="btn-danger-action" 
-                [disabled]="deletingId() === item.id"
-                (click)="deleteAttention(item.id)">
-                  <i class="fa-solid fa-trash icon-badge"></i> Eliminar
-              </button>
+              </div>
             </div>
-          </div>
-        }
-      </div>
+          }
+        </div>
+      }
     }
   }
-
-  <!-- Botón Volver -->
-  <div class="back-button-container">
-    <a routerLink="/dashboard" class="btn-secondary-action">
-      <i class="fa-solid fa-arrow-left icon-badge"></i> Volver al Inicio
-    </a>
-  </div>
 </div>

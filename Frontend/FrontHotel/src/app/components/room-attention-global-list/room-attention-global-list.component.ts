@@ -1,4 +1,4 @@
-import { Component, OnInit, ChangeDetectionStrategy, signal, inject } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy, signal, computed, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { RoomAttentionService } from '../../core/services/room-attention.service';
@@ -16,11 +16,38 @@ import { catchError } from 'rxjs/operators';
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class RoomAttentionGlobalListComponent implements OnInit {
-  attentions = signal<(RoomAttentionDtoResponse & { roomNumber?: string })[]>([]);
+  attentions = signal<(RoomAttentionDtoResponse & { roomNumber?: string; room?: string })[]>([]);
   loading = signal<boolean>(true);
   errorMessage = signal<string>('');
   deliveringId = signal<number | null>(null);
   deletingId = signal<number | null>(null);
+
+  // SEÑALES PARA LOS FILTROS
+  roomFilter = signal<string>('');
+  statusFilter = signal<string>('ALL'); // 'ALL' | 'PENDING' | 'DELIVERED'
+
+  // SEÑAL COMPUTADA QUE FILTRA LA LISTA AUTOMÁTICAMENTE
+  filteredAttentions = computed(() => {
+    const roomTerm = this.roomFilter().toLowerCase().trim();
+    const status = this.statusFilter();
+
+    return this.attentions().filter(item => {
+      // 1. Filtro por número de habitación (asegurando el tipado correcto)
+      const roomVal = item.roomNumber || item.room || '';
+      const roomNumStr = String(roomVal).toLowerCase();
+      const matchesRoom = roomNumStr.includes(roomTerm);
+
+      // 2. Filtro por estado de entrega
+      let matchesStatus = true;
+      if (status === 'PENDING') {
+        matchesStatus = !item.delivered;
+      } else if (status === 'DELIVERED') {
+        matchesStatus = item.delivered;
+      }
+
+      return matchesRoom && matchesStatus;
+    });
+  });
 
   private roomAttentionService = inject(RoomAttentionService);
   private bookingService = inject(BookingService);

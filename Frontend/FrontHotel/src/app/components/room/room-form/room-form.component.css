@@ -1,8 +1,8 @@
 /* --- Contenedor Principal --- */
 .container {
-  max-width: 900px;
-  margin: 2.5rem auto;
-  padding: 2.5rem;
+  max-width: 680px; /* Reducido de 900px a 680px */
+  margin: 1rem auto; /* Margen superior/inferior más chico */
+  padding: 1.25rem 1.5rem; /* Padding interno más compacto */
   background: var(--bg-secondary);
   backdrop-filter: var(--backdrop-blur);
   border: var(--border-glass);
@@ -13,21 +13,21 @@
 
 /* --- Encabezado --- */
 .header-section {
-  margin-bottom: 1.5rem;
+  margin-bottom: 0.75rem; /* Margen reducido */
 }
 
 .header-section h2 {
-  font-size: var(--font-size-lg);
+  font-size: 1rem; /* Tamaño de fuente más compacto */
   font-weight: 700;
   color: var(--color-text-main);
   display: flex;
   align-items: center;
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.25rem;
 }
 
 .subtitle {
   color: var(--color-text-muted);
-  font-size: var(--font-size-xs);
+  font-size: 0.7rem;
   margin: 0;
 }
 
@@ -37,11 +37,11 @@
 }
 
 .icon-alert {
-  margin-right: 0.5rem;
+  margin-right: 0.4rem;
 }
 
 .icon-badge {
-  margin-right: 0.25rem;
+  margin-right: 0.2rem;
 }
 
 /* --- Divisor --- */
@@ -49,20 +49,20 @@
   border: 0;
   height: 1px;
   background: rgba(255, 255, 255, 0.08);
-  margin-bottom: 2rem;
+  margin-bottom: 1rem; /* Reducido */
 }
 
 /* --- Tarjeta de Formulario Glass --- */
 .card-form {
   display: flex;
   flex-direction: column;
-  gap: 1.25rem;
+  gap: 0.75rem; /* Espacio reducido entre campos */
 }
 
 .field {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 3px; /* Espacio mínimo entre etiqueta e input */
 }
 
 .field.full-width {
@@ -71,7 +71,7 @@
 
 .label {
   color: var(--color-text-main);
-  font-size: var(--font-size-xs);
+  font-size: 0.7rem;
   font-weight: 500;
 }
 
@@ -82,8 +82,8 @@
   border: var(--border-input);
   border-radius: var(--radius-md);
   color: var(--color-text-main);
-  padding: 10px 14px;
-  font-size: var(--font-size-sm);
+  padding: 8px 12px; /* Padding reducido */
+  font-size: 0.75rem; /* Fuente más chica */
   outline: none;
   transition: border-color 0.2s ease;
 }
@@ -103,47 +103,47 @@ select.input-field option {
 }
 
 .file-input {
-  padding: 8px;
+  padding: 6px;
   cursor: pointer;
 }
 
 /* --- Mensajes y Errores --- */
 .error-text {
   color: #fca5a5;
-  font-size: 0.75rem;
+  font-size: 0.68rem;
   display: flex;
   align-items: center;
-  margin-top: 2px;
+  margin-top: 1px;
 }
 
 .file-count-text {
   color: var(--color-text-muted);
-  font-size: var(--font-size-xs);
-  margin-top: 0.5rem;
+  font-size: 0.7rem;
+  margin-top: 0.3rem;
   display: flex;
   align-items: center;
 }
 
 .loading-box {
   color: var(--color-text-muted);
-  font-size: var(--font-size-xs);
-  padding: 10px 0;
+  font-size: 0.7rem;
+  padding: 6px 0;
   display: flex;
   align-items: center;
 }
 
-/* --- Cuadrícula de Vistas Previas --- */
+/* --- Cuadrícula de Vistas Previas más compacta --- */
 .preview-images-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
-  gap: 1rem;
-  margin-top: 0.75rem;
+  grid-template-columns: repeat(auto-fill, minmax(65px, 1fr));
+  gap: 0.5rem;
+  margin-top: 0.4rem;
 }
 
 .image-thumbnail-card {
-  width: 90px;
-  height: 90px;
-  border-radius: var(--radius-md);
+  width: 65px;
+  height: 65px;
+  border-radius: var(--radius-sm);
   overflow: hidden;
   border: var(--border-input);
   background: rgba(15, 23, 42, 0.4);
@@ -159,23 +159,25 @@ select.input-field option {
 .form-actions {
   display: flex;
   justify-content: flex-end;
-  gap: 1rem;
-  margin-top: 1.5rem;
+  gap: 0.75rem;
+  margin-top: 0.75rem;
+  padding-top: 0.75rem;
+  border-top: var(--border-glass);
 }
 
 .btn-primary-action {
   background: var(--color-primary);
   color: #fff;
   border: none;
-  padding: 10px 18px;
+  padding: 7px 14px;
   border-radius: var(--radius-sm);
   font-weight: 600;
   cursor: pointer;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 0.5rem;
-  font-size: var(--font-size-sm);
+  gap: 0.4rem;
+  font-size: 0.7rem;
   transition: opacity 0.2s;
 }
 
@@ -192,7 +194,7 @@ select.input-field option {
   background: var(--bg-btn-secondary);
   color: var(--color-text-main);
   border: var(--border-btn);
-  padding: 10px 16px;
+  padding: 7px 12px;
   border-radius: var(--radius-sm);
   font-weight: 500;
   text-decoration: none;
@@ -200,7 +202,7 @@ select.input-field option {
   align-items: center;
   justify-content: center;
   gap: 0.3rem;
-  font-size: var(--font-size-sm);
+  font-size: 0.7rem;
   transition: background 0.2s;
 }
 
@@ -210,10 +212,10 @@ select.input-field option {
 
 /* --- Alertas --- */
 .alert {
-  padding: 0.85rem 1.15rem;
+  padding: 0.6rem 0.9rem;
   border-radius: var(--radius-sm);
-  font-size: var(--font-size-sm);
-  margin-bottom: 1.25rem;
+  font-size: 0.75rem;
+  margin-bottom: 0.75rem;
   display: flex;
   align-items: center;
   border: var(--border-glass);
@@ -234,4 +236,23 @@ select.input-field option {
 @keyframes spin {
   from { transform: rotate(0deg); }
   to { transform: rotate(360deg); }
+}
+
+/* --- Responsividad --- */
+@media (max-width: 640px) {
+  .container {
+    padding: 0.75rem;
+    margin: 0.5rem;
+  }
+  
+  .form-actions {
+    flex-direction: column-reverse;
+    width: 100%;
+  }
+
+  .form-actions a,
+  .form-actions button[type="submit"] {
+    width: 100%;
+    justify-content: center;
+  }
 }

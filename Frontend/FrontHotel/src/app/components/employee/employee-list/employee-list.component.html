@@ -2,490 +2,260 @@
 
   <!-- Encabezado -->
   <header class="employee-header">
-    <h2>Gestión de Empleados</h2>
-
+    <h2><i class="fa-solid fa-users-gear"></i> Gestión de Empleados</h2>
     @if (isAdmin()) {
-      <a
-        class="employee-create-link"
-        routerLink="/dashboard/employee-create">
-        Nuevo Empleado
+      <a class="btn-action btn-primary" routerLink="/dashboard/employee-create">
+        <i class="fa-solid fa-user-plus"></i> Nuevo Empleado
       </a>
     }
   </header>
 
   <!-- Estados -->
   @if (loading()) {
-    <p class="loading-message">
-      Cargando empleados...
-    </p>
+    <p class="alert-message loading"><i class="fa-solid fa-rotate spin"></i> Cargando empleados...</p>
   }
 
   @if (errorMessage()) {
-    <p class="error-message" role="alert">
-      {{ errorMessage() }}
-    </p>
+    <p class="alert-message error"><i class="fa-solid fa-triangle-exclamation"></i> {{ errorMessage() }}</p>
   }
 
-  <!-- Listado -->
+  <!-- ========================================== -->
+  <!-- BARRA DE FILTROS SENCILLA                  -->
+  <!-- ========================================== -->
   @if (!loading() && employees().length > 0) {
-    <div class="employee-table-container">
-      <table class="employee-table">
+    <div class="filters-bar">
+      <div class="filter-group">
+        <i class="fa-solid fa-magnifying-glass"></i>
+        <input 
+          type="text" 
+          placeholder="Buscar por nombre, apellido o usuario..." 
+          (input)="onSearchInput($event)"
+          class="filter-input"
+        />
+      </div>
 
+      <div class="filter-group">
+        <i class="fa-solid fa-clock"></i>
+        <select (change)="onShiftFilterChange($event)" class="filter-select">
+          <option value="">Todos los turnos</option>
+          @for (shift of availableShifts; track shift) {
+            <option [value]="shift">{{ shift }}</option>
+          }
+        </select>
+      </div>
+    </div>
+  }
+
+  <!-- Listado (Usando filteredEmployees) -->
+  @if (!loading() && filteredEmployees().length > 0) {
+    
+    <!-- Tabla de Escritorio -->
+    <div class="table-wrapper">
+      <table class="clean-table">
         <thead>
           <tr>
-            <th>Fotografía</th>
-            <th>ID</th>
-            <th>Usuario</th>
-            <th>Nombre y apellido</th>
+            <th>Foto</th>
+            <th>ID / Usuario</th>
+            <th>Nombre</th>
             <th>Rol</th>
-            <th>Legajo</th>
-            <th>Tel. emergencia</th>
             <th>Email</th>
-            <th>Contratación</th>
             <th>Turno</th>
             <th>Salario</th>
-            <th>Acciones</th>
+            <th class="th-right">Acciones</th>
           </tr>
         </thead>
-
         <tbody>
-          @for (employee of employees(); track employee.id) {
+          @for (emp of filteredEmployees(); track emp.id) {
             <tr>
-
               <td>
-                @if (getEmployeeAvatarUrl(employee.id) !== defaultAvatar) {
-                  <img
-                    class="employee-avatar"
-                    [src]="getEmployeeAvatarUrl(employee.id)"
-                    alt="Fotografía del empleado">
+                @if (getEmployeeAvatarUrl(emp.id) !== defaultAvatar) {
+                  <img class="avatar" [src]="getEmployeeAvatarUrl(emp.id)" alt="Foto">
                 } @else {
-                  <span class="employee-avatar-placeholder">
-                    Sin foto
-                  </span>
+                  <span class="avatar-placeholder"><i class="fa-solid fa-user"></i></span>
                 }
               </td>
-
-              <td>{{ employee.id }}</td>
-              <td>{{ employee.username }}</td>
-              <td>{{ employee.name }} {{ employee.surname }}</td>
-
               <td>
-                {{ getEmployeeRole(employee.id) }}
-              </td>
-
-              <td>{{ employee.employeeNumber || '-' }}</td>
-
-              <td>
-                {{ employee.emergencyPhoneNumber || '-' }}
-              </td>
-
-              <td>{{ employee.email }}</td>
-              <td>{{ employee.hireDate || '-' }}</td>
-              <td>{{ employee.shift }}</td>
-
-              <td>
-                ${{ employee.salary | number:'1.2-2' }}
-              </td>
-
-              <td>
-                <div class="employee-actions">
-
-                  <button
-                    type="button"
-                    class="btn-detail"
-                    (click)="openEmployeeDetail(employee)">
-                    Ver detalles
-                  </button>
-
-                  @if (isAdmin()) {
-
-                    <!-- Editar empleado -->
-                    <a
-                      class="btn-detail"
-                      [routerLink]="[
-                        '/dashboard/employee-edit',
-                        employee.id
-                      ]">
-                      Editar
-                    </a>
-
-                    <!-- Cambiar turno -->
-                    <button
-                      type="button"
-                      class="btn-detail"
-                      [disabled]="updatingShift()"
-                      (click)="openShiftForm(employee)">
-                      Cambiar turno
-                    </button>
-
-                    <!-- Eliminar empleado -->
-                    <button
-                      type="button"
-                      class="btn-delete"
-                      [disabled]="deletingId() !== null"
-                      (click)="deleteEmployee(employee.id)">
-
-                      @if (deletingId() === employee.id) {
-                        Eliminando...
-                      } @else {
-                        Eliminar
-                      }
-                    </button>
-                  }
-
+                <div class="stack-text">
+                  <strong>#{{ emp.id }}</strong>
+                  <span class="text-muted">{{ emp.username }}</span>
                 </div>
               </td>
-
+              <td>{{ emp.name }} {{ emp.surname }}</td>
+              <td><span class="badge">{{ getEmployeeRole(emp.id) }}</span></td>
+              <td>{{ emp.email }}</td>
+              <td>{{ emp.shift }}</td>
+              <td><strong>${{ emp.salary | number:'1.2-2' }}</strong></td>
+              <td class="td-right">
+                <div class="actions-group">
+                  <button type="button" class="btn-action" title="Detalle" (click)="openEmployeeDetail(emp)">
+                    <i class="fa-solid fa-file-lines"></i>
+                  </button>
+                  @if (isAdmin()) {
+                    <a class="btn-action" title="Editar" [routerLink]="['/dashboard/employee-edit', emp.id]">
+                      <i class="fa-solid fa-pen-to-square"></i>
+                    </a>
+                    <button type="button" class="btn-action" title="Turno" [disabled]="updatingShift()" (click)="openShiftForm(emp)">
+                      <i class="fa-solid fa-clock-rotate-left"></i>
+                    </button>
+                    <button type="button" class="btn-action btn-danger" title="Eliminar" [disabled]="deletingId() !== null" (click)="deleteEmployee(emp.id)">
+                      @if (deletingId() === emp.id) { <i class="fa-solid fa-rotate spin"></i> } 
+                      @else { <i class="fa-solid fa-trash"></i> }
+                    </button>
+                  }
+                </div>
+              </td>
             </tr>
           }
         </tbody>
-
       </table>
     </div>
-  }
 
-  <!-- Listado vacío -->
-  @if (!loading() && !errorMessage() && employees().length === 0) {
-    <p class="empty-message">
-      No se encontraron empleados registrados.
-    </p>
-  }
-
-  <!-- Detalle del empleado -->
-  @if (selectedEmployee(); as employee) {
-
-    <div class="employee-modal-overlay">
-
-      <section
-        class="employee-modal"
-        role="dialog"
-        aria-modal="true"
-        aria-label="Detalle del empleado">
-
-        <div class="employee-modal-header">
-          <h3>Detalle del empleado</h3>
-
-          <button
-            type="button"
-            class="btn-close"
-            (click)="closeEmployeeDetail()">
-            Cerrar
-          </button>
-        </div>
-
-        <div class="employee-profile">
-
-          @if (getEmployeeAvatarUrl(employee.id) !== defaultAvatar) {
-            <img
-              class="employee-profile-avatar"
-              [src]="getEmployeeAvatarUrl(employee.id)"
-              alt="Fotografía del empleado">
-          } @else {
-            <div class="employee-profile-placeholder">
-              Sin fotografía
-            </div>
-          }
-
-          <h4>{{ employee.name }} {{ employee.surname }}</h4>
-          <p>@if(selectedUser(); as u) { {{ u.username }} } @else { {{ employee.username }} }</p>
-        </div>
-
-        @if (detailLoading()) {
-          <p class="loading-message">
-            Cargando información del usuario...
-          </p>
-        }
-
-        @if (detailError()) {
-          <p class="error-message" role="alert">
-            {{ detailError() }}
-          </p>
-        }
-
-        <!-- Datos laborales -->
-        <h4 class="employee-section-title">
-          Datos laborales
-        </h4>
-
-        <div class="employee-detail-grid">
-
-          <div>
-            <strong>Legajo:</strong>
-            <span>{{ employee.employeeNumber || 'No especificado' }}</span>
-          </div>
-
-          <div>
-            <strong>Teléfono de emergencia:</strong>
-            <span>{{ employee.emergencyPhoneNumber || 'No especificado' }}</span>
-          </div>
-
-          <div>
-            <strong>Fecha de contratación:</strong>
-            <span>{{ employee.hireDate || 'No especificada' }}</span>
-          </div>
-
-          <div>
-            <strong>Turno:</strong>
-            <span>{{ employee.shift }}</span>
-          </div>
-
-          <div>
-            <strong>Salario:</strong>
-            <span>${{ employee.salary | number:'1.2-2' }}</span>
-          </div>
-
-          <div>
-            <strong>Rol:</strong>
-            <span>{{ getEmployeeRole(employee.id) }}</span>
-          </div>
-
-        </div>
-
-        <!-- Datos del usuario -->
-        @if (selectedUser(); as user) {
-
-          <h4 class="employee-section-title">
-            Datos del usuario
-          </h4>
-
-          <div class="employee-detail-grid">
-
-            <div>
-              <strong>Usuario:</strong>
-              <span>{{ user.username }}</span>
-            </div>
-
-            <div>
-              <strong>DNI:</strong>
-              <span>{{ user.dni || 'No especificado' }}</span>
-            </div>
-
-            <div>
-              <strong>Email:</strong>
-              <span>{{ user.email }}</span>
-            </div>
-
-            <div>
-              <strong>Teléfono:</strong>
-              <span>{{ user.phoneNumber || 'No especificado' }}</span>
-            </div>
-
-            <div>
-              <strong>Género:</strong>
-              <span>{{ user.gender || 'No especificado' }}</span>
-            </div>
-
-            <div>
-              <strong>Dirección:</strong>
-              <span>{{ user.address || 'No especificada' }}</span>
-            </div>
-
-            <div>
-              <strong>Fecha de nacimiento:</strong>
-              <span>{{ user.birthDay || 'No especificada' }}</span>
-            </div>
-
-            <div>
-              <strong>Estado:</strong>
-              <span>
-                {{ user.enabled ? 'Activo' : 'Inactivo' }}
-              </span>
-            </div>
-
-          </div>
-        }
-
-        <!-- Acciones del detalle -->
-        <div class="employee-modal-actions">
-
-          <button
-            type="button"
-            class="btn-cancel"
-            (click)="closeEmployeeDetail()">
-            Cerrar
-          </button>
-
-          @if (isAdmin()) {
-
-            <!-- Editar empleado -->
-            <a
-              class="btn-detail"
-              [routerLink]="[
-                '/dashboard/employee-edit',
-                employee.id
-              ]">
-              Editar empleado
-            </a>
-
-            <!-- Cambiar turno -->
-            <button
-              type="button"
-              class="btn-detail"
-              [disabled]="updatingShift()"
-              (click)="closeEmployeeDetail(); openShiftForm(employee)">
-              Cambiar turno
-            </button>
-
-            <!-- Eliminar empleado -->
-            <button
-              type="button"
-              class="btn-delete"
-              [disabled]="deletingId() !== null"
-              (click)="deleteEmployee(employee.id)">
-
-              @if (deletingId() === employee.id) {
-                Eliminando...
+    <!-- Tarjetas para Móvil -->
+    <div class="mobile-cards">
+      @for (emp of filteredEmployees(); track emp.id) {
+        <div class="employee-card">
+          <div class="card-header">
+            <div class="card-user">
+              @if (getEmployeeAvatarUrl(emp.id) !== defaultAvatar) {
+                <img class="avatar" [src]="getEmployeeAvatarUrl(emp.id)" alt="Foto">
               } @else {
-                Eliminar empleado
+                <span class="avatar-placeholder"><i class="fa-solid fa-user"></i></span>
               }
+              <div>
+                <h4>{{ emp.name }} {{ emp.surname }}</h4>
+                <span class="text-muted">#{{ emp.id }} - {{ emp.username }}</span>
+              </div>
+            </div>
+            <span class="badge">{{ getEmployeeRole(emp.id) }}</span>
+          </div>
+
+          <div class="card-body">
+            <div><span class="text-muted">Email:</span> {{ emp.email }}</div>
+            <div><span class="text-muted">Turno:</span> {{ emp.shift }}</div>
+            <div><span class="text-muted">Salario:</span> <strong>${{ emp.salary | number:'1.2-2' }}</strong></div>
+          </div>
+
+          <div class="card-footer">
+            <button type="button" class="btn-action" (click)="openEmployeeDetail(emp)">
+              <i class="fa-solid fa-file-lines"></i> Detalle
             </button>
-
-          }
-
+            @if (isAdmin()) {
+              <a class="btn-action" [routerLink]="['/dashboard/employee-edit', emp.id]">
+                <i class="fa-solid fa-pen-to-square"></i> Editar
+              </a>
+              <button type="button" class="btn-action" [disabled]="updatingShift()" (click)="openShiftForm(emp)">
+                <i class="fa-solid fa-clock-rotate-left"></i> Turno
+              </button>
+              <button type="button" class="btn-action btn-danger" [disabled]="deletingId() !== null" (click)="deleteEmployee(emp.id)">
+                @if (deletingId() === emp.id) { <i class="fa-solid fa-rotate spin"></i> } 
+                @else { <i class="fa-solid fa-trash"></i> Eliminar }
+              </button>
+            }
+          </div>
         </div>
-
-      </section>
+      }
     </div>
   }
 
-  <!-- Modal para cambiar turno -->
-  @if (selectedEmployeeForShift(); as employee) {
+  <!-- Listado vacío por filtros o sin datos -->
+  @if (!loading() && !errorMessage() && filteredEmployees().length === 0) {
+    <p class="alert-message warning"><i class="fa-solid fa-circle-info"></i> No se encontraron empleados con los criterios de búsqueda.</p>
+  }
 
-    <div class="employee-modal-overlay">
-
-      <section
-        class="employee-modal"
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby="shift-modal-title">
-
-        <div class="employee-modal-header">
-
-          <h3 id="shift-modal-title">
-            Cambiar turno
-          </h3>
-
-          <button
-            type="button"
-            class="btn-close"
-            [disabled]="updatingShift()"
-            (click)="cancelShiftChange()">
-            Cerrar
-          </button>
-
+  <!-- Modal Detalle -->
+  @if (selectedEmployee(); as emp) {
+    <div class="modal-overlay">
+      <div class="modal-box">
+        <div class="modal-header">
+          <h3><i class="fa-solid fa-id-card"></i> Detalle del empleado</h3>
+          <button type="button" class="btn-action" (click)="closeEmployeeDetail()"><i class="fa-solid fa-xmark"></i></button>
         </div>
 
-        <!-- Información del empleado -->
-        <div class="employee-profile">
-
-          <h4>
-            {{ employee.name }}
-            {{ employee.surname }}
-          </h4>
-
-          <p>
-            Legajo:
-            {{ employee.employeeNumber || 'No especificado' }}
-          </p>
-
-          <p>
-            Turno actual:
-            <strong>{{ employee.shift }}</strong>
-          </p>
-
+        <div class="modal-profile">
+          @if (getEmployeeAvatarUrl(emp.id) !== defaultAvatar) {
+            <img class="avatar-large" [src]="getEmployeeAvatarUrl(emp.id)" alt="Foto">
+          } @else {
+            <span class="avatar-large-placeholder"><i class="fa-solid fa-user fa-2x"></i></span>
+          }
+          <h4>{{ emp.name }} {{ emp.surname }}</h4>
+          <p class="text-muted">{{ emp.username }}</p>
         </div>
 
-        <!-- Mensaje de error -->
-        @if (shiftError()) {
-          <p class="error-message" role="alert">
-            {{ shiftError() }}
-          </p>
+        <h4 class="section-title">Datos laborales</h4>
+        <div class="info-grid">
+          <div><span class="text-muted">Legajo:</span> <strong>{{ emp.employeeNumber || '-' }}</strong></div>
+          <div><span class="text-muted">Emergencia:</span> <strong>{{ emp.emergencyPhoneNumber || '-' }}</strong></div>
+          <div><span class="text-muted">Contratación:</span> <strong>{{ emp.hireDate || '-' }}</strong></div>
+          <div><span class="text-muted">Turno:</span> <strong>{{ emp.shift }}</strong></div>
+          <div><span class="text-muted">Salario:</span> <strong>${{ emp.salary | number:'1.2-2' }}</strong></div>
+          <div><span class="text-muted">Rol:</span> <strong>{{ getEmployeeRole(emp.id) }}</strong></div>
+        </div>
+
+        @if (selectedUser(); as user) {
+          <h4 class="section-title">Datos del usuario</h4>
+          <div class="info-grid">
+            <div><span class="text-muted">DNI:</span> <strong>{{ user.dni || '-' }}</strong></div>
+            <div><span class="text-muted">Email:</span> <strong>{{ user.email }}</strong></div>
+            <div><span class="text-muted">Teléfono:</span> <strong>{{ user.phoneNumber || '-' }}</strong></div>
+            <div><span class="text-muted">Género:</span> <strong>{{ user.gender || '-' }}</strong></div>
+            <div><span class="text-muted">Dirección:</span> <strong>{{ user.address || '-' }}</strong></div>
+            <div><span class="text-muted">Estado:</span> <strong>{{ user.enabled ? 'Activo' : 'Inactivo' }}</strong></div>
+          </div>
         }
 
-        <!-- Formulario reactivo -->
-        <form
-          [formGroup]="shiftForm"
-          (ngSubmit)="saveShiftChange()">
+        <div class="modal-footer">
+          <button type="button" class="btn-action" (click)="closeEmployeeDetail()">Cerrar</button>
+          @if (isAdmin()) {
+            <a class="btn-action btn-primary" [routerLink]="['/dashboard/employee-edit', emp.id]">
+              <i class="fa-solid fa-pen-to-square"></i> Editar
+            </a>
+            <button type="button" class="btn-action btn-primary" [disabled]="updatingShift()" (click)="closeEmployeeDetail(); openShiftForm(emp)">
+              <i class="fa-solid fa-clock-rotate-left"></i> Turno
+            </button>
+          }
+        </div>
+      </div>
+    </div>
+  }
 
+  <!-- Modal Turno -->
+  @if (selectedEmployeeForShift(); as emp) {
+    <div class="modal-overlay">
+      <div class="modal-box">
+        <div class="modal-header">
+          <h3><i class="fa-solid fa-clock-rotate-left"></i> Cambiar Turno</h3>
+          <button type="button" class="btn-action" [disabled]="updatingShift()" (click)="cancelShiftChange()"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+
+        <div class="modal-profile">
+          <h4>{{ emp.name }} {{ emp.surname }}</h4>
+          <p class="text-muted">Turno actual: <strong>{{ emp.shift }}</strong></p>
+        </div>
+
+        @if (shiftError()) {
+          <p class="alert-message error"><i class="fa-solid fa-triangle-exclamation"></i> {{ shiftError() }}</p>
+        }
+
+        <form [formGroup]="shiftForm" (ngSubmit)="saveShiftChange()" class="modal-form">
           <fieldset [disabled]="updatingShift()">
-
-            <legend>Nuevo turno</legend>
-
-            <div>
-
-              <label for="newShift">
-                Seleccione el nuevo turno *
-              </label>
-
-              <select
-                id="newShift"
-                formControlName="shift">
-
-                @for (shift of availableShifts; track shift) {
-                  <option [value]="shift">
-                    {{ shift }}
-                  </option>
-                }
-
-              </select>
-
-              @if (
-                shiftForm.controls.shift.touched &&
-                shiftForm.controls.shift.hasError('required')
-              ) {
-                <small class="error-message">
-                  Debe seleccionar un turno.
-                </small>
+            <label for="newShift">Nuevo turno *</label>
+            <select id="newShift" formControlName="shift">
+              @for (shift of availableShifts; track shift) {
+                <option [value]="shift">{{ shift }}</option>
               }
-
-              @if (
-                shiftForm.controls.shift.value === employee.shift
-              ) {
-                <p>
-                  Seleccione un turno diferente al actual.
-                </p>
-              }
-
-            </div>
-
+            </select>
           </fieldset>
 
-          <!-- Acciones del formulario -->
-          <div class="employee-modal-actions">
-
-            <button
-              type="button"
-              class="btn-cancel"
-              [disabled]="updatingShift()"
-              (click)="cancelShiftChange()">
-              Cancelar
+          <div class="modal-footer">
+            <button type="button" class="btn-action" [disabled]="updatingShift()" (click)="cancelShiftChange()">Cancelar</button>
+            <button type="submit" class="btn-action btn-primary" [disabled]="updatingShift() || shiftForm.invalid || shiftForm.controls.shift.value === emp.shift">
+              @if (updatingShift()) { <i class="fa-solid fa-rotate spin"></i> Guardando... } 
+              @else { <i class="fa-solid fa-check"></i> Confirmar }
             </button>
-
-            <button
-              type="submit"
-              class="btn-save"
-              [disabled]="
-                updatingShift() ||
-                shiftForm.invalid ||
-                shiftForm.controls.shift.value === employee.shift
-              ">
-
-              @if (updatingShift()) {
-                Actualizando turno...
-              } @else {
-                Confirmar cambio
-              }
-
-            </button>
-
           </div>
-
         </form>
-
-      </section>
-
+      </div>
     </div>
-
   }
 
 </div>

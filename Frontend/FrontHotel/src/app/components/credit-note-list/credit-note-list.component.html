@@ -7,6 +7,36 @@
 
   <hr class="divider" />
 
+  <!-- SECCIÓN DE FILTROS BÁSICOS -->
+  @if (!loading() && allCreditNotesCache().length > 0) {
+    <div class="filters-container">
+      <!-- Filtro por Nombre o Apellido del cliente -->
+      <div class="filter-group">
+        <label class="filter-label"><i class="fa-solid fa-search"></i> Buscar cliente (Nombre o Apellido):</label>
+        <input 
+          type="text" 
+          class="form-control" 
+          [value]="searchTerm()" 
+          (input)="searchTerm.set($any($event.target).value)" 
+          placeholder="Ej: Juan Pérez..."
+        />
+      </div>
+
+      <!-- Filtro por Estado (Pagado / Pendiente) -->
+      <div class="filter-group">
+        <label class="filter-label"><i class="fa-solid fa-filter"></i> Estado de pago:</label>
+        <select 
+          class="form-control" 
+          [value]="statusFilter()" 
+          (change)="statusFilter.set($any($event.target).value)">
+          <option value="ALL">Todos los estados</option>
+          <option value="PAID">Pagados</option>
+          <option value="PENDING">Pendientes</option>
+        </select>
+      </div>
+    </div>
+  }
+
   <!-- Alertas de Carga o Error -->
   @if (loading()) {
     <div class="alert alert-info">
@@ -17,7 +47,7 @@
       {{ errorMessage() }}
     </div>
   } @else {
-    @if (creditNotes().length > 0) {
+    @if (filteredCreditNotes().length > 0) {
       <div class="table-responsive">
         <table class="table">
           <thead>
@@ -34,7 +64,7 @@
             </tr>
           </thead>
           <tbody>
-            @for (note of creditNotes(); track note.id) {
+            @for (note of filteredCreditNotes(); track note.id) {
               <tr>
                 <td>#{{ note.id }}</td>
                 <td>Cuenta #{{ note.accountId }}</td>
@@ -70,7 +100,7 @@
       </div>
     } @else {
       <div class="alert alert-info">
-        No hay notas de crédito registradas en el sistema.
+        No hay notas de crédito que coincidan con los filtros aplicados.
       </div>
     }
   }

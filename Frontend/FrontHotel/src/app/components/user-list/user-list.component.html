@@ -25,68 +25,88 @@
     </div>
   }
 
-  <!-- Vista de Datos (Tabla para Desktop y Cards para Móvil) -->
+  <!-- Barra de Filtros Sencilla -->
   @if (!loading && !errorMessage && users.length > 0) {
-    
-    <!-- 1. TABLA TRADICIONAL (Visible en Escritorio) -->
-    <div class="glass-table-wrapper desktop-table">
-      <table class="glass-table">
-        <thead>
-          <tr>
-            <th style="width: 60px;">Avatar</th>
-            <th>Username</th>
-            <th>Nombre y Apellido</th>
-            <th>DNI</th>
-            <th>Teléfono</th>
-          </tr>
-        </thead>
-        <tbody>
-          @for (user of users; track user.id) {
-            <tr (click)="openUserDetail(user)" title="Haz clic para ver detalles" class="table-row-clickable">
-              <td>
-                <img 
-                  [src]="getUserAvatarUrl(user)" 
-                  alt="Avatar" 
-                  class="avatar-sm">
-              </td>
-              <td><strong>{{ user.username }}</strong></td>
-              <td>{{ user.name }} {{ user.surname }}</td>
-              <td>{{ user.dni }}</td>
-              <td>{{ user.phoneNumber || '-' }}</td>
+    <div class="filters-bar">
+      <div class="filter-group">
+        <i class="fa-solid fa-magnifying-glass"></i>
+        <input 
+          type="text" 
+          placeholder="Buscar por nombre, apellido, username o DNI..." 
+          (input)="onSearchInput($event)"
+          class="filter-input"
+        />
+      </div>
+    </div>
+
+    <!-- Vista de Datos (Tabla para Desktop y Cards para Móvil usando filteredUsers) -->
+    @if (filteredUsers().length > 0) {
+      
+      <!-- 1. TABLA TRADICIONAL (Visible en Escritorio) -->
+      <div class="glass-table-wrapper desktop-table">
+        <table class="glass-table">
+          <thead>
+            <tr>
+              <th style="width: 60px;">Avatar</th>
+              <th>Username</th>
+              <th>Nombre y Apellido</th>
+              <th>DNI</th>
+              <th>Teléfono</th>
             </tr>
-          }
-        </tbody>
-      </table>
-    </div>
+          </thead>
+          <tbody>
+            @for (user of filteredUsers(); track user.id) {
+              <tr (click)="openUserDetail(user)" title="Haz clic para ver detalles" class="table-row-clickable">
+                <td>
+                  <img 
+                    [src]="getUserAvatarUrl(user)" 
+                    alt="Avatar" 
+                    class="avatar-sm">
+                </td>
+                <td><strong>{{ user.username }}</strong></td>
+                <td>{{ user.name }} {{ user.surname }}</td>
+                <td>{{ user.dni }}</td>
+                <td>{{ user.phoneNumber || '-' }}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
 
-    <!-- 2. VISTA DE TARJETAS (Visible en Dispositivos Móviles) -->
-    <div class="mobile-cards-container">
-      @for (user of users; track user.id) {
-        <div class="mobile-user-card" (click)="openUserDetail(user)">
-          <div class="mobile-card-header">
-            <img [src]="getUserAvatarUrl(user)" alt="Avatar" class="avatar-sm">
-            <div class="mobile-user-titles">
-              <strong>{{ user.name }} {{ user.surname }}</strong>
-              <span class="subtitle">&#64;{{ user.username }}</span>
+      <!-- 2. VISTA DE TARJETAS (Visible en Dispositivos Móviles) -->
+      <div class="mobile-cards-container">
+        @for (user of filteredUsers(); track user.id) {
+          <div class="mobile-user-card" (click)="openUserDetail(user)">
+            <div class="mobile-card-header">
+              <img [src]="getUserAvatarUrl(user)" alt="Avatar" class="avatar-sm">
+              <div class="mobile-user-titles">
+                <strong>{{ user.name }} {{ user.surname }}</strong>
+                <span class="subtitle">&#64;{{ user.username }}</span>
+              </div>
+            </div>
+            <div class="mobile-card-body">
+              <div class="mobile-card-info">
+                <span><i class="fa-solid fa-id-card"></i> DNI:</span>
+                <span>{{ user.dni }}</span>
+              </div>
+              <div class="mobile-card-info">
+                <span><i class="fa-solid fa-phone"></i> Teléfono:</span>
+                <span>{{ user.phoneNumber || '-' }}</span>
+              </div>
             </div>
           </div>
-          <div class="mobile-card-body">
-            <div class="mobile-card-info">
-              <span><i class="fa-solid fa-id-card"></i> DNI:</span>
-              <span>{{ user.dni }}</span>
-            </div>
-            <div class="mobile-card-info">
-              <span><i class="fa-solid fa-phone"></i> Teléfono:</span>
-              <span>{{ user.phoneNumber || '-' }}</span>
-            </div>
-          </div>
-        </div>
-      }
-    </div>
+        }
+      </div>
 
+    } @else {
+      <!-- Mensaje si el filtro no arroja resultados -->
+      <div class="notification-box notification-warning">
+        <i class="fa-solid fa-circle-info"></i> No se encontraron huéspedes que coincidan con la búsqueda.
+      </div>
+    }
   }
 
-  <!-- Mensaje si la lista está vacía -->
+  <!-- Mensaje si la lista general está vacía -->
   @if (!loading && !errorMessage && users.length === 0) {
     <div class="notification-box notification-warning">
       <i class="fa-solid fa-circle-info"></i> No se encontraron usuarios con el rol GUEST registrados en el sistema.

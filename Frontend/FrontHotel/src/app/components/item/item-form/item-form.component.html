@@ -31,9 +31,7 @@
         >
       </div>
       @if (itemForm.controls.description.touched && itemForm.controls.description.hasError('required')) {
-        <small class="error-text">
-          La descripción es obligatoria.
-        </small>
+        <small class="error-text">La descripción es obligatoria.</small>
       }
     </div>
 
@@ -54,7 +52,7 @@
         </div>
         @if (itemForm.controls.quantity.touched) {
           @if (itemForm.controls.quantity.hasError('required')) {
-            <small class="error-text">La cantidad es obligatoria.</small>
+            <small class="error-text">Obligatorio.</small>
           }
           @if (itemForm.controls.quantity.hasError('min')) {
             <small class="error-text">Mínimo 1.</small>
@@ -78,10 +76,10 @@
         </div>
         @if (itemForm.controls.unitPrice.touched) {
           @if (itemForm.controls.unitPrice.hasError('required')) {
-            <small class="error-text">El precio es obligatorio.</small>
+            <small class="error-text">Obligatorio.</small>
           }
           @if (itemForm.controls.unitPrice.hasError('min')) {
-            <small class="error-text">Debe ser mayor a cero.</small>
+            <small class="error-text">Debe ser mayor a 0.</small>
           }
         }
       </div>
@@ -114,7 +112,7 @@
       </div>
       @if (selectedImage()) {
         <small class="subtitle file-selected-text">
-          Archivo seleccionado: <strong>{{ selectedImage()?.name }}</strong>
+          Seleccionado: <strong>{{ selectedImage()?.name }}</strong>
         </small>
       }
     </div>
@@ -133,7 +131,7 @@
         }
       </button>
 
-      <a routerLink="/items" class="btn-secondary-action">
+      <a routerLink="/dashboard/item-list" class="btn-secondary-action">
         Cancelar
       </a>
     </div>

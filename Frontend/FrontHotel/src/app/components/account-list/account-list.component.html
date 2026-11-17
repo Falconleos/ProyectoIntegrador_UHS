@@ -1,37 +1,69 @@
 <div class="container">
   <!-- Encabezado -->
   <div class="header-section">
-    <h2>
-      <i class="bi bi-file-earmark-text"></i> Gestión de Cuentas y Pagos
-    </h2>
-    <p class="subtitle">Administre y consulte los saldos, pagos y estados de cuentas del hotel.</p>
+    <div>
+      <h2>
+        <i class="bi bi-file-earmark-text icon-title"></i> Gestión de Cuentas y Pagos
+      </h2>
+      <p class="subtitle">Administre y consulte los saldos, pagos y estados de cuentas del hotel.</p>
+    </div>
   </div>
 
   <hr class="divider" />
 
+  <!-- SECCIÓN DE FILTROS BÁSICOS -->
+  @if (!loading() && !errorMessage() && accounts().length > 0) {
+    <div class="filters-container">
+      <!-- Filtro por Nombre o Apellido -->
+      <div class="filter-group">
+        <label class="filter-label"><i class="bi bi-search"></i> Buscar huésped:</label>
+        <input 
+          type="text" 
+          class="form-control" 
+          [value]="searchTerm()" 
+          (input)="searchTerm.set($any($event.target).value)" 
+          placeholder="Nombre o apellido..."
+        />
+      </div>
+
+      <!-- Filtro por Estado de Pago -->
+      <div class="filter-group">
+        <label class="filter-label"><i class="bi bi-filter"></i> Estado de pago:</label>
+        <select 
+          class="form-control" 
+          [value]="paymentFilter()" 
+          (change)="paymentFilter.set($any($event.target).value)">
+          <option value="ALL">Todos</option>
+          <option value="PAID">Pagado (Saldo $0)</option>
+          <option value="UNPAID">Impago (Con saldo pendiente)</option>
+        </select>
+      </div>
+    </div>
+  }
+
   <!-- Alertas de Carga / Error -->
   @if (loading()) {
     <div class="alert alert-info">
-      <i class="bi bi-arrow-repeat spin"></i> Cargando registros de cuentas...
+      <i class="bi bi-arrow-repeat spin icon-alert"></i> Cargando registros de cuentas...
     </div>
   }
 
   @if (errorMessage()) {
     <div class="alert alert-danger">
-      <i class="bi bi-exclamation-triangle"></i> {{ errorMessage() }}
+      <i class="bi bi-exclamation-triangle icon-alert"></i> {{ errorMessage() }}
     </div>
   }
 
-  <!-- Tabla de Cuentas con diseño Glass -->
-  @if (!loading() && !errorMessage() && accounts().length > 0) {
+  <!-- Tabla de Cuentas con diseño Glass compacto -->
+  @if (!loading() && !errorMessage() && filteredAccounts().length > 0) {
     <div class="table-wrapper">
       <table class="table">
         <thead>
           <tr>
-            <th class="cell-id">ID Cuenta</th>
+            <th class="cell-id">ID</th>
             <th>Huésped</th>
             <th>DNI</th>
-            <th>Habitación</th>
+            <th>Hab.</th>
             <th>Período</th>
             <th>Total</th>
             <th>Pagado</th>
@@ -41,42 +73,42 @@
           </tr>
         </thead>
         <tbody>
-          @for (account of accounts(); track account.id) {
+          @for (account of filteredAccounts(); track account.id) {
             <tr>
-              <td class="cell-id"><strong>#{{ account.id }}</strong></td>
-              <td class="text-nowrap-custom">{{ account.user ? (account.user.name + ' ' + account.user.surname) : '-' }}</td>
-              <td>{{ account.user?.dni || '-' }}</td>
+              <td class="cell-id"><strong class="text-subtitle">#{{ account.id }}</strong></td>
+              <td class="text-nowrap-custom text-main">{{ account.user ? (account.user.name + ' ' + account.user.surname) : '-' }}</td>
+              <td class="text-subtitle">{{ account.user?.dni || '-' }}</td>
               <td>
                 <span class="badge badge-secondary">
-                  <i class="bi bi-door-closed"></i> Hab. {{ account.roomNumber || 'N/D' }}
+                  Hab. {{ account.roomNumber || 'N/D' }}
                 </span>
               </td>
               <td class="subtitle text-nowrap-custom">
-                <i class="bi bi-calendar-range"></i> {{ account.checkInDate || 'N/D' }} al {{ account.checkOutDate || 'N/D' }}
+                {{ account.checkInDate || 'N/D' }} al {{ account.checkOutDate || 'N/D' }}
               </td>
-              <td class="text-bold text-nowrap-custom">${{ account.totalAmount | number:'1.2-2' }}</td>
+              <td class="text-bold text-nowrap-custom text-main">${{ account.totalAmount | number:'1.2-2' }}</td>
               <td class="text-bold text-nowrap-custom text-success-custom">${{ account.paidAmount | number:'1.2-2' }}</td>
               <td class="text-bold text-nowrap-custom text-danger-custom">${{ account.remainingBalance | number:'1.2-2' }}</td>
               <td>
                 @switch (account.state) {
                   @case ('OPEN') {
                     <span class="badge badge-state-open">
-                      <i class="bi bi-clock"></i> Abierta
+                      <i class="bi bi-clock icon-badge"></i> Abierta
                     </span>
                   }
                   @case ('PAID') {
                     <span class="badge badge-state-paid">
-                      <i class="bi bi-check-circle"></i> Pagada
+                      <i class="bi bi-check-circle icon-badge"></i> Pagada
                     </span>
                   }
                   @case ('CANCELLED') {
                     <span class="badge badge-state-cancelled">
-                      <i class="bi bi-x-circle"></i> Cancelada
+                      <i class="bi bi-x-circle icon-badge"></i> Cancelada
                     </span>
                   }
                   @case ('REFUNDED') {
                     <span class="badge badge-state-refunded">
-                      <i class="bi bi-arrow-counterclockwise"></i> Reembolsada
+                      <i class="bi bi-arrow-counterclockwise icon-badge"></i> Reembolsada
                     </span>
                   }
                   @default {
@@ -92,7 +124,7 @@
                     class="btn-secondary-action" 
                     (click)="viewAccountDetail(account.id)"
                     title="Ver detalle de cuenta">
-                    <i class="bi bi-eye"></i> Ver Detalle
+                    <i class="bi bi-eye icon-badge"></i> Ver Detalle
                   </button>
                 </div>
               </td>
@@ -103,10 +135,17 @@
     </div>
   }
 
-  <!-- Mensaje si la lista está vacía -->
+  <!-- Mensaje si la lista está vacía tras filtrar -->
+  @if (!loading() && !errorMessage() && accounts().length > 0 && filteredAccounts().length === 0) {
+    <div class="alert alert-info">
+      <i class="bi bi-info-circle icon-alert"></i> No se encontraron cuentas que coincidan con los filtros aplicados.
+    </div>
+  }
+
+  <!-- Mensaje si la lista general está vacía -->
   @if (!loading() && !errorMessage() && accounts().length === 0) {
     <div class="alert alert-info">
-      <i class="bi bi-info-circle"></i> No se encontraron cuentas registradas en el sistema.
+      <i class="bi bi-info-circle icon-alert"></i> No se encontraron cuentas registradas en el sistema.
     </div>
   }
 </div>

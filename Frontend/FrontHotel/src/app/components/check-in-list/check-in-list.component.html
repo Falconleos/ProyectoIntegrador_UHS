@@ -1,8 +1,11 @@
 <div class="container">
   <!-- Encabezado -->
   <div class="header-section">
-    <h2>Gestión de Check-Ins y Estadías</h2>
-    <p class="subtitle">Administre las reservas del día y controle las estadías activas del hotel.</p>
+    <div class="header-title-wrapper">
+      <h2>Gestión de Check-Ins y Estadías</h2>
+      <p class="subtitle">Administre las reservas del día y controle las estadías activas del hotel.</p>
+    </div>
+
   </div>
 
   <hr class="divider" />
@@ -49,10 +52,12 @@
       
       @if (pendingBookingsToday().length === 0 && !loading()) {
         <p class="subtitle">No hay reservas pendientes o confirmadas para realizar check-in hoy.</p>
+      } @else if (filteredPendingBookings().length === 0 && searchTerm()) {
+        <p class="subtitle">No se encontraron reservas que coincidan con "{{ searchTerm() }}".</p>
       }
 
       <div class="cards-grid">
-        @for (booking of pendingBookingsToday(); track booking.id) {
+        @for (booking of filteredPendingBookings(); track booking.id) {
           <div class="booking-card">
             <div>
               <div class="card-header-row">
@@ -91,15 +96,34 @@
     </section>
   }
 
+  <!-- Barra de Filtro Rápido -->
+    <div class="search-box">
+      <i class="fa-solid fa-magnifying-glass search-icon" aria-hidden="true"></i>
+      <input 
+        type="text" 
+        class="search-input" 
+        placeholder="Filtrar por nombre, hab..." 
+        [value]="searchTerm()"
+        (input)="searchTerm.set($any($event.target).value)"
+      />
+      @if (searchTerm()) {
+        <button type="button" class="clear-search-btn" (click)="searchTerm.set('')" title="Limpiar filtro">
+          ✕
+        </button>
+      }
+    </div>
+
   <!-- Sección de estadías activas -->
   <section class="active-stays-section">
     <h3 class="section-title">Estadías Activas (Checked-In)</h3>
 
     @if (checkedInBookings().length === 0 && !loading()) {
       <p class="subtitle">No hay pasajeros con check-in activo actualmente.</p>
+    } @else if (filteredCheckedInBookings().length === 0 && searchTerm()) {
+      <p class="subtitle">No se encontraron estadías activas que coincidan con "{{ searchTerm() }}".</p>
     }
 
-    @if (checkedInBookings().length > 0) {
+    @if (filteredCheckedInBookings().length > 0) {
       <!-- Contenedor en Tabla (Visible en Desktop) -->
       <div class="table-wrapper desktop-only">
         <table class="table">
@@ -113,7 +137,7 @@
             </tr>
           </thead>
           <tbody>
-            @for (b of checkedInBookings(); track b.id) {
+            @for (b of filteredCheckedInBookings(); track b.id) {
               <tr>
                 <td class="col-id"><strong>#{{ b.id }}</strong></td>
                 <td>{{ getGuestDisplayName(b) }}</td>
@@ -145,7 +169,7 @@
 
       <!-- Contenedor en Cards (Visible en Móvil) -->
       <div class="active-stays-cards mobile-only">
-        @for (b of checkedInBookings(); track b.id) {
+        @for (b of filteredCheckedInBookings(); track b.id) {
           <div class="stay-mobile-card">
             <div class="card-header-row">
               <span class="badge badge-secondary">Estadía #{{ b.id }}</span>

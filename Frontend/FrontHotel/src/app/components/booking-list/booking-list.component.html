@@ -6,14 +6,34 @@
       <i class="fa-solid fa-calendar-days header-title-icon" aria-hidden="true"></i>
       Gestión de Reservas
     </h2>
-    <button 
-      type="button"
-      class="action-btn primary" 
-      [routerLink]="(canModify() || isGuest()) ? '/dashboard/availability' : null" 
-      [disabled]="!canModify() && !isGuest()">
-      <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
-      Consultar Disponibilidad
-    </button>
+    
+    <div class="header-actions-group">
+      <!-- Barra de Filtro Rápido -->
+      <div class="search-box">
+        <i class="fa-solid fa-magnifying-glass search-icon" aria-hidden="true"></i>
+        <input 
+          type="text" 
+          class="search-input" 
+          placeholder="Filtrar por nombre o apellido" 
+          [value]="searchTerm()"
+          (input)="searchTerm.set($any($event.target).value)"
+        />
+        @if (searchTerm()) {
+          <button type="button" class="clear-search-btn" (click)="searchTerm.set('')" title="Limpiar filtro">
+            <i class="fa-solid fa-xmark" aria-hidden="true"></i>
+          </button>
+        }
+      </div>
+
+      <button 
+        type="button"
+        class="action-btn primary" 
+        [routerLink]="(canModify() || isGuest()) ? '/dashboard/availability' : null" 
+        [disabled]="!canModify() && !isGuest()">
+        <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
+        Consultar Disponibilidad
+      </button>
+    </div>
   </header>
 
   <hr class="divider" />
@@ -30,6 +50,10 @@
   } @else if (bookings().length === 0) {
     <div class="feedback-banner warning">
       No se encontraron reservas registradas en el sistema.
+    </div>
+  } @else if (filteredBookings().length === 0) {
+    <div class="feedback-banner warning">
+      No se encontraron reservas que coincidan con "{{ searchTerm() }}".
     </div>
   } @else {
 
@@ -52,7 +76,7 @@
           </tr>
         </thead>
         <tbody>
-          @for (booking of bookings(); track booking.id) {
+          @for (booking of filteredBookings(); track booking.id) {
             <tr>
               <td class="col-start"><strong>#{{ booking.id }}</strong></td>
               <td>
@@ -172,7 +196,7 @@
 
     <!-- 2. VISTA DE TARJETAS (Visible en Dispositivos Móviles) -->
     <div class="mobile-cards-container">
-      @for (booking of bookings(); track booking.id) {
+      @for (booking of filteredBookings(); track booking.id) {
         <article class="mobile-booking-card">
           
           <!-- Encabezado de Tarjeta -->

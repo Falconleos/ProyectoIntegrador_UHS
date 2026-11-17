@@ -1,5 +1,4 @@
-// src/app/components/user-list/user-list.component.ts
-import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterLink } from '@angular/router';
 import { UserService } from '../../core/services/user.service';
@@ -20,6 +19,35 @@ export class UserListComponent implements OnInit {
   canModify = false;
   userAvatars: { [key: number]: string } = {};
   selectedUser: UserDtoResponse | null = null;
+
+  // ==========================================
+  // FILTRO SENCILLO (Texto de búsqueda)
+  // ==========================================
+  searchText = signal('');
+
+  filteredUsers = computed(() => {
+    const list = this.users;
+    const search = this.searchText().toLowerCase().trim();
+
+    if (!search) return list;
+
+    return list.filter(user => {
+      // Unimos nombre, apellido, username y DNI en una sola cadena para buscar en todos
+      const name = user.name || '';
+      const surname = user.surname || '';
+      const username = user.username || '';
+      const dni = user.dni || '';
+
+      const searchString = `${name} ${surname} ${username} ${dni}`.toLowerCase();
+      return searchString.includes(search);
+    });
+  });
+
+  onSearchInput(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    this.searchText.set(input.value);
+  }
+  // ==========================================
 
   constructor(
     private userService: UserService,

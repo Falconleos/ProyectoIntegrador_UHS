@@ -301,6 +301,49 @@
   margin-right: 0.5rem;
 }
 
+/* --- Contenedor de Filtros --- */
+.filters-container {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1rem;
+  flex-wrap: wrap;
+}
+
+.filter-group {
+  flex: 1;
+  min-width: 240px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.filter-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--color-text-muted, #94a3b8);
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.filter-group .form-control {
+  width: 100%;
+  padding: 6px 12px;
+  background: var(--bg-secondary, rgba(15, 23, 42, 0.6));
+  border: var(--border-input, 1px solid rgba(255, 255, 255, 0.1));
+  border-radius: var(--radius-sm, 6px);
+  color: var(--color-text-main, #ffffff);
+  font-size: 0.8rem;
+  height: 34px;
+  outline: none;
+  transition: border-color 0.2s;
+  box-sizing: border-box;
+}
+
+.filter-group .form-control:focus {
+  border-color: var(--color-primary, #6366f1);
+}
+
 /* --- Animaciones del Modal --- */
 @keyframes fadeIn {
   from { opacity: 0; }

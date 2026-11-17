@@ -47,7 +47,7 @@
 
             <!-- Contenido de la Tarjeta -->
             <div class="item-content">
-              <h3 class="item-title">{{ item.description }}</h3>
+              <h3 class="item-title" title="{{ item.description }}">{{ item.description }}</h3>
 
               <div class="item-details">
                 <p>
@@ -61,7 +61,7 @@
                   <span class="item-value-bold">{{ item.quantity }}</span>
                 </p>
                 <p>
-                  <span class="subtitle">Precio unitario:</span>
+                  <span class="subtitle">Precio unit.:</span>
                   <span class="item-price">
                     {{ item.unitPrice | currency:'ARS':'symbol':'1.2-2' }}
                   </span>
@@ -81,7 +81,7 @@
                   (click)="deleteItem(item.id)"
                 >
                   @if (deletingId() === item.id) {
-                    <i class="fa-solid fa-rotate spin icon-margin"></i> Eliminando...
+                    <i class="fa-solid fa-rotate spin icon-margin"></i> ...
                   } @else {
                     <i class="fa-solid fa-trash icon-margin"></i> Eliminar
                   }

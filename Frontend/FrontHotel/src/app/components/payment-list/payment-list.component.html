@@ -9,6 +9,38 @@
 
   <hr class="divider" />
 
+  <!-- SECCIÓN DE FILTROS BÁSICOS -->
+  @if (!loading() && !errorMessage() && payments().length > 0) {
+    <div class="filters-container">
+      <!-- Filtro por Nombre o Apellido del huésped -->
+      <div class="filter-group">
+        <label class="filter-label"><i class="bi bi-search"></i> Buscar huésped (Nombre o Apellido):</label>
+        <input 
+          type="text" 
+          class="form-control" 
+          [value]="searchTerm()" 
+          (input)="searchTerm.set($any($event.target).value)" 
+          placeholder="Ej: Juan Pérez..."
+        />
+      </div>
+
+      <!-- Filtro por Método de Pago -->
+      <div class="filter-group">
+        <label class="filter-label"><i class="bi bi-filter"></i> Método de pago:</label>
+        <select 
+          class="form-control" 
+          [value]="methodFilter()" 
+          (change)="methodFilter.set($any($event.target).value)">
+          <option value="ALL">Todos los métodos</option>
+          <option value="CASH">Efectivo</option>
+          <option value="CREDIT_CARD">Tarjeta de Crédito</option>
+          <option value="DEBIT_CARD">Tarjeta de Débito</option>
+          <option value="TRANSFER">Transferencia</option>
+        </select>
+      </div>
+    </div>
+  }
+
   <!-- Mensajes de carga, error o listado vacío -->
   @if (loading()) {
     <div class="alert alert-info">
@@ -24,74 +56,81 @@
     </div>
   } @else {
 
-    <!-- Tabla de Datos -->
-    <div class="table-wrapper">
-      <table class="table">
-        <thead>
-          <tr>
-            <th class="col-first">ID Pago</th>
-            <th>Huésped (Nombre y Apellido)</th>
-            <th>Registrado por</th>
-            <th>ID Cuenta</th>
-            <th class="col-end">Monto ($)</th>
-            <th>Fecha y Hora</th>
-            <th>Método de Pago</th>
-            <th class="col-last">Referencia / Transacción</th>
-          </tr>
-        </thead>
-        <tbody>
-          @for (payment of payments(); track payment.id) {
+    <!-- Tabla de Datos Compacta (Usando filteredPayments) -->
+    @if (filteredPayments().length > 0) {
+      <div class="table-wrapper">
+        <table class="table">
+          <thead>
             <tr>
-              <td class="col-first"><strong>#{{ payment.id }}</strong></td>
-              
-              <!-- Columna Huésped -->
-              <td>
-                @if (payment.guestName || payment.guestSurname) {
-                  {{ payment.guestName }} {{ payment.guestSurname }}
-                } @else {
-                  <span class="subtitle">-</span>
-                }
-              </td>
-
-              <!-- Columna Registrado por -->
-              <td>
-                @if (payment.username) {
-                  {{ payment.username }}
-                } @else {
-                  <span class="subtitle">-</span>
-                }
-              </td>
-
-              <!-- Columna Cuenta -->
-              <td>
-                <span class="badge badge-secondary">
-                  <i class="bi bi-wallet2 icon-margin"></i> Cuenta #{{ payment.accountId }}
-                </span>
-              </td>
-
-              <!-- Columna Monto -->
-              <td class="col-end text-success">
-                <strong>${{ payment.amount | number:'1.2-2' }}</strong>
-              </td>
-
-              <!-- Columna Fecha -->
-              <td class="subtitle">{{ payment.paymentDate | date:'short' }}</td>
-
-              <!-- Columna Método de Pago -->
-              <td>
-                <span class="badge badge-secondary">
-                  <i class="bi bi-credit-card icon-margin"></i> {{ payment.paymentMethod || 'N/D' }}
-                </span>
-              </td>
-
-              <!-- Columna Referencia -->
-              <td class="subtitle col-last">
-                {{ payment.transactionReference || 'Sin referencia' }}
-              </td>
+              <th class="col-first">ID Pago</th>
+              <th>Huésped (Nombre y Apellido)</th>
+              <th>Registrado por</th>
+              <th>ID Cuenta</th>
+              <th class="col-end">Monto ($)</th>
+              <th>Fecha y Hora</th>
+              <th>Método de Pago</th>
+              <th class="col-last">Referencia / Transacción</th>
             </tr>
-          }
-        </tbody>
-      </table>
-    </div>
+          </thead>
+          <tbody>
+            @for (payment of filteredPayments(); track payment.id) {
+              <tr>
+                <td class="col-first"><strong class="text-subtitle">#{{ payment.id }}</strong></td>
+                
+                <!-- Columna Huésped -->
+                <td class="text-main">
+                  @if (payment.guestName || payment.guestSurname) {
+                    {{ payment.guestName }} {{ payment.guestSurname }}
+                  } @else {
+                    <span class="subtitle">-</span>
+                  }
+                </td>
+
+                <!-- Columna Registrado por -->
+                <td class="text-subtitle">
+                  @if (payment.username) {
+                    {{ payment.username }}
+                  } @else {
+                    <span>-</span>
+                  }
+                </td>
+
+                <!-- Columna Cuenta -->
+                <td>
+                  <span class="badge badge-secondary">
+                    <i class="bi bi-wallet2 icon-margin"></i> Cuenta #{{ payment.accountId }}
+                  </span>
+                </td>
+
+                <!-- Columna Monto -->
+                <td class="col-end text-success-custom text-bold">
+                  ${{ payment.amount | number:'1.2-2' }}
+                </td>
+
+                <!-- Columna Fecha -->
+                <td class="subtitle">{{ payment.paymentDate | date:'short' }}</td>
+
+                <!-- Columna Método de Pago -->
+                <td>
+                  <span class="badge badge-secondary">
+                    <i class="bi bi-credit-card icon-margin"></i> {{ payment.paymentMethod || 'N/D' }}
+                  </span>
+                </td>
+
+                <!-- Columna Referencia -->
+                <td class="subtitle col-last">
+                  {{ payment.transactionReference || 'Sin referencia' }}
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    } @else {
+      <!-- Mensaje si la búsqueda no arroja resultados -->
+      <div class="alert alert-info">
+        <i class="bi bi-info-circle icon-margin"></i> No se encontraron pagos que coincidan con los filtros aplicados.
+      </div>
+    }
   }
 </div>

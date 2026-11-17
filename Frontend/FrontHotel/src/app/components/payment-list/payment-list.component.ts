@@ -1,4 +1,4 @@
-import { Component, OnInit, ChangeDetectionStrategy, signal } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { PaymentService } from '../../core/services/payment.service';
 import { AccountService } from '../../core/services/account.service';
@@ -25,6 +25,33 @@ export class PaymentListComponent implements OnInit {
   loading = signal<boolean>(true);
   errorMessage = signal<string>('');
 
+  // SEÑALES PARA LOS FILTROS
+  searchTerm = signal<string>('');
+  methodFilter = signal<string>('ALL'); // 'ALL' | 'CASH' | 'CREDIT_CARD' | 'DEBIT_CARD' | 'TRANSFER'
+
+  // SEÑAL COMPUTADA QUE FILTRA LA LISTA AUTOMÁTICAMENTE
+  filteredPayments = computed(() => {
+    const term = this.searchTerm().toLowerCase().trim();
+    const method = this.methodFilter();
+
+    return this.payments().filter(payment => {
+      // 1. Filtro por Nombre o Apellido del huésped
+      const name = payment.guestName ? payment.guestName.toLowerCase() : '';
+      const surname = payment.guestSurname ? payment.guestSurname.toLowerCase() : '';
+      const fullName = `${name} ${surname}`;
+      
+      const matchesSearch = fullName.includes(term);
+
+      // 2. Filtro por Método de Pago
+      let matchesMethod = true;
+      if (method !== 'ALL') {
+        matchesMethod = payment.paymentMethod === method;
+      }
+
+      return matchesSearch && matchesMethod;
+    });
+  });
+
   constructor(
     private paymentService: PaymentService,
     private accountService: AccountService
@@ -36,14 +63,11 @@ export class PaymentListComponent implements OnInit {
 
   // Método principal para obtener y completar los datos del listado de pagos
   loadPayments(): void {
-    // 1. Iniciamos el estado de carga y limpiamos errores previos
     this.loading.set(true);
     this.errorMessage.set('');
     
-    // 2. Invocamos al servicio principal para obtener todos los pagos
     this.paymentService.getAllPayments().subscribe({
       next: (data: PaymentDTOResponse[]) => {
-        // 3. Procesamos la respuesta asegurando que sea un arreglo válido
         const rawPayments: PaymentWithGuest[] = Array.isArray(data) ? [...data] : [];
         
         // Ordenamos para que el más reciente (ID mayor) quede arriba
@@ -52,17 +76,16 @@ export class PaymentListComponent implements OnInit {
         this.payments.set(rawPayments);
         this.loading.set(false);
 
-        // 4. Recorremos los pagos para consultar los datos del usuario mediante la cuenta asociada
+        // Recorremos los pagos para consultar los datos del usuario mediante la cuenta asociada
         rawPayments.forEach(payment => {
           if (payment.accountId) {
             this.accountService.getAccountById(payment.accountId).subscribe({
               next: (account: any) => {
                 if (account) {
-                  // Asignamos los datos del huésped obtenidos desde la cuenta
                   payment.guestName = account.user?.name || account.name || '';
                   payment.guestSurname = account.user?.surname || account.surname || '';
                   
-                  // Actualizamos la señal con una nueva copia del arreglo para notificar a la vista con OnPush
+                  // Actualizamos la señal con una nueva copia del arreglo para notificar a la vista
                   this.payments.set([...rawPayments]);
                 }
               },
@@ -74,7 +97,6 @@ export class PaymentListComponent implements OnInit {
         });
       },
       error: (err: any) => {
-        // 5. Manejamos el error de la petición principal y detenemos el indicador de carga
         this.errorMessage.set('No se pudieron cargar los pagos o no cuentas con los permisos necesarios.');
         this.loading.set(false);
         console.error(err);

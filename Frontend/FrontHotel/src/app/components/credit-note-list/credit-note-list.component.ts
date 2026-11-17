@@ -1,4 +1,4 @@
-import { Component, OnInit, ChangeDetectionStrategy, signal } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpErrorResponse } from '@angular/common/http';
@@ -24,6 +24,34 @@ export class CreditNoteListComponent implements OnInit {
   loading = signal<boolean>(false);
   errorMessage = signal<string>('');
   searchCode = signal<string>('');
+
+  // --- SEÑALES PARA LOS FILTROS ---
+  searchTerm = signal<string>('');
+  statusFilter = signal<string>('ALL'); // 'ALL' | 'PAID' | 'PENDING'
+
+  // --- SEÑAL COMPUTADA QUE FILTRA LA LISTA AUTOMÁTICAMENTE ---
+  filteredCreditNotes = computed(() => {
+    const term = this.searchTerm().toLowerCase().trim();
+    const status = this.statusFilter();
+
+    return this.creditNotes().filter(note => {
+      // 1. Filtro por Nombre o Apellido del cliente
+      const name = note.clientName ? note.clientName.toLowerCase() : '';
+      const lastName = note.clientLastName ? note.clientLastName.toLowerCase() : '';
+      const fullName = `${name} ${lastName}`;
+      const matchesSearch = fullName.includes(term);
+
+      // 2. Filtro por Estado (Pagado / Pendiente)
+      let matchesStatus = true;
+      if (status === 'PAID') {
+        matchesStatus = note.paid === true;
+      } else if (status === 'PENDING') {
+        matchesStatus = !note.paid;
+      }
+
+      return matchesSearch && matchesStatus;
+    });
+  });
 
   // --- Estados reactivos para el Modal de Detalle ---
   showModal = signal<boolean>(false);

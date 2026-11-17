@@ -1,9 +1,11 @@
-import { Component, OnInit, ChangeDetectionStrategy, signal } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy, signal, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
+import { Subscription } from 'rxjs';
 import { BookingService } from '../../core/services/booking.service';
 import { BookingStateService } from '../../core/services/booking-state.service';
+import { RoomService } from '../../core/services/room.service';
 import { RoomDtoResponse } from '../../models/Room-model';
 
 @Component({
@@ -14,24 +16,37 @@ import { RoomDtoResponse } from '../../models/Room-model';
   styleUrls: ['./availability.component.css'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class AvailabilityComponent implements OnInit {
+export class AvailabilityComponent implements OnInit, OnDestroy {
   availabilityForm!: FormGroup;
   
-  // --- Estados con Signals en sintonía con tus otros componentes ---
+  // --- Estados con Signals ---
   availableRooms = signal<RoomDtoResponse[]>([]);
   loading = signal<boolean>(false);
   hasSearched = signal<boolean>(false);
   errorMessage = signal<string>('');
 
+  // --- Estados para el Modal de Detalle y Carrusel de Imágenes ---
+  selectedRoom = signal<RoomDtoResponse | null>(null);
+  roomImages = signal<string[]>([]);
+  loadingImages = signal(false);
+  imageError = signal('');
+  currentImageIndex = signal(0);
+  private imageSubscription?: Subscription;
+
   constructor(
     private fb: FormBuilder,
     private bookingService: BookingService,
     private bookingStateService: BookingStateService,
+    private roomService: RoomService,
     private router: Router
   ) {}
 
   ngOnInit(): void {
     this.initForm();
+  }
+
+  ngOnDestroy(): void {
+    this.closeRoomModal();
   }
 
   initForm(): void {
@@ -66,7 +81,7 @@ export class AvailabilityComponent implements OnInit {
         this.availableRooms.set(Array.isArray(rooms) ? [...rooms] : []);
         this.loading.set(false);
       },
-      error: (err) => {
+      error: (err: unknown) => {
         this.errorMessage.set('Error al consultar la disponibilidad en el sistema.');
         this.loading.set(false);
         console.error(err);
@@ -74,7 +89,6 @@ export class AvailabilityComponent implements OnInit {
     });
   }
 
-  // <--- Calcula la cantidad de días entre checkIn y checkOut
   calculateDays(): number {
     const { checkIn, checkOut } = this.availabilityForm.value;
     if (!checkIn || !checkOut) return 1;
@@ -87,17 +101,14 @@ export class AvailabilityComponent implements OnInit {
     return diffDays > 0 ? diffDays : 1;
   }
 
-  // <--- Obtiene el precio por noche de forma segura según el modelo actual
   getRoomPrice(room: RoomDtoResponse): number {
     return room.roomTypeDTOResponse?.pricePerNight ?? room.pricePerNight ?? 0;
   }
 
-  // <--- Calcula el costo total para una habitación específica
   calculateTotalPrice(room: RoomDtoResponse): number {
     return this.getRoomPrice(room) * this.calculateDays();
   }
 
-  // <--- Pregunta antes de confirmar o cancelar
   selectRoomAndRedirect(room: RoomDtoResponse): void {
     const { checkIn, checkOut, guestCount } = this.availabilityForm.value;
     const pricePerNight = this.getRoomPrice(room);
@@ -121,8 +132,89 @@ export class AvailabilityComponent implements OnInit {
         totalPrice: total
       });
       this.router.navigate(['/dashboard/booking-create']);
-    } else {
-      console.log('Selección de habitación cancelada por el usuario.');
     }
+  }
+
+  // ==========================================
+  // GESTIÓN DEL MODAL DE DETALLE Y CARRUSEL
+  // ==========================================
+  openRoomModal(room: RoomDtoResponse): void {
+    this.closeRoomModal();
+    this.selectedRoom.set(room);
+    this.loadRoomImagesSimple(room);
+  }
+
+  loadRoomImagesSimple(room: RoomDtoResponse): void {
+    const totalImagenes = room.imagesCount ?? 0;
+
+    this.loadingImages.set(totalImagenes > 0);
+    this.imageError.set('');
+    this.currentImageIndex.set(0);
+
+    if (totalImagenes === 0) {
+      return;
+    }
+
+    const urlsTemporales: string[] = [];
+    let imagenesDescargadas = 0;
+
+    for (let i = 0; i < totalImagenes; i++) {
+      this.roomService.getRoomImage(room.id, i).subscribe({
+        next: (blob: Blob) => {
+          if (this.selectedRoom()?.id !== room.id) return;
+
+          const url = URL.createObjectURL(blob);
+          urlsTemporales[i] = url;
+          imagenesDescargadas++;
+
+          if (imagenesDescargadas === totalImagenes) {
+            this.roomImages.set(urlsTemporales);
+            this.loadingImages.set(false);
+          }
+        },
+        error: (err: unknown) => {
+          if (this.selectedRoom()?.id === room.id) {
+            this.imageError.set('No se pudieron cargar las imágenes.');
+            this.loadingImages.set(false);
+          }
+          console.error(err);
+        }
+      });
+    }
+  }
+
+  previousImage(): void {
+    const total = this.roomImages().length;
+    if (total === 0) return;
+
+    let nuevoIndice = this.currentImageIndex() - 1;
+    if (nuevoIndice < 0) {
+      nuevoIndice = total - 1;
+    }
+    this.currentImageIndex.set(nuevoIndice);
+  }
+
+  nextImage(): void {
+    const total = this.roomImages().length;
+    if (total === 0) return;
+
+    let nuevoIndice = this.currentImageIndex() + 1;
+    if (nuevoIndice >= total) {
+      nuevoIndice = 0;
+    }
+    this.currentImageIndex.set(nuevoIndice);
+  }
+
+  closeRoomModal(): void {
+    this.imageSubscription?.unsubscribe();
+    this.imageSubscription = undefined;
+
+    this.roomImages().forEach(url => URL.revokeObjectURL(url));
+
+    this.roomImages.set([]);
+    this.selectedRoom.set(null);
+    this.loadingImages.set(false);
+    this.imageError.set('');
+    this.currentImageIndex.set(0);
   }
 }
