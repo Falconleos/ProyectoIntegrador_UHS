@@ -1,5 +1,5 @@
 import { Component, OnInit, OnDestroy, signal, inject } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { Router, RouterOutlet, RouterLink, RouterLinkActive } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { AuthService } from '../../core/services/auth.service';
@@ -7,7 +7,7 @@ import { RoomAttentionService } from '../../core/services/room-attention.service
 
 @Component({
     selector: 'app-dashboard',
-    imports: [CommonModule, RouterOutlet, RouterLink, RouterLinkActive],
+    imports: [RouterOutlet, RouterLink, RouterLinkActive],
     templateUrl: './dashboard.component.html',
     styleUrls: ['./dashboard.component.css']
 })

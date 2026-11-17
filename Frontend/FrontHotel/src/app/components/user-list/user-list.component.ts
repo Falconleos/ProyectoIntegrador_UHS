@@ -1,5 +1,5 @@
 import { Component, OnInit, ChangeDetectorRef, signal, computed } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { Router, RouterLink } from '@angular/router';
 import { UserService } from '../../core/services/user.service';
 import { UserDtoResponse } from '../../models/User-model';
@@ -7,7 +7,7 @@ import { AuthService } from '../../core/services/auth.service';
 
 @Component({
     selector: 'app-user-list',
-    imports: [CommonModule, RouterLink],
+    imports: [RouterLink],
     templateUrl: './user-list.component.html',
     styleUrls: ['./user-list.component.css']
 })

@@ -1,5 +1,5 @@
 import { Component, OnInit, ChangeDetectorRef, inject, signal, ChangeDetectionStrategy } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink, ActivatedRoute } from '@angular/router';
 import { UserService } from '../../core/services/user.service';
@@ -7,7 +7,7 @@ import { RoleType } from '../../models/User-model';
 
 @Component({
     selector: 'app-user-edit',
-    imports: [CommonModule, ReactiveFormsModule, RouterLink],
+    imports: [ReactiveFormsModule, RouterLink],
     templateUrl: './user-edit.component.html',
     styleUrls: ['../user-form/user-form.component.css'],
     changeDetection: ChangeDetectionStrategy.OnPush

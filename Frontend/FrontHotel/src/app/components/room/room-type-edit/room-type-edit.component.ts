@@ -1,5 +1,5 @@
 import { Component, ChangeDetectionStrategy, OnInit, inject, signal } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { RoomTypeService } from '../../../core/services/room-type.service';
@@ -7,7 +7,7 @@ import { RoomTypeDTORequest } from '../../../models/RoomType-model';
 
 @Component({
     selector: 'app-room-type-edit',
-    imports: [CommonModule, ReactiveFormsModule, RouterLink],
+    imports: [ReactiveFormsModule, RouterLink],
     templateUrl: './room-type-edit.component.html',
     styleUrl: './room-type-edit.component.css',
     changeDetection: ChangeDetectionStrategy.OnPush

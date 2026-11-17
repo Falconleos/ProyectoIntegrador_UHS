@@ -1,5 +1,5 @@
 import { Component, ChangeDetectionStrategy, ChangeDetectorRef, OnInit, inject, signal } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 
 import { UserService } from '../../core/services/user.service';
@@ -8,7 +8,7 @@ import { UserDtoRequest } from '../../models/User-model';
 
 @Component({
     selector: 'app-change-password',
-    imports: [CommonModule, ReactiveFormsModule],
+    imports: [ReactiveFormsModule],
     templateUrl: './change-password.component.html',
     styleUrls: ['./change-password.component.css'],
     changeDetection: ChangeDetectionStrategy.OnPush

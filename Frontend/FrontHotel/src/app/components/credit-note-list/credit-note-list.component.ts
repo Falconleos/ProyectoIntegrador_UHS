@@ -1,5 +1,5 @@
 import { Component, OnInit, ChangeDetectionStrategy, signal, computed } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { FormsModule } from '@angular/forms';
 import { HttpErrorResponse } from '@angular/common/http';
 
@@ -10,7 +10,7 @@ import { BookingService } from '../../core/services/booking.service';
 
 @Component({
     selector: 'app-credit-note-list',
-    imports: [CommonModule, FormsModule],
+    imports: [FormsModule],
     templateUrl: './credit-note-list.component.html',
     styleUrls: ['./credit-note-list.component.css'],
     changeDetection: ChangeDetectionStrategy.OnPush

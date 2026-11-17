@@ -1,5 +1,5 @@
 import { Component, OnInit, ChangeDetectionStrategy, signal } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
@@ -12,7 +12,7 @@ import { UserService } from '../../core/services/user.service';
 
 @Component({
     selector: 'app-booking-form',
-    imports: [CommonModule, ReactiveFormsModule, RouterLink],
+    imports: [ReactiveFormsModule, RouterLink],
     templateUrl: './booking-form.component.html',
     styleUrls: ['./booking-form.component.css'],
     changeDetection: ChangeDetectionStrategy.OnPush
