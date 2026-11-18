@@ -87,9 +87,7 @@ export class UserListComponent implements OnInit {
     if (confirm('¿Estás seguro de que deseas eliminar este usuario?')) {
       this.userService.deleteUser(id).subscribe({
         next: () => {
-          this.users = this.users.filter(user => user.id !== id);
-          delete this.userAvatars[id];
-          this.cdr.markForCheck();
+          window.location.reload(); // Recarga la página por completo
         },
         error: (err) => {
           alert('Error al eliminar el usuario.');
