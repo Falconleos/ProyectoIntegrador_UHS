@@ -1,11 +1,11 @@
-<div class="container">
-  <!-- Encabezado -->
+<section class="room-list-container">
+
+  <!-- Sección de Encabezado -->
   <div class="header-section">
     <div class="header-title-wrapper">
       <h2>Gestión de Check-Ins y Estadías</h2>
       <p class="subtitle">Administre las reservas del día y controle las estadías activas del hotel.</p>
     </div>
-
   </div>
 
   <hr class="divider" />
@@ -85,7 +85,7 @@
                 </div>
               }
 
-              <!-- Botón Realizar Check-In sin icono -->
+              <!-- Botón Realizar Check-In -->
               <button class="btn-primary btn-full" (click)="goToCreateCheckIn(booking)">
                 Realizar Check-In
               </button>
@@ -97,21 +97,21 @@
   }
 
   <!-- Barra de Filtro Rápido -->
-    <div class="search-box">
-      <i class="fa-solid fa-magnifying-glass search-icon" aria-hidden="true"></i>
-      <input 
-        type="text" 
-        class="search-input" 
-        placeholder="Filtrar por nombre, hab..." 
-        [value]="searchTerm()"
-        (input)="searchTerm.set($any($event.target).value)"
-      />
-      @if (searchTerm()) {
-        <button type="button" class="clear-search-btn" (click)="searchTerm.set('')" title="Limpiar filtro">
-          ✕
-        </button>
-      }
-    </div>
+  <div class="search-box">
+    <i class="fa-solid fa-magnifying-glass search-icon" aria-hidden="true"></i>
+    <input 
+      type="text" 
+      class="search-input" 
+      placeholder="Filtrar por nombre, hab..." 
+      [value]="searchTerm()"
+      (input)="searchTerm.set($any($event.target).value)"
+    />
+    @if (searchTerm()) {
+      <button type="button" class="clear-search-btn" (click)="searchTerm.set('')" title="Limpiar filtro">
+        ✕
+      </button>
+    }
+  </div>
 
   <!-- Sección de estadías activas -->
   <section class="active-stays-section">
@@ -145,16 +145,13 @@
                 <td class="subtitle">{{ b.checkIn }} al {{ b.checkOut }}</td>
                 <td class="col-actions">
                   <div class="table-actions">
-                    <!-- Botón Servicios sin icono -->
                     <button class="btn-secondary-action" (click)="servicesPlaceholder(b.id)" title="Servicios">
                       Servicios
                     </button>
-                    <!-- Botón Cuenta sin icono -->
                     <button class="btn-secondary-action" (click)="viewAccountPlaceholder(b.id)" title="Cuenta">
                       Cuenta
                     </button>
                     @if (canModify()) {
-                      <!-- Botón Interrumpir sin icono -->
                       <button class="btn-danger" (click)="interruptStay(b.id)" title="Interrumpir">
                         Interrumpir
                       </button>
@@ -224,18 +221,22 @@
               <h6 class="modal-warning-title">La reserva no tiene un usuario asociado. Seleccione uno:</h6>
               
               <div class="form-group">
-                <label class="form-label">Usuario del Sistema:</label>
-                <select class="form-control" [value]="selectedUserId()" (change)="onUserSelectChange($event)">
-                    <option [value]="null" disabled>-- Seleccione un usuario --</option>
-                    @for (u of users(); track u.id) {
-                    <option [value]="u.id">
-                        {{ u.name }} {{ u.surname }} ({{ u.email }})
-                    </option>
-                    }
-                </select>
+                <label class="form-label">Usuario Vinculado *</label>
+                <div class="user-selection-wrapper">
+                  <input 
+                    type="text" 
+                    class="form-control" 
+                    [value]="selectedUserName || 'Ningún huésped seleccionado'" 
+                    readonly 
+                    placeholder="Haga clic en buscar..."
+                    (click)="openUserModal()">
+                  
+                  <button type="button" class="btn-primary" (click)="openUserModal()">
+                    <i class="fa-solid fa-magnifying-glass"></i> Buscar Huésped
+                  </button>
+                </div>
               </div>
 
-              <!-- Botón Asociar sin icono -->
               <button class="btn-primary btn-full" [disabled]="!selectedUserId()" (click)="assignAndCheckIn()">
                 Asociar y Registrar Check-In
               </button>
@@ -257,12 +258,123 @@
               <div class="form-group"><input type="text" class="form-control" [value]="newUser().dni" (input)="updateNewUserField('dni', $event)" placeholder="DNI"></div>
               <div class="form-group"><input type="text" class="form-control" [value]="newUser().phoneNumber" (input)="updateNewUserField('phoneNumber', $event)" placeholder="Teléfono"></div>
               
-              <!-- Botón Crear Usuario sin icono -->
               <button class="btn-primary btn-full" (click)="createNewUserAndProceed()">
                 Crear Usuario y Hacer Check-In
               </button>
             </div>
           }
+        </div>
+
+      </div>
+    </div>
+  }
+
+  <!-- ======================================================== -->
+  <!-- MODAL FLOTANTE DE SELECCIÓN DE HUÉSPED                   -->
+  <!-- ======================================================== -->
+  @if (isUserModalOpen()) {
+    <div class="modal-backdrop" (click)="closeUserModal()">
+      <div class="modal-card user-picker-modal" (click)="$event.stopPropagation()">
+        
+        <!-- Botón Cerrar -->
+        <button type="button" class="modal-close-btn" (click)="closeUserModal()">
+          <i class="fa-solid fa-xmark" aria-hidden="true"></i>
+        </button>
+
+        <div class="modal-header">
+          <h3>
+            <i class="fa-solid fa-users-gear icon-primary"></i> Seleccionar Huésped Registrado
+          </h3>
+          <p class="muted-text">Busque y seleccione un usuario de la lista para asociar al check-in.</p>
+        </div>
+
+        <!-- Barra de Filtros -->
+        <div class="filters-bar">
+          <div class="search-box modal-search-box">
+            <i class="fa-solid fa-magnifying-glass search-icon" aria-hidden="true"></i>
+            <input 
+              type="text" 
+              placeholder="Buscar por nombre, apellido, username o DNI..." 
+              [value]="searchText()"
+              (input)="onSearchInput($event)"
+              class="search-input"
+            />
+          </div>
+        </div>
+
+        <!-- Listado con Tabla y Tarjetas adaptables -->
+        @if (filteredUsers().length > 0) {
+          <div class="modal-table-scroll-container">
+            
+            <!-- TABLA (Escritorio) -->
+            <div class="table-wrapper desktop-table">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th class="col-avatar">Avatar</th>
+                    <th>Username</th>
+                    <th>Nombre y Apellido</th>
+                    <th>DNI</th>
+                    <th class="col-center">Acción</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @for (user of filteredUsers(); track user.id) {
+                    <tr class="table-row-clickable" (click)="selectUser(user)">
+                      <td>
+                        <img [src]="getUserAvatarUrl(user)" alt="Avatar" class="avatar-sm">
+                      </td>
+                      <td><strong>{{ user.username }}</strong></td>
+                      <td>{{ user.name }} {{ user.surname }}</td>
+                      <td>{{ user.dni }}</td>
+                      <td class="col-center">
+                        <button type="button" class="action-btn primary compact" (click)="$event.stopPropagation(); selectUser(user)">
+                          Seleccionar
+                        </button>
+                      </td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+
+            <!-- TARJETAS (Móvil) -->
+            <div class="mobile-cards-container">
+              @for (user of filteredUsers(); track user.id) {
+                <div class="mobile-user-card" (click)="selectUser(user)">
+                  <div class="mobile-card-header mobile-card-header-bordered">
+                    <div class="mobile-card-user-info">
+                      <img [src]="getUserAvatarUrl(user)" alt="Avatar" class="avatar-sm">
+                      <div>
+                        <strong class="mobile-card-title">{{ user.name }} {{ user.surname }}</strong>
+                        <span class="muted-text">&#64;{{ user.username }}</span>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="mobile-card-body">
+                    <span>DNI: {{ user.dni }}</span>
+                    <span class="select-action-label">Hacer clic para seleccionar</span>
+                  </div>
+                </div>
+              }
+            </div>
+
+          </div>
+        } @else {
+          <div class="feedback-banner warning">
+            <i class="fa-solid fa-circle-info"></i> No se encontraron huéspedes que coincidan con la búsqueda.
+          </div>
+        }
+
+        <!-- Pie del Modal -->
+        <div class="modal-actions" style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+          <button type="button" class="btn-secondary-action" (click)="goToCreateUser()">
+            <i class="fa-solid fa-user-plus"></i> ¿No está registrado? Crear usuario
+          </button>
+
+          <button type="button" class="action-btn btn-secondary-action" (click)="closeUserModal()">
+            Cancelar
+          </button>
         </div>
 
       </div>
@@ -282,4 +394,4 @@
     </div>
   }
 
-</div>
+</section>

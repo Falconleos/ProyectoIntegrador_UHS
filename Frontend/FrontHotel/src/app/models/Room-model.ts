@@ -6,6 +6,7 @@ export interface RoomDtoResponse {
     id: number;
     name: string;
     capacity: number;
+    description?: string;
     pricePerNight: number;
   };
   roomTypeName?: string;

@@ -1,4 +1,4 @@
-import { Component, OnInit, ChangeDetectionStrategy, signal, computed } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy, signal, computed, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { CheckInService } from '../../core/services/check-in.service';
@@ -6,6 +6,7 @@ import { BookingDtoResponse } from '../../models/Booking-model';
 import { AuthService } from '../../core/services/auth.service';
 import { UserService } from '../../core/services/user.service';
 import { AccountService } from '../../core/services/account.service';
+import { UserDtoResponse } from '../../models/User-model'; // 👈 Importar modelo de usuario
 import * as QRCode from 'qrcode';
 // @ts-ignore
 import jsQR from 'jsqr';
@@ -29,7 +30,7 @@ export class CheckInListComponent implements OnInit {
   selectedBookingForCheckIn = signal<BookingDtoResponse | null>(null);
   inputDni = signal<string>('');
   
-  users = signal<any[]>([]);
+  users = signal<UserDtoResponse[]>([]);
   selectedUserId = signal<number | null>(null);
   showUserSelector = signal<boolean>(false);
   
@@ -40,6 +41,29 @@ export class CheckInListComponent implements OnInit {
   
   checkInError = signal<string>('');
   checkInSuccess = signal<string>('');
+
+  // --- Estados y señales para el Modal de Selección de Usuarios ---
+  isUserModalOpen = signal(false);
+  selectedUserName = '';
+  userAvatars: { [key: number]: string } = {};
+  searchText = signal('');
+
+  // Computada para filtrar en tiempo real los usuarios en el modal
+  filteredUsers = computed(() => {
+    const list = this.users();
+    const search = this.searchText().toLowerCase().trim();
+
+    if (!search) return list;
+
+    return list.filter(user => {
+      const name = user.name || '';
+      const surname = user.surname || '';
+      const username = user.username || '';
+      const dni = user.dni || '';
+      const searchString = `${name} ${surname} ${username} ${dni}`.toLowerCase();
+      return searchString.includes(search);
+    });
+  });
 
   // --- PROPIEDADES PARA LECTURA DE QR MEDIANTE ARCHIVO ---
   qrInputCode = signal<string>('');
@@ -90,7 +114,8 @@ export class CheckInListComponent implements OnInit {
     private authService: AuthService,
     private userService: UserService,
     private accountService: AccountService,
-    private router: Router
+    private router: Router,
+    private cdr: ChangeDetectorRef // 👈 Inyectado para actualizar la vista con los avatares
   ) {}
 
   ngOnInit(): void {
@@ -251,6 +276,7 @@ export class CheckInListComponent implements OnInit {
     this.checkInSuccess.set('');
     this.checkInError.set('');
     this.selectedUserId.set(null);
+    this.selectedUserName = '';
 
     const hasUser = !!booking.username;
 
@@ -259,8 +285,55 @@ export class CheckInListComponent implements OnInit {
       this.executeCheckInDirectly(booking.id);
     } else {
       this.showUserSelector.set(true);
-      this.checkInError.set("Please select a valid user before checking in.");
+      this.checkInError.set("Por favor seleccione un usuario válido antes de realizar el check-in.");
     }
+  }
+
+  // --- Métodos del Modal de Selección de Huésped ---
+  openUserModal(): void {
+    this.isUserModalOpen.set(true);
+    this.users().forEach(user => {
+      this.loadUserAvatar(user);
+    });
+  }
+
+  closeUserModal(): void {
+    this.isUserModalOpen.set(false);
+    this.searchText.set('');
+  }
+
+  onSearchInput(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    this.searchText.set(input.value);
+  }
+
+  loadUserAvatar(user: UserDtoResponse): void {
+    if (!user || !user.id) return;
+    if (this.userAvatars[user.id]) return;
+
+    this.userService.getProfilePicture(user.id).subscribe({
+      next: (blob) => {
+        const objectURL = URL.createObjectURL(blob);
+        this.userAvatars[user.id] = objectURL;
+        this.cdr.markForCheck();
+      },
+      error: () => {
+        this.userAvatars[user.id] = 'assets/default-avatar.png';
+        this.cdr.markForCheck();
+      }
+    });
+  }
+
+  getUserAvatarUrl(user: UserDtoResponse | null): string {
+    if (!user || !user.id) return 'assets/default-avatar.png';
+    return this.userAvatars[user.id] || 'assets/default-avatar.png';
+  }
+
+  selectUser(user: UserDtoResponse): void {
+    this.selectedUserName = `${user.name} ${user.surname} (@${user.username})`;
+    this.selectedUserId.set(user.id);
+    this.closeUserModal();
+    this.cdr.markForCheck();
   }
 
   executeCheckInDirectly(bookingId: number): void {
@@ -375,11 +448,6 @@ export class CheckInListComponent implements OnInit {
     });
   }
 
-  onUserSelectChange(event: Event): void {
-    const value = (event.target as HTMLSelectElement).value;
-    this.selectedUserId.set(value ? Number(value) : null);
-  }
-
   updateNewUserField(field: string, event: Event): void {
     const value = (event.target as HTMLInputElement).value;
     this.newUser.update(u => ({ ...u, [field]: value }));
@@ -426,5 +494,10 @@ export class CheckInListComponent implements OnInit {
 
   servicesPlaceholder(id: number): void { 
     this.router.navigate([`/dashboard/bookings/${id}/servicios`]);
+  }
+
+  goToCreateUser(): void {
+    this.closeUserModal();
+    this.router.navigate(['/dashboard/user-creation']);
   }
 }

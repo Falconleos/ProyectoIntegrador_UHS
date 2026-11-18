@@ -241,6 +241,16 @@
             ${{ getRoomPrice(room) | number:'1.2-2' }}
           </span>
         </div>
+
+        <!-- Descripción del Tipo de Habitación -->
+        @if (room.roomTypeDTOResponse?.description) {
+          <div class="detail-item detail-item-full">
+            <span class="detail-label"><i class="fa-solid fa-align-left"></i> Descripción:</span>
+            <span class="detail-value">
+              {{ room.roomTypeDTOResponse?.description }}
+            </span>
+          </div>
+        }
       </div>
 
       <!-- Sección de Imágenes / Carrusel -->

@@ -120,7 +120,7 @@
   margin-top: 0;
 }
 
-/* --- TARJETA DE SCANNER DE QR (Súper Compacta y Horizontal) --- */
+/* --- TARJETA DE SCANNER DE QR --- */
 .card-box {
   background: rgba(15, 23, 42, 0.5);
   border: var(--border-input);
@@ -190,7 +190,7 @@
   font-size: 0.7rem;
 }
 
-/* --- GRILLA DE CARDS DE RESERVAS (Más compactas) --- */
+/* --- GRILLA DE CARDS DE RESERVAS --- */
 section {
   margin-bottom: 1.5rem;
 }
@@ -428,6 +428,11 @@ section {
   box-sizing: border-box;
 }
 
+/* Estilo específico para el modal selector de usuarios */
+.user-picker-modal {
+  max-width: 650px !important;
+}
+
 .modal-card-sm {
   max-width: 320px;
 }
@@ -486,6 +491,16 @@ section {
   gap: 0.3rem;
 }
 
+.user-selection-wrapper {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.user-selection-wrapper input {
+  cursor: pointer;
+}
+
 .form-control, select.form-control {
   width: 100%;
   padding: 8px 10px;
@@ -502,6 +517,110 @@ section {
 
 .form-control:focus {
   border-color: var(--color-primary);
+}
+
+/* Componentes del Modal Selector de Huésped */
+.filters-bar {
+  margin-bottom: 0.5rem;
+}
+
+.modal-search-box {
+  width: 100% !important;
+  height: 36px;
+}
+
+.modal-table-scroll-container {
+  max-height: 350px;
+  overflow-y: auto;
+  border-radius: var(--radius-md);
+  border: var(--border-input);
+}
+
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.75rem;
+  text-align: left;
+}
+
+.data-table th, .data-table td {
+  padding: 8px 10px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.data-table th {
+  background: rgba(15, 23, 42, 0.95);
+  color: #fff;
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}
+
+.table-row-clickable {
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.table-row-clickable:hover {
+  background: rgba(129, 140, 248, 0.1);
+}
+
+.avatar-sm {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.col-avatar {
+  width: 40px;
+  text-align: center;
+}
+
+.col-center {
+  text-align: center;
+}
+
+.action-btn.compact {
+  padding: 4px 8px;
+  font-size: 0.7rem;
+  height: 24px;
+}
+
+.mobile-user-card {
+  background: rgba(2, 6, 23, 0.6);
+  border: var(--border-input);
+  border-radius: var(--radius-sm);
+  padding: 8px;
+  margin-bottom: 6px;
+  cursor: pointer;
+  display: none;
+}
+
+.mobile-card-user-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.mobile-card-title {
+  font-size: 0.8rem;
+  display: block;
+}
+
+.select-action-label {
+  font-size: 0.65rem;
+  color: var(--color-primary);
+  margin-top: 4px;
+  display: block;
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 0.5rem;
 }
 
 .badge {
@@ -635,6 +754,12 @@ section {
   .mobile-only {
     display: none !important;
   }
+  .desktop-table {
+    display: block !important;
+  }
+  .mobile-cards-container {
+    display: none !important;
+  }
 }
 
 @media (max-width: 768px) {
@@ -671,6 +796,20 @@ section {
   
   .mobile-only {
     display: flex !important;
+  }
+
+  .desktop-table {
+    display: none !important;
+  }
+
+  .mobile-cards-container {
+    display: flex !important;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .mobile-user-card {
+    display: block !important;
   }
 
   .modal-card {
