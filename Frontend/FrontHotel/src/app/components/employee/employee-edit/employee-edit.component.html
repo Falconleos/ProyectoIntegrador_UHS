@@ -149,6 +149,37 @@
           </div>
         </fieldset>
 
+        <!-- CAMBIAR CONTRASEÑA (Opcional) -->
+        <fieldset class="employee-fieldset" formGroupName="passwordSection">
+          <legend class="employee-legend">Cambiar Contraseña (Opcional)</legend>
+          <p class="fieldset-subtitle">Completá estos campos únicamente si deseás actualizar tu contraseña.</p>
+          
+          <div class="form-grid">
+            <div class="form-group">
+              <label for="newPassword">Nueva contraseña</label>
+              <input 
+                id="newPassword" 
+                type="password" 
+                formControlName="newPassword" 
+                class="form-control" 
+                placeholder="Mínimo 1 carácter">
+              @if (employeeForm.get('passwordSection.newPassword')?.touched && employeeForm.get('passwordSection.newPassword')?.hasError('minlength')) {
+                <small class="error-text">La contraseña debe tener al menos 1 carácter.</small>
+              }
+            </div>
+
+            <div class="form-group">
+              <label for="confirmPassword">Confirmar nueva contraseña</label>
+              <input 
+                id="confirmPassword" 
+                type="password" 
+                formControlName="confirmPassword" 
+                class="form-control" 
+                placeholder="Repetí tu nueva contraseña">
+            </div>
+          </div>
+        </fieldset>
+
         <!-- FOTO DE PERFIL -->
         <fieldset class="employee-fieldset">
           <legend class="employee-legend">Foto de Perfil</legend>

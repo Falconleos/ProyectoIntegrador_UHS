@@ -534,6 +534,44 @@
   margin-right: 0.3rem;
 }
 
+/* --- Estilos para Asociación de Usuarios en Reservas --- */
+.association-input {
+  cursor: pointer;
+  font-size: 0.75rem;
+  padding: 4px 8px;
+  height: 28px;
+  max-width: 140px;
+}
+
+.avatar-sm {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: var(--border-input);
+}
+
+.table-row-clickable {
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.table-row-clickable:hover {
+  background: var(--bg-btn-secondary-hover);
+}
+
+.modal-table-scroll-container {
+  max-height: 320px;
+  overflow-y: auto;
+  margin-bottom: 1rem;
+  border-radius: var(--radius-sm);
+  border: var(--border-input);
+}
+
+.user-picker-modal {
+  max-width: 700px;
+}
+
 /* ========================================================
    RESPONSIVIDAD MÓVIL (Max-width: 768px)
    ======================================================== */

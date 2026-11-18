@@ -1,4 +1,4 @@
-import { Component, OnInit, ChangeDetectionStrategy, signal } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy, signal, computed, ChangeDetectorRef } from '@angular/core';
 
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
@@ -9,6 +9,7 @@ import { UserDtoResponse } from '../../models/User-model';
 import * as QRCode from 'qrcode';
 import { BookingDtoResponse } from '../../models/Booking-model';
 import { UserService } from '../../core/services/user.service';
+import { AuthService } from '../../core/services/auth.service'; // 👈 1. Importar AuthService
 
 @Component({
     selector: 'app-booking-form',
@@ -28,13 +29,38 @@ export class BookingFormComponent implements OnInit {
   loading = signal<boolean>(false);
   errorMessage = signal<string>('');
 
+  // --- Estados y señales para el Modal de Selección de Usuarios ---
+  isUserModalOpen = signal(false);
+  selectedUserName = '';
+  userAvatars: { [key: number]: string } = {};
+  searchText = signal('');
+
+  // Computada para filtrar en tiempo real por nombre, apellido, username o DNI
+  filteredUsers = computed(() => {
+    const list = this.usersList();
+    const search = this.searchText().toLowerCase().trim();
+
+    if (!search) return list;
+
+    return list.filter(user => {
+      const name = user.name || '';
+      const surname = user.surname || '';
+      const username = user.username || '';
+      const dni = user.dni || '';
+      const searchString = `${name} ${surname} ${username} ${dni}`.toLowerCase();
+      return searchString.includes(search);
+    });
+  });
+
   constructor(
     private fb: FormBuilder,
     private bookingService: BookingService,
     private bookingStateService: BookingStateService,
     private userService: UserService, 
+    public authService: AuthService, // 👈 2. Inyectar AuthService como público para usarlo en el HTML
     private http: HttpClient,
-    private router: Router
+    private router: Router,
+    private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
@@ -69,11 +95,10 @@ export class BookingFormComponent implements OnInit {
     }
   }
 
-  // --- FILTRADO PARA QUE SOLO FIGUREN USUARIOS CON ROLE_GUEST ---
+  // Resto de métodos idénticos...
   private filterGuestUsers(users: any[]): UserDtoResponse[] {
     if (!Array.isArray(users)) return [];
     return users.filter(user => {
-      // Verificamos si el usuario tiene roles definidos y si alguno es ROLE_GUEST o GUEST
       const roles = user.roles || user.authorities || user.role;
       if (!roles) return false;
 
@@ -94,10 +119,12 @@ export class BookingFormComponent implements OnInit {
       next: (users: UserDtoResponse[]) => {
         const guestOnly = this.filterGuestUsers(users);
         this.usersList.set(guestOnly);
+        this.cdr.markForCheck();
       },
       error: (err: any) => {
         console.error('Error al cargar la lista de usuarios', err);
         this.usersList.set([]);
+        this.cdr.markForCheck();
       }
     });
   }
@@ -107,10 +134,12 @@ export class BookingFormComponent implements OnInit {
       next: (users: UserDtoResponse[]) => {
         const guestOnly = this.filterGuestUsers(users);
         this.usersList.set(guestOnly);
+        this.cdr.markForCheck();
       },
       error: () => {
         const username = localStorage.getItem('username') || 'Mi Usuario';
         this.usersList.set([{ id: userId, username, name: username, surname: '', email: '', enabled: true } as any]);
+        this.cdr.markForCheck();
       }
     });
   }
@@ -144,6 +173,7 @@ export class BookingFormComponent implements OnInit {
         phoneCtrl?.setValidators([Validators.required]);
         userIdCtrl?.clearValidators();
         userIdCtrl?.setValue(null);
+        this.selectedUserName = '';
       }
 
       firstNameCtrl?.updateValueAndValidity();
@@ -153,10 +183,55 @@ export class BookingFormComponent implements OnInit {
     });
   }
 
-  onUserSelectChange(event: Event): void {
-    const val = (event.target as HTMLSelectElement).value;
-    const numericVal = val === '' || val === 'null' ? null : Number(val);
-    this.bookingForm.patchValue({ userId: numericVal });
+  onSearchInput(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    this.searchText.set(input.value);
+  }
+
+  openUserModal(): void {
+    this.isUserModalOpen.set(true);
+    this.usersList().forEach(user => {
+      this.loadUserAvatar(user);
+    });
+  }
+
+  closeUserModal(): void {
+    this.isUserModalOpen.set(false);
+    this.searchText.set('');
+  }
+
+  loadUserAvatar(user: UserDtoResponse): void {
+    if (!user || !user.id) return;
+    if (this.userAvatars[user.id]) return;
+
+    this.userService.getProfilePicture(user.id).subscribe({
+      next: (blob) => {
+        const objectURL = URL.createObjectURL(blob);
+        this.userAvatars[user.id] = objectURL;
+        this.cdr.markForCheck();
+      },
+      error: () => {
+        this.userAvatars[user.id] = 'assets/default-avatar.png';
+        this.cdr.markForCheck();
+      }
+    });
+  }
+
+  getUserAvatarUrl(user: UserDtoResponse | null): string {
+    if (!user || !user.id) return 'assets/default-avatar.png';
+    return this.userAvatars[user.id] || 'assets/default-avatar.png';
+  }
+
+  selectUser(user: UserDtoResponse): void {
+    this.selectedUserName = `${user.name} ${user.surname} (@${user.username})`;
+    this.bookingForm.patchValue({ userId: user.id });
+    this.closeUserModal();
+    this.cdr.markForCheck();
+  }
+
+  goToCreateUser(): void {
+    this.closeUserModal();
+    this.router.navigate(['/dashboard/user-creation']);
   }
 
   getSubmitButtonIcon(): string {
@@ -175,8 +250,7 @@ export class BookingFormComponent implements OnInit {
     const formValues = this.bookingForm.getRawValue();
 
     const currentUserIdStr = localStorage.getItem('userId');
-    const storedRoles = localStorage.getItem('role');
-    const isGuestUser = storedRoles ? storedRoles.includes('GUEST') : false;
+    const isGuestUser = this.authService.isGuest();
 
     const targetUserId = isGuestUser && currentUserIdStr 
       ? Number(currentUserIdStr) 

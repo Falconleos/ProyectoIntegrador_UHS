@@ -38,45 +38,51 @@
   <!-- Formulario Principal -->
   <form [formGroup]="bookingForm" (ngSubmit)="onSubmit()" class="form-container">
     
-    <!-- Selector de Tipo de Cliente -->
-    <div class="switch-box">
-      <div class="switch-wrapper">
-        <input class="switch-input" type="checkbox" id="isRegisteredUser" formControlName="isRegisteredUser">
-        <label class="form-check-label" for="isRegisteredUser">
-          Asociar a un usuario ya registrado en el sistema
-        </label>
-      </div>
-      <small class="subtitle switch-hint">
-        @if (isGuestUser()) {
-          Su cuenta de huésped ha sido vinculada automáticamente a esta reserva.
-        } @else {
+    <!-- SECCIÓN OCULTA SI EL USUARIO ES GUEST -->
+    @if (!authService.isGuest()) {
+      <!-- Selector de Tipo de Cliente -->
+      <div class="switch-box">
+        <div class="switch-wrapper">
+          <input class="switch-input" type="checkbox" id="isRegisteredUser" formControlName="isRegisteredUser">
+          <label class="form-check-label" for="isRegisteredUser">
+            Asociar a un usuario ya registrado en el sistema
+          </label>
+        </div>
+        <small class="subtitle switch-hint">
           Si se deja desmarcado, se creará una reserva rápida (telefónica) y el pasajero podrá registrarse o vincularse en el momento del Check-In.
-        }
-      </small>
-    </div>
+        </small>
+      </div>
 
-    <!-- OPCIÓN A: Selección de Usuario Registrado -->
-    @if (isRegisteredUser()) {
-      <div class="form-section">
-        <h4 class="section-title">Usuario Vinculado</h4>
-        <div class="form-group">
-          <label for="userId" class="form-label">Usuario Registrado *</label>
-          <div class="input-wrapper">
-            <select id="userId" class="form-control" formControlName="userId" (change)="onUserSelectChange($event)">
-              <option [value]="null">Seleccione usuario</option>
-              @for (user of usersList(); track user.id) {
-                <option [value]="user.id">
-                  {{ user.name }} {{ user.surname }} (Username: {{ user.username }})
-                </option>
-              }
-            </select>
+      <!-- OPCIÓN A: Selección de Usuario Registrado con Modal -->
+      @if (isRegisteredUser()) {
+        <div class="form-section">
+          <h4 class="section-title">Usuario Vinculado</h4>
+          <div class="form-group">
+            <label for="userId" class="form-label">Usuario Registrado *</label>
+            <div class="user-selection-wrapper">
+              <input 
+                type="text" 
+                id="userId"
+                class="form-control" 
+                [value]="selectedUserName || 'Ningún huésped seleccionado'" 
+                readonly 
+                placeholder="Haga clic en buscar..."
+                (click)="openUserModal()">
+              
+              <button type="button" class="btn-primary" (click)="openUserModal()">
+                <i class="fa-solid fa-magnifying-glass"></i> Buscar Huésped
+              </button>
+            </div>
+            @if (bookingForm.get('userId')?.invalid && bookingForm.get('userId')?.touched) {
+              <small class="error-text">Debe seleccionar un usuario/huésped.</small>
+            }
           </div>
         </div>
-      </div>
+      }
     }
 
-    <!-- OPCIÓN B: Datos Manuales del Titular (Solo si NO es GUEST) -->
-    @if (!isRegisteredUser() && !isGuestUser()) {
+    <!-- OPCIÓN B: Datos Manuales del Titular (Solo si NO es GUEST y NO está marcado el check) -->
+    @if (!isRegisteredUser() && !authService.isGuest()) {
       <div class="form-section">
         <h4 class="section-title">Información del Huésped Titular</h4>
         <div class="grid-2">
@@ -128,3 +134,111 @@
 
   </form>
 </div>
+
+<!-- ======================================================== -->
+<!-- MODAL FLOTANTE DE SELECCIÓN DE HUÉSPED                   -->
+<!-- ======================================================== -->
+@if (isUserModalOpen()) {
+  <div class="modal-backdrop" (click)="closeUserModal()">
+    <div class="modal-card user-picker-modal" (click)="$event.stopPropagation()">
+      
+      <!-- Botón Cerrar -->
+      <button type="button" class="modal-close-btn" (click)="closeUserModal()">
+        <i class="fa-solid fa-xmark" aria-hidden="true"></i>
+      </button>
+
+      <div class="modal-header">
+        <h3>
+          <i class="fa-solid fa-users-gear icon-primary"></i> Seleccionar Huésped Registrado
+        </h3>
+        <p class="muted-text">Busque y seleccione un usuario de la lista para asociar a la reserva.</p>
+      </div>
+
+      <!-- Barra de Filtros -->
+      <div class="filters-bar">
+        <div class="search-box modal-search-box">
+          <i class="fa-solid fa-magnifying-glass search-icon" aria-hidden="true"></i>
+          <input 
+            type="text" 
+            placeholder="Buscar por nombre, apellido, username o DNI..." 
+            [value]="searchText()"
+            (input)="onSearchInput($event)"
+            class="search-input"
+          />
+        </div>
+      </div>
+
+      <!-- Listado con Tabla y Tarjetas adaptables -->
+      @if (filteredUsers().length > 0) {
+        <div class="modal-table-scroll-container">
+          
+          <!-- TABLA (Escritorio) -->
+          <div class="table-wrapper desktop-table">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th class="col-avatar">Avatar</th>
+                  <th>Username</th>
+                  <th>Nombre y Apellido</th>
+                  <th>DNI</th>
+                  <th class="col-center">Acción</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (user of filteredUsers(); track user.id) {
+                  <tr class="table-row-clickable" (click)="selectUser(user)">
+                    <td>
+                      <img [src]="getUserAvatarUrl(user)" alt="Avatar" class="avatar-sm">
+                    </td>
+                    <td><strong>{{ user.username }}</strong></td>
+                    <td>{{ user.name }} {{ user.surname }}</td>
+                    <td>{{ user.dni }}</td>
+                    <td class="col-center">
+                      <button type="button" class="action-btn primary compact" (click)="$event.stopPropagation(); selectUser(user)">
+                        Seleccionar
+                      </button>
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+
+          <!-- TARJETAS (Móvil) -->
+          <div class="mobile-cards-container">
+            @for (user of filteredUsers(); track user.id) {
+              <div class="mobile-user-card" (click)="selectUser(user)">
+                <div class="mobile-card-header mobile-card-header-bordered">
+                  <div class="mobile-card-user-info">
+                    <img [src]="getUserAvatarUrl(user)" alt="Avatar" class="avatar-sm">
+                    <div>
+                      <strong class="mobile-card-title">{{ user.name }} {{ user.surname }}</strong>
+                      <span class="muted-text">&#64;{{ user.username }}</span>
+                    </div>
+                  </div>
+                </div>
+                <div class="mobile-card-body">
+                  <span>DNI: {{ user.dni }}</span>
+                  <span class="select-action-label">Hacer clic para seleccionar</span>
+                </div>
+              </div>
+            }
+          </div>
+
+        </div>
+      } @else {
+        <div class="feedback-banner warning">
+          <i class="fa-solid fa-circle-info"></i> No se encontraron huéspedes que coincidan con la búsqueda.
+        </div>
+      }
+
+      <!-- Pie del Modal -->
+      <div class="modal-actions">
+        <button type="button" class="action-btn btn-secondary-action" (click)="closeUserModal()">
+          Cancelar
+        </button>
+      </div>
+
+    </div>
+  </div>
+}
