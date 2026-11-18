@@ -98,6 +98,6 @@ export class AccountListComponent implements OnInit {
 
   // Redirige a la vista de detalles utilizando el enrutador de Angular
   viewAccountDetail(id: number): void {
-    this.router.navigate([`/dashboard/account-detail/${id}`]);
+    this.router.navigate(['/dashboard/account-detail', id]);
   }
 }

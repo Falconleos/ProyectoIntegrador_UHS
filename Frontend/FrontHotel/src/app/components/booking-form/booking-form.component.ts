@@ -9,7 +9,7 @@ import { UserDtoResponse } from '../../models/User-model';
 import * as QRCode from 'qrcode';
 import { BookingDtoResponse } from '../../models/Booking-model';
 import { UserService } from '../../core/services/user.service';
-import { AuthService } from '../../core/services/auth.service'; // 👈 1. Importar AuthService
+import { AuthService } from '../../core/services/auth.service';
 
 @Component({
     selector: 'app-booking-form',
@@ -57,7 +57,7 @@ export class BookingFormComponent implements OnInit {
     private bookingService: BookingService,
     private bookingStateService: BookingStateService,
     private userService: UserService, 
-    public authService: AuthService, // 👈 2. Inyectar AuthService como público para usarlo en el HTML
+    public authService: AuthService,
     private http: HttpClient,
     private router: Router,
     private cdr: ChangeDetectorRef
@@ -95,7 +95,6 @@ export class BookingFormComponent implements OnInit {
     }
   }
 
-  // Resto de métodos idénticos...
   private filterGuestUsers(users: any[]): UserDtoResponse[] {
     if (!Array.isArray(users)) return [];
     return users.filter(user => {
@@ -250,7 +249,7 @@ export class BookingFormComponent implements OnInit {
     const formValues = this.bookingForm.getRawValue();
 
     const currentUserIdStr = localStorage.getItem('userId');
-    const isGuestUser = this.authService.isGuest();
+    const isGuestUser = this.isGuestUser(); // 👈 Usando la signal local
 
     const targetUserId = isGuestUser && currentUserIdStr 
       ? Number(currentUserIdStr) 

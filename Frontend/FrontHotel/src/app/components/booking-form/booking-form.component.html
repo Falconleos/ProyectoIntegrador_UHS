@@ -39,7 +39,7 @@
   <form [formGroup]="bookingForm" (ngSubmit)="onSubmit()" class="form-container">
     
     <!-- SECCIÓN OCULTA SI EL USUARIO ES GUEST -->
-    @if (!authService.isGuest()) {
+    @if (!isGuestUser()) {
       <!-- Selector de Tipo de Cliente -->
       <div class="switch-box">
         <div class="switch-wrapper">
@@ -82,7 +82,7 @@
     }
 
     <!-- OPCIÓN B: Datos Manuales del Titular (Solo si NO es GUEST y NO está marcado el check) -->
-    @if (!isRegisteredUser() && !authService.isGuest()) {
+    @if (!isRegisteredUser() && !isGuestUser()) {
       <div class="form-section">
         <h4 class="section-title">Información del Huésped Titular</h4>
         <div class="grid-2">

@@ -122,7 +122,7 @@
                 <div class="table-actions">
                   <button 
                     class="btn-secondary-action" 
-                    (click)="viewAccountDetail(account.id)"
+                    (click)="viewAccountDetail(account.bookingId ?? account.id)"
                     title="Ver detalle de cuenta">
                     <i class="bi bi-eye icon-badge"></i> Ver Detalle
                   </button>

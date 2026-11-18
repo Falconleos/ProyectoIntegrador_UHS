@@ -274,18 +274,17 @@ export class CheckInListComponent implements OnInit {
     this.inputDni.set(booking.guestPhone || '');
     this.showNewUserForm.set(false);
     this.checkInSuccess.set('');
-    this.checkInError.set('');
+    this.checkInError.set(''); // 👈 Esto limpia cualquier error previo
     this.selectedUserId.set(null);
     this.selectedUserName = '';
 
-    const hasUser = !!booking.username;
+    const hasUser = !!booking.username || !!(booking as any).userId;
 
     if (hasUser) {
       this.showUserSelector.set(false);
       this.executeCheckInDirectly(booking.id);
     } else {
       this.showUserSelector.set(true);
-      this.checkInError.set("Por favor seleccione un usuario válido antes de realizar el check-in.");
     }
   }
 
