@@ -1,4 +1,4 @@
-import { Component, inject, OnInit, signal, ChangeDetectionStrategy } from '@angular/core';
+import { Component, inject, OnInit, signal, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
 import {
   ReactiveFormsModule,
   NonNullableFormBuilder,
@@ -20,7 +20,7 @@ import {
     selector: 'app-employee-edit',
     imports: [ReactiveFormsModule, RouterLink],
     templateUrl: './employee-edit.component.html',
-    changeDetection: ChangeDetectionStrategy.Eager,
+    changeDetection: ChangeDetectionStrategy.OnPush, // Recomendado cambiar a OnPush igual que en usuario
     styleUrl: './employee-edit.component.css'
 })
 export class EmployeeEditComponent implements OnInit {
@@ -30,6 +30,7 @@ export class EmployeeEditComponent implements OnInit {
   private userService = inject(UserService);
   private route = inject(ActivatedRoute);
   private router = inject(Router);
+  private cdr = inject(ChangeDetectorRef); // Añadido para refrescar la vista con signals/OnPush
 
   employeeId = signal<number | null>(null);
   employee = signal<EmployeeDtoResponse | null>(null);
@@ -46,6 +47,7 @@ export class EmployeeEditComponent implements OnInit {
     'NIGHT'
   ];
 
+  // 1. Añadimos el group de passwordSection igual que en usuarios
   employeeForm = this.fb.group({
     username: ['', [Validators.required]],
     name: ['', [Validators.required]],
@@ -54,14 +56,19 @@ export class EmployeeEditComponent implements OnInit {
     gender: [''],
     email: ['', [Validators.required, Validators.email]],
     phoneNumber: [''],
-    emergencyPhoneNumber: [''], // 👈 Propiedad corregida según la interfaz
+    emergencyPhoneNumber: [''],
     address: [''],
     birthDay: [''],
 
     employeeNumber: [''],
     hireDate: ['', [Validators.required]],
     shift: this.fb.control<ShiftType>('MORNING', [Validators.required]),
-    salary: [0, [Validators.required, Validators.min(0.01)]]
+    salary: [0, [Validators.required, Validators.min(0.01)]],
+    
+    passwordSection: this.fb.group({
+      newPassword: ['', [Validators.minLength(1)]],
+      confirmPassword: ['']
+    })
   });
 
   ngOnInit(): void {
@@ -93,25 +100,27 @@ export class EmployeeEditComponent implements OnInit {
           name: user.name || '',
           surname: user.surname || '',
           dni: user.dni || '',
-          gender: user.gender || '',
+          gender: user.gender || employee.gender || '', // 👈 Busca primero en user y como respaldo en employee
           email: user.email || '',
           phoneNumber: user.phoneNumber || '',
           address: user.address || '',
           birthDay: user.birthDay || '',
 
           employeeNumber: employee.employeeNumber || '',
-          emergencyPhoneNumber: employee.emergencyPhoneNumber || '', // 👈 Seteo desde el DTO del empleado
+          emergencyPhoneNumber: employee.emergencyPhoneNumber || '',
           hireDate: employee.hireDate || '',
           shift: employee.shift || 'MORNING',
           salary: employee.salary || 0
         });
 
         this.loading.set(false);
+        this.cdr.markForCheck();
       },
       error: (err) => {
         console.error('Error al cargar datos:', err);
         this.errorMessage.set('No se pudieron cargar los datos del empleado.');
         this.loading.set(false);
+        this.cdr.markForCheck();
       }
     });
   }
@@ -129,12 +138,30 @@ export class EmployeeEditComponent implements OnInit {
     const id = this.employeeId();
     if (id === null) return;
 
+    this.errorMessage.set('');
+    this.successMessage.set('');
+
     if (this.employeeForm.invalid) {
       this.employeeForm.markAllAsTouched();
       return;
     }
 
     const formValue = this.employeeForm.getRawValue();
+    const passVal = formValue.passwordSection;
+
+    // 2. Validar las contraseñas si el usuario intenta cambiarlas
+    const isChangingPassword = !!passVal.newPassword || !!passVal.confirmPassword;
+    
+    if (isChangingPassword) {
+      if (!passVal.newPassword || !passVal.confirmPassword) {
+        this.errorMessage.set('Para cambiar la contraseña, debés completar ambos campos de la sección de contraseña.');
+        return;
+      }
+      if (passVal.newPassword !== passVal.confirmPassword) {
+        this.errorMessage.set('La nueva contraseña y su confirmación no coinciden.');
+        return;
+      }
+    }
 
     const updatePayload: EmployeeDtoRequest = {
       userId: id,
@@ -148,48 +175,65 @@ export class EmployeeEditComponent implements OnInit {
       address: formValue.address || undefined,
       birthDay: formValue.birthDay || undefined,
       employeeNumber: formValue.employeeNumber || undefined,
-      emergencyPhoneNumber: formValue.emergencyPhoneNumber || undefined, // 👈 Enviado en el payload
+      emergencyPhoneNumber: formValue.emergencyPhoneNumber || undefined,
       hireDate: formValue.hireDate,
       shift: formValue.shift,
       salary: Number(formValue.salary)
     };
 
     this.saving.set(true);
-    this.errorMessage.set('');
-    this.successMessage.set('');
 
+    // 3. Actualizar datos laborales y de empleado primero
     this.employeeService.update(id, updatePayload).subscribe({
       next: () => {
-        if (this.selectedProfilePicture) {
-          this.uploadProfilePicture(id, this.selectedProfilePicture);
+        // 4. Si se indicó cambio de contraseña, la actualizamos
+        if (isChangingPassword) {
+          this.userService.updatePasswordWithoutCurrent(id, passVal.newPassword).subscribe({
+            next: () => {
+              this.handleImageUploadOrFinish(id);
+            },
+            error: (err: any) => {
+              this.saving.set(false);
+              const msg = err.error?.mensaje || err.error?.message || 'Error al actualizar la contraseña.';
+              this.errorMessage.set(msg);
+              this.cdr.markForCheck();
+            }
+          });
         } else {
-          this.saving.set(false);
-          this.successMessage.set('Empleado y usuario actualizados correctamente.');
-          this.router.navigate(['/dashboard/employee-list']);
+          this.handleImageUploadOrFinish(id);
         }
       },
-      error: (err) => {
-        this.errorMessage.set(err.error?.message || 'No se pudo actualizar la información.');
+      error: (err: any) => {
         this.saving.set(false);
+        const msg = err.error?.mensaje || err.error?.message || 'No se pudo actualizar la información.';
+        this.errorMessage.set(msg);
+        this.cdr.markForCheck();
       }
     });
   }
 
-  uploadProfilePicture(userId: number, file: File): void {
-    const formData = new FormData();
-    formData.append('profilePicture', file);
+  handleImageUploadOrFinish(userId: number): void {
+    if (this.selectedProfilePicture) {
+      const formData = new FormData();
+      formData.append('profilePicture', this.selectedProfilePicture);
 
-    this.userService.updateProfilePicture(userId, formData).subscribe({
-      next: () => {
-        this.saving.set(false);
-        this.successMessage.set('Empleado, usuario y foto actualizados correctamente.');
-        this.router.navigate(['/dashboard/employee-list']);
-      },
-      error: () => {
-        this.saving.set(false);
-        this.successMessage.set('Se guardaron los datos, pero hubo un error al actualizar la foto.');
-        this.router.navigate(['/dashboard/employee-list']);
-      }
-    });
+      this.userService.updateProfilePicture(userId, formData).subscribe({
+        next: () => {
+          this.finalizeSuccess('Empleado, usuario y foto actualizados correctamente.');
+        },
+        error: () => {
+          this.finalizeSuccess('Se guardaron los datos, pero hubo un error al actualizar la foto.');
+        }
+      });
+    } else {
+      this.finalizeSuccess('Empleado y usuario actualizados correctamente.');
+    }
+  }
+
+  finalizeSuccess(message: string): void {
+    this.saving.set(false);
+    this.successMessage.set(message);
+    alert(message);
+    this.router.navigate(['/dashboard/employee-list']);
   }
 }

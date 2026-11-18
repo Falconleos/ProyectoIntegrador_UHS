@@ -77,7 +77,7 @@
         </thead>
         <tbody>
           @for (booking of filteredBookings(); track booking.id) {
-            <tr>
+            <tr [title]="booking.observation ? 'Observación: ' + booking.observation : 'Sin observaciones'" class="table-row-hover">
               <td class="col-start"><strong>#{{ booking.id }}</strong></td>
               <td>
                 <div>{{ booking.guestFirstName }} {{ booking.guestLastName }}</div>
@@ -88,16 +88,13 @@
                   </span>
                 } @else if (canModify()) {
                   <div class="user-association-group">
-                    <select 
-                      class="user-select-compact" 
-                      [value]="booking.selectedUserId ?? ''"
-                      (change)="onUserSelectChange(booking, $event)"
-                    >
-                      <option value="">Asociar usuario...</option>
-                      @for (u of users(); track u.id) {
-                        <option [value]="u.id">{{ u.username || (u.name + ' ' + u.surname) }}</option>
-                      }
-                    </select>
+                    <input 
+                      type="text" 
+                      class="form-field association-input" 
+                      [value]="booking.selectedUserName || 'Asociar usuario...'" 
+                      readonly 
+                      (click)="openUserModal(booking)"
+                    />
                     <button 
                       type="button" 
                       class="action-btn primary compact" 
@@ -197,7 +194,7 @@
     <!-- 2. VISTA DE TARJETAS (Visible en Dispositivos Móviles) -->
     <div class="mobile-cards-container">
       @for (booking of filteredBookings(); track booking.id) {
-        <article class="mobile-booking-card">
+        <article class="mobile-booking-card" [title]="booking.observation ? 'Observación: ' + booking.observation : 'Sin observaciones'">
           
           <!-- Encabezado de Tarjeta -->
           <div class="mobile-card-header">
@@ -225,16 +222,13 @@
               <div class="mobile-card-row mobile-card-association">
                 <span class="detail-label">Asociar usuario:</span>
                 <div class="user-association-group">
-                  <select 
-                    class="user-select-compact" 
-                    [value]="booking.selectedUserId ?? ''"
-                    (change)="onUserSelectChange(booking, $event)"
-                  >
-                    <option value="">Seleccionar...</option>
-                    @for (u of users(); track u.id) {
-                      <option [value]="u.id">{{ u.username || (u.name + ' ' + u.surname) }}</option>
-                    }
-                  </select>
+                  <input 
+                    type="text" 
+                    class="form-field association-input" 
+                    [value]="booking.selectedUserName || 'Seleccionar...'" 
+                    readonly 
+                    (click)="openUserModal(booking)"
+                  />
                   <button 
                     type="button" 
                     class="action-btn primary compact" 
@@ -333,3 +327,111 @@
   }
 
 </section>
+
+<!-- ======================================================== -->
+<!-- MODAL FLOTANTE DE SELECCIÓN DE HUÉSPED                   -->
+<!-- ======================================================== -->
+@if (isUserModalOpen()) {
+  <div class="modal-backdrop" (click)="closeUserModal()">
+    <div class="modal-card user-picker-modal" (click)="$event.stopPropagation()">
+      
+      <!-- Botón Cerrar -->
+      <button type="button" class="modal-close-btn" (click)="closeUserModal()">
+        <i class="fa-solid fa-xmark" aria-hidden="true"></i>
+      </button>
+
+      <div class="modal-header">
+        <h3>
+          <i class="fa-solid fa-users-gear" style="color: var(--color-primary);"></i> Seleccionar Huésped Registrado
+        </h3>
+        <p class="muted-text">Busque y seleccione un usuario de la lista para asociar a la reserva.</p>
+      </div>
+
+      <!-- Barra de Filtros -->
+      <div class="filters-bar" style="margin-bottom: 1rem;">
+        <div class="search-box" style="width: 100%;">
+          <i class="fa-solid fa-magnifying-glass search-icon" aria-hidden="true"></i>
+          <input 
+            type="text" 
+            placeholder="Buscar por nombre, apellido, username o DNI..." 
+            [value]="modalSearchText()"
+            (input)="onModalSearchInput($event)"
+            class="search-input"
+          />
+        </div>
+      </div>
+
+      <!-- Listado con Tabla y Tarjetas adaptables -->
+      @if (filteredModalUsers().length > 0) {
+        <div class="modal-table-scroll-container">
+          
+          <!-- TABLA (Escritorio) -->
+          <div class="table-wrapper desktop-table">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th style="width: 50px;">Avatar</th>
+                  <th>Username</th>
+                  <th>Nombre y Apellido</th>
+                  <th>DNI</th>
+                  <th class="col-center">Acción</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (user of filteredModalUsers(); track user.id) {
+                  <tr class="table-row-clickable" (click)="selectUserForBooking(user)">
+                    <td>
+                      <img [src]="getUserAvatarUrl(user)" alt="Avatar" class="avatar-sm">
+                    </td>
+                    <td><strong>{{ user.username }}</strong></td>
+                    <td>{{ user.name }} {{ user.surname }}</td>
+                    <td>{{ user.dni }}</td>
+                    <td class="col-center">
+                      <button type="button" class="action-btn primary compact" (click)="$event.stopPropagation(); selectUserForBooking(user)">
+                        Seleccionar
+                      </button>
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+
+          <!-- TARJETAS (Móvil) -->
+          <div class="mobile-cards-container">
+            @for (user of filteredModalUsers(); track user.id) {
+              <div class="mobile-user-card" (click)="selectUserForBooking(user)">
+                <div class="mobile-card-header">
+                  <div style="display: flex; align-items: center; gap: 10px;">
+                    <img [src]="getUserAvatarUrl(user)" alt="Avatar" class="avatar-sm">
+                    <div>
+                      <strong class="mobile-card-title">{{ user.name }} {{ user.surname }}</strong>
+                      <span class="muted-text">&#64;{{ user.username }}</span>
+                    </div>
+                  </div>
+                </div>
+                <div class="mobile-card-body">
+                  <span>DNI: {{ user.dni }}</span>
+                  <span style="color: var(--color-primary); font-weight: 600;">Hacer clic para seleccionar</span>
+                </div>
+              </div>
+            }
+          </div>
+
+        </div>
+      } @else {
+        <div class="feedback-banner warning">
+          <i class="fa-solid fa-circle-info"></i> No se encontraron huéspedes que coincidan con la búsqueda.
+        </div>
+      }
+
+      <!-- Pie del Modal -->
+      <div class="modal-actions">
+        <button type="button" class="action-btn" style="background: var(--bg-btn-secondary); color: var(--color-text-main); border: var(--border-btn);" (click)="closeUserModal()">
+          Cancelar
+        </button>
+      </div>
+
+    </div>
+  </div>
+}

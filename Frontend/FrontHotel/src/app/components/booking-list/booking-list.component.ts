@@ -1,6 +1,6 @@
 import { Component, OnInit, ChangeDetectionStrategy, signal, computed, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ReactiveFormsModule, FormsModule } from '@angular/forms'; // <-- Añadir FormsModule para ngModel
+import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { BookingService } from '../../core/services/booking.service';
 import { BookingDtoResponse } from '../../models/Booking-model';
@@ -13,11 +13,12 @@ export interface BookingWithAccount extends BookingDtoResponse {
   hasAccount?: boolean;
   accountId?: number;
   selectedUserId?: number | null;
+  selectedUserName?: string;
 }
 
 @Component({
     selector: 'app-booking-list',
-    imports: [CommonModule, ReactiveFormsModule, FormsModule, RouterLink], // <-- Añadir FormsModule aquí
+    imports: [CommonModule, ReactiveFormsModule, FormsModule, RouterLink],
     templateUrl: './booking-list.component.html',
     styleUrls: ['./booking-list.component.css'],
     changeDetection: ChangeDetectionStrategy.OnPush
@@ -33,10 +34,16 @@ export class BookingListComponent implements OnInit {
   isGuest = signal<boolean>(false);
   cancellingIds = signal<number[]>([]);
   
-  // --- Nuevo: Estado para el término de búsqueda ---
+  // --- Estado para el término de búsqueda general de reservas ---
   searchTerm = signal<string>('');
 
-  // --- Nuevo: Listado filtrado reactivo basado en nombre, apellido o habitación ---
+  // --- Estados y señales para el Modal de Selección de Usuarios ---
+  isUserModalOpen = signal(false);
+  activeBookingForAssociation: BookingWithAccount | null = null;
+  userAvatars: { [key: number]: string } = {};
+  modalSearchText = signal('');
+
+  // --- Listado filtrado reactivo basado en nombre, apellido o habitación ---
   filteredBookings = computed(() => {
     const term = this.searchTerm().toLowerCase().trim();
     const list = this.bookings();
@@ -55,6 +62,23 @@ export class BookingListComponent implements OnInit {
              fullName.includes(term) || 
              roomNum.includes(term) ||
              idStr.includes(term);
+    });
+  });
+
+  // --- Filtrado en tiempo real dentro del modal de usuarios ---
+  filteredModalUsers = computed(() => {
+    const list = this.users();
+    const search = this.modalSearchText().toLowerCase().trim();
+
+    if (!search) return list;
+
+    return list.filter(user => {
+      const name = user.name || '';
+      const surname = user.surname || '';
+      const username = user.username || '';
+      const dni = user.dni || '';
+      const searchString = `${name} ${surname} ${username} ${dni}`.toLowerCase();
+      return searchString.includes(search);
     });
   });
 
@@ -78,7 +102,10 @@ export class BookingListComponent implements OnInit {
 
     this.userService.getAll().subscribe({
       next: (data) => {
-        this.users.set(Array.isArray(data) ? data : []);
+        const allUsers = Array.isArray(data) ? data : [];
+        this.users.set(allUsers);
+        // Precargar avatares
+        allUsers.forEach(user => this.loadUserAvatar(user));
         this.cdr.markForCheck();
       },
       error: (err) => {
@@ -87,9 +114,52 @@ export class BookingListComponent implements OnInit {
     });
   }
 
-  onUserSelectChange(booking: BookingWithAccount, event: Event): void {
-    const selectedValue = (event.target as HTMLSelectElement).value;
-    booking.selectedUserId = selectedValue ? Number(selectedValue) : null;
+  loadUserAvatar(user: any): void {
+    if (!user || !user.id) return;
+    if (this.userAvatars[user.id]) return;
+
+    this.userService.getProfilePicture(user.id).subscribe({
+      next: (blob) => {
+        const objectURL = URL.createObjectURL(blob);
+        this.userAvatars[user.id] = objectURL;
+        this.cdr.markForCheck();
+      },
+      error: () => {
+        this.userAvatars[user.id] = 'assets/default-avatar.png';
+        this.cdr.markForCheck();
+      }
+    });
+  }
+
+  getUserAvatarUrl(user: any): string {
+    if (!user || !user.id) return 'assets/default-avatar.png';
+    return this.userAvatars[user.id] || 'assets/default-avatar.png';
+  }
+
+  // --- Métodos de Control del Modal ---
+  openUserModal(booking: BookingWithAccount): void {
+    this.activeBookingForAssociation = booking;
+    this.isUserModalOpen.set(true);
+  }
+
+  closeUserModal(): void {
+    this.isUserModalOpen.set(false);
+    this.activeBookingForAssociation = null;
+    this.modalSearchText.set('');
+  }
+
+  onModalSearchInput(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    this.modalSearchText.set(input.value);
+  }
+
+  selectUserForBooking(user: any): void {
+    if (this.activeBookingForAssociation) {
+      this.activeBookingForAssociation.selectedUserId = user.id;
+      this.activeBookingForAssociation.selectedUserName = `${user.name} ${user.surname} (@${user.username})`;
+    }
+    this.closeUserModal();
+    this.cdr.markForCheck();
   }
 
   assignUser(booking: BookingWithAccount): void {
